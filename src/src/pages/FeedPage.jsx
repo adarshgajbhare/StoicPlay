@@ -8,8 +8,12 @@ import {
   fetchChannelVideos,
   fetchChannelDetails,
 } from '../services/youtubeApi';
+import { db } from '../lib/firebase';
+import { useAuth } from '../contexts/AuthContext';
+import { doc, getDoc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 
 function FeedPage() {
+  const { user } = useAuth();
   const { feedName } = useParams();
   const [videos, setVideos] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -18,19 +22,38 @@ function FeedPage() {
   const [channelDetails, setChannelDetails] = useState({});
 
   useEffect(() => {
-    loadFeedChannels();
-  }, [feedName]);
+    const loadFeedData = async () => {
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const currentFeed = userData.feeds.find(feed => feed.name === feedName);
+          if (currentFeed) {
+            setFeedChannels(
+              currentFeed.channels.reduce((acc, channel) => {
+                acc[channel.channelId] = channel.channelTitle;
+                return acc;
+              }, {})
+            );
+          } else {
+            setFeedChannels({});
+          }
+        } else {
+          console.log("No such document!");
+          setFeedChannels({});
+        }
+      }
+    };
+    loadFeedData();
+  }, [feedName, user]);
 
   useEffect(() => {
     if (Object.keys(feedChannels).length > 0) {
       loadChannelDetails();
     }
   }, [feedChannels]);
-
-  const loadFeedChannels = () => {
-    const storedChannels = JSON.parse(localStorage.getItem(feedName) || '{}');
-    setFeedChannels(storedChannels);
-  };
 
   const loadChannelDetails = async () => {
     const details = {};
@@ -55,7 +78,6 @@ function FeedPage() {
         try {
           const channelVideos = await fetchChannelVideos(channelId);
           if (Array.isArray(channelVideos)) {
-            // Add channel details to each video
             const videosWithChannel = channelVideos.map(video => ({
               ...video,
               channelDetails: channelDetailsMap[channelId]
@@ -67,8 +89,7 @@ function FeedPage() {
         }
       }
 
-      // Sort videos by date
-      allVideos.sort((a, b) => 
+      allVideos.sort((a, b) =>
         new Date(b.snippet?.publishedAt || 0) - new Date(a.snippet?.publishedAt || 0)
       );
 
@@ -91,15 +112,39 @@ function FeedPage() {
   };
 
   const addChannelToFeed = async (channelId, channelTitle) => {
-    if (!feedChannels[channelId]) {
+    if (user) {
       try {
-        // Fetch channel details before adding
         const channelDetail = await fetchChannelDetails(channelId);
-        const updatedFeedChannels = { ...feedChannels, [channelId]: channelTitle };
-        setFeedChannels(updatedFeedChannels);
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const updatedFeeds = userDocSnap.data().feeds.map(feed => {
+            if (feed.name === feedName) {
+              return {
+                ...feed,
+                channels: [...(feed.channels || []), { channelId, channelTitle }]
+              };
+            }
+            return feed;
+          });
+
+          await updateDoc(userDocRef, { feeds: updatedFeeds });
+        } else {
+          // If the document doesn't exist, create it with the initial channel
+          await setDoc(userDocRef, {
+            feeds: [{
+              name: feedName,
+              channels: [{ channelId, channelTitle }]
+            }]
+          });
+        }
+
+        // Update local state
+        setFeedChannels(prev => ({ ...prev, [channelId]: channelTitle }));
         setChannelDetails(prev => ({ ...prev, [channelId]: channelDetail }));
-        localStorage.setItem(feedName, JSON.stringify(updatedFeedChannels));
-        setSearchResults([]); // Clear search results
+        setSearchResults([]);
+
       } catch (error) {
         console.error('Error adding channel:', error);
       }
@@ -118,7 +163,7 @@ function FeedPage() {
           <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
             {feedName}
           </h1>
-          <div className="w-6"></div> {/* Placeholder for alignment */}
+          <div className="w-6"></div>
         </div>
         <div className="mb-8">
           <SearchBar onSearch={searchChannels} />
@@ -147,8 +192,8 @@ function FeedPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {videos.map((video) => (
-              <VideoCard 
-                key={video.id?.videoId || video.id} 
+              <VideoCard
+                key={video.id?.videoId || video.id}
                 video={video}
                 channelDetails={video.channelDetails}
               />
@@ -161,4 +206,3 @@ function FeedPage() {
 }
 
 export default FeedPage;
-

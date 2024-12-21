@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import AddFeedModal from '../components/AddFeedModal';
 import EditFeedModal from '../components/EditFeedModal';
 import FeedNavigation from '../components/FeedNavigation';
+import { collection, doc, getDoc, updateDoc, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -14,16 +15,96 @@ function HomePage() {
   const [feeds, setFeeds] = useState([]);
   const [editingFeed, setEditingFeed] = useState(null);
 
-  const loadFeeds = () => {
-    let storedFeeds = localStorage.getItem('feeds');
-    if (storedFeeds) {
-      setFeeds(JSON.parse(storedFeeds));
+  const loadFeeds = async () => {
+    if (user) {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        setFeeds(userDocSnap.data().feeds || []);
+      } else {
+        console.log("No such document! Creating a new one...");
+        setFeeds([]);
+      }
     }
   };
 
   useEffect(() => {
     loadFeeds();
-  }, []);
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const handleAddFeed = async (feedName, imageUrl) => {
+    const newFeed = { name: feedName, image: imageUrl, channels: [] };
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      // Document exists, update it
+      await updateDoc(userDocRef, {
+        feeds: arrayUnion(newFeed)
+      });
+    } else {
+      // Document doesn't exist, create it
+      await setDoc(userDocRef, {
+        feeds: [newFeed]
+      });
+    }
+
+    setFeeds([...feeds, newFeed]);
+  };
+
+  const handleDeleteFeed = async (feedName) => {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const feedToDelete = feeds.find(feed => feed.name === feedName);
+      await updateDoc(userDocRef, {
+        feeds: arrayRemove(feedToDelete)
+      });
+      setFeeds(feeds.filter((feed) => feed.name !== feedName));
+    } else {
+      console.log("No such document!");
+    }
+  };
+
+  const handleEditFeed = (feedName) => {
+    const feedToEdit = feeds.find((feed) => feed.name === feedName);
+    setEditingFeed(feedToEdit);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateFeed = async (oldName, newName, newImageUrl) => {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const updatedFeeds = feeds.map(feed =>
+        feed.name === oldName ? { ...feed, name: newName, image: newImageUrl } : feed
+      );
+      const oldFeed = feeds.find(feed => feed.name === oldName);
+      const newFeed = updatedFeeds.find(feed => feed.name === newName);
+          
+      await updateDoc(userDocRef, {
+        feeds: arrayRemove(oldFeed)
+      });
+      await updateDoc(userDocRef, {
+        feeds: arrayUnion(newFeed)
+      });
+
+      setFeeds(updatedFeeds);
+    } else {
+      console.log("No such document!");
+    }
+  };
 
   if (loading) {
     return (
@@ -36,48 +117,6 @@ function HomePage() {
   if (!user) {
     return <Navigate to="/login" />;
   }
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
-
-
-  const handleAddFeed = (feedName, imageUrl) => {
-    const newFeeds = [...feeds, { name: feedName, image: imageUrl }];
-    setFeeds(newFeeds);
-    localStorage.setItem('feeds', JSON.stringify(newFeeds));
-  };
-
-  const handleDeleteFeed = (feedName) => {
-    const updatedFeeds = feeds.filter((feed) => feed.name !== feedName);
-    setFeeds(updatedFeeds);
-    localStorage.setItem('feeds', JSON.stringify(updatedFeeds));
-    localStorage.removeItem(feedName);
-  };
-
-  const handleEditFeed = (feedName) => {
-    const feedToEdit = feeds.find((feed) => feed.name === feedName);
-    setEditingFeed(feedToEdit);
-    setShowEditModal(true);
-  };
-
-  const handleUpdateFeed = (oldName, newName, newImageUrl) => {
-    const updatedFeeds = feeds.map((feed) =>
-      feed.name === oldName ? { name: newName, image: newImageUrl } : feed
-    );
-    setFeeds(updatedFeeds);
-    localStorage.setItem('feeds', JSON.stringify(updatedFeeds));
-    if (oldName !== newName) {
-      const feedData = localStorage.getItem(oldName);
-      localStorage.setItem(newName, feedData);
-      localStorage.removeItem(oldName);
-    }
-  };
 
   return (
     <div className="min-h-screen  bg-black  text-white p-8">
@@ -163,4 +202,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

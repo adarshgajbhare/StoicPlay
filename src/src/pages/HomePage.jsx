@@ -5,6 +5,7 @@ import { auth } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import AddFeedModal from '../components/AddFeedModal';
 import EditFeedModal from '../components/EditFeedModal';
+import FeedNavigation from '../components/FeedNavigation';
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -79,10 +80,10 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-8">
+    <div className="min-h-screen  bg-black  text-white p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text text-white">
             Youtube Feeds
           </h1>
           <div className="flex items-center gap-4">
@@ -102,9 +103,10 @@ function HomePage() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <FeedNavigation feeds={feeds} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
           {feeds.map((feed) => (
-            <div key={feed.name} className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden transition-transform duration-200 ease-in-out transform hover:scale-105">
+            <div key={feed.name} className="bg-white ring ring-white/10 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden transition-transform duration-200 ease-in-out transform hover:scale-105">
               <Link to={`/feed/${feed.name}`}>
                 <img
                   src={feed.image || '/placeholder.png'}

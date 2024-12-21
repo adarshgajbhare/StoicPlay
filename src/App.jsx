@@ -37,6 +37,7 @@ function App() {
               </PrivateRoute>
             }
           />
+           <Route path="/" element={<HomePage />} />
           <Route
             path="/feed/:feedName"
             element={

@@ -115,17 +115,17 @@ function HomePage() {
               ZenFeeds
             </h1>
             <div className="flex  items-center space-x-4">
-              <div className="flex items-center space-x-2">
+              <div className="flex  items-center space-x-2">
                 <img
                   src={user.photoURL}
                   alt={user.displayName}
-                  className="w-8 h-8 rounded-full border-2 border-blue-400"
+                  className="size-10 rounded-md ring-[1px] ring-white/20 object-cover"
                 />
-                <span className="text-sm font-medium">{user.displayName}</span>
+                <span className="text-lg/4 tracking-tight  font-medium">{user.displayName}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20  drop-shadow-md flex items-center"
+                className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20  drop-shadow-md flex items-center hover:bg-red-800"
               >
                 Logout
               </button>
@@ -139,9 +139,9 @@ function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           <div
             onClick={() => setShowAddModal(true)}
-            className="bg-[#151515] h-52 ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden tcursor-pointer flex  flex-col items-center justify-center gap-2"
+            className="bg-[#101010] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.2)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)] h-52 ring-[1px] ring-white/15 rounded-lg overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-[#555555]  flex-col items-center justify-center gap-2"
           >
-            <Plus size={56} strokeWidth={1.5} />
+            <Plus size={48} strokeWidth={2} />
 <span className="text-2xl/6 font-medium tracking-tight">Create feed</span>
           </div>
           {feeds.map((feed) => (

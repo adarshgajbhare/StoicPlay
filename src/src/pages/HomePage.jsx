@@ -7,6 +7,7 @@ import AddFeedModal from '../components/AddFeedModal';
 import EditFeedModal from '../components/EditFeedModal';
 import FeedNavigation from '../components/FeedNavigation';
 import { collection, doc, getDoc, updateDoc, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
+import { Plus, LogOut, Edit2, Trash2 } from 'lucide-react';
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -47,12 +48,10 @@ function HomePage() {
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
-      // Document exists, update it
       await updateDoc(userDocRef, {
         feeds: arrayUnion(newFeed)
       });
     } else {
-      // Document doesn't exist, create it
       await setDoc(userDocRef, {
         feeds: [newFeed]
       });
@@ -61,26 +60,6 @@ function HomePage() {
     setFeeds([...feeds, newFeed]);
   };
 
-  const handleDeleteFeed = async (feedName) => {
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      const feedToDelete = feeds.find(feed => feed.name === feedName);
-      await updateDoc(userDocRef, {
-        feeds: arrayRemove(feedToDelete)
-      });
-      setFeeds(feeds.filter((feed) => feed.name !== feedName));
-    } else {
-      console.log("No such document!");
-    }
-  };
-
-  const handleEditFeed = (feedName) => {
-    const feedToEdit = feeds.find((feed) => feed.name === feedName);
-    setEditingFeed(feedToEdit);
-    setShowEditModal(true);
-  };
 
   const handleUpdateFeed = async (oldName, newName, newImageUrl) => {
     const userDocRef = doc(db, "users", user.uid);
@@ -108,8 +87,8 @@ function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -119,86 +98,78 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen  bg-black  text-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text text-white">
-            Youtube Feeds
-          </h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <img
-                src={user.photoURL}
-                alt={user.displayName}
-                className="w-8 h-8 rounded-full"
-              />
-              <span className="text-sm">{user.displayName}</span>
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      <header className="bg-gray-800 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-blue-400">Youtube Feeds</h1>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName}
+                  className="w-8 h-8 rounded-full border-2 border-blue-400"
+                />
+                <span className="text-sm font-medium">{user.displayName}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 flex items-center space-x-1"
+              >
+                <LogOut size={16} />
+                <span>Logout</span>
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors duration-200"
-            >
-              Logout
-            </button>
           </div>
         </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <FeedNavigation feeds={feeds} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {feeds.map((feed) => (
-            <div key={feed.name} className="bg-white ring ring-white/10 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden transition-transform duration-200 ease-in-out transform hover:scale-105">
-              <Link to={`/feed/${feed.name}`}>
+            <div key={feed.name} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-105">
+              <Link to={`/feed/${feed.name}`} className="block">
                 <img
                   src={feed.image || '/placeholder.png'}
                   alt={feed.name}
-                  className="w-full h-40 object-cover"
+                  className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h2 className="text-lg font-semibold">{feed.name}</h2>
+                  <h2 className="text-lg font-semibold text-blue-400">{feed.name}</h2>
                 </div>
               </Link>
-              <div className="p-4 pt-0 flex justify-between">
-                <button
-                  onClick={() => handleEditFeed(feed.name)}
-                  className="text-blue-300 hover:text-blue-100 transition-colors duration-200"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteFeed(feed.name)}
-                  className="text-red-300 hover:text-red-100 transition-colors duration-200"
-                >
-                  Delete
-                </button>
-              </div>
+          
             </div>
           ))}
         </div>
-        <button
-          className="fixed bottom-8 right-8 bg-pink-500 text-white p-4 rounded-full shadow-lg transition-transform duration-200 ease-in-out transform hover:scale-110 active:scale-90"
-          onClick={() => setShowAddModal(true)}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-        {showAddModal && (
-          <AddFeedModal
-            isOpen={showAddModal}
-            onClose={() => setShowAddModal(false)}
-            onAddFeed={handleAddFeed}
-          />
-        )}
-        {showEditModal && (
-          <EditFeedModal
-            isOpen={showEditModal}
-            onClose={() => setShowEditModal(false)}
-            onUpdateFeed={handleUpdateFeed}
-            feed={editingFeed}
-          />
-        )}
-      </div>
+      </main>
+
+      <button
+        className="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:bg-blue-600 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+        onClick={() => setShowAddModal(true)}
+      >
+        <Plus size={24} />
+      </button>
+
+      {showAddModal && (
+        <AddFeedModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onAddFeed={handleAddFeed}
+        />
+      )}
+      {showEditModal && (
+        <EditFeedModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onUpdateFeed={handleUpdateFeed}
+          feed={editingFeed}
+        />
+      )}
     </div>
   );
 }
 
 export default HomePage;
+

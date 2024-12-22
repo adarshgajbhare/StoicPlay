@@ -9,7 +9,8 @@ function FeedCard({ feedName, onDelete }) {
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
       <Link to={`/feed/${feedName}`}>
-        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg  flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg  flex flex-col items-center
+         justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
           <h3 className="text-white text-xl font-bold mb-2 ">{feedName}</h3>
           <div className="flex space-x-2">
             <button

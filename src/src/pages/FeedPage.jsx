@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import ChannelCard from '../components/ChannelCard';
 import VideoCard from '../components/VideoCard';
+import EditFeedModal from '../components/EditFeedModal';
+import { Pencil, Trash2 } from 'lucide-react';
 import {
   searchChannels as fetchChannelSearch,
   fetchChannelVideos,
@@ -15,11 +17,14 @@ import { doc, getDoc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 function FeedPage() {
   const { user } = useAuth();
   const { feedName } = useParams();
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentFeed, setCurrentFeed] = useState(null);
 
   useEffect(() => {
     const loadFeedData = async () => {
@@ -31,6 +36,7 @@ function FeedPage() {
           const userData = userDocSnap.data();
           const currentFeed = userData.feeds.find(feed => feed.name === feedName);
           if (currentFeed) {
+            setCurrentFeed(currentFeed);
             setFeedChannels(
               currentFeed.channels.reduce((acc, channel) => {
                 acc[channel.channelId] = channel.channelTitle;
@@ -131,7 +137,6 @@ function FeedPage() {
 
           await updateDoc(userDocRef, { feeds: updatedFeeds });
         } else {
-          // If the document doesn't exist, create it with the initial channel
           await setDoc(userDocRef, {
             feeds: [{
               name: feedName,
@@ -140,7 +145,6 @@ function FeedPage() {
           });
         }
 
-        // Update local state
         setFeedChannels(prev => ({ ...prev, [channelId]: channelTitle }));
         setChannelDetails(prev => ({ ...prev, [channelId]: channelDetail }));
         setSearchResults([]);
@@ -151,8 +155,85 @@ function FeedPage() {
     }
   };
 
+  const handleDeleteFeed = async () => {
+    if (!window.confirm('Are you sure you want to delete this feed?')) return;
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const updatedFeeds = userData.feeds.filter(feed => feed.name !== feedName);
+        
+        // Update Firebase
+        await updateDoc(userDocRef, { feeds: updatedFeeds });
+        
+        // Navigate away after successful deletion
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error deleting feed:', error);
+    }
+  };
+
+  const handleUpdateFeed = async (oldName, newName, newImage, updatedChannels) => {
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const updatedFeeds = userData.feeds.map(feed => {
+          if (feed.name === oldName) {
+            return {
+              ...feed,
+              name: newName,
+              image: newImage,
+              channels: updatedChannels
+            };
+          }
+          return feed;
+        });
+
+        // Update Firebase
+        await updateDoc(userDocRef, { feeds: updatedFeeds });
+        
+        // Update local state and refresh
+        if (oldName !== newName) {
+          navigate(`/feed/${newName}`);
+        } else {
+          setFeedChannels(
+            updatedChannels.reduce((acc, channel) => {
+              acc[channel.channelId] = channel.channelTitle;
+              return acc;
+            }, {})
+          );
+          
+          setChannelDetails({});
+          setVideos([]);
+          setIsLoading(true);
+
+          setTimeout(() => {
+            loadChannelDetails();
+          }, 100);
+
+          setCurrentFeed(prev => ({
+            ...prev,
+            name: newName,
+            image: newImage,
+            channels: updatedChannels
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error updating feed:', error);
+    }
+  };
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-8">
+    <div className="min-h-screen bg-black text-white p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <Link to="/" className="text-white hover:text-pink-300 transition-colors duration-200">
@@ -163,8 +244,24 @@ function FeedPage() {
           <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
             {feedName}
           </h1>
-          <div className="w-6"></div>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="p-2 hover:bg-purple-400 rounded-full transition-colors duration-200"
+              aria-label="Edit feed"
+            >
+              <Pencil className="h-6 w-6" />
+            </button>
+            <button
+              onClick={handleDeleteFeed}
+              className="p-2 hover:bg-red-400 rounded-full transition-colors duration-200"
+              aria-label="Delete feed"
+            >
+              <Trash2 className="h-6 w-6" />
+            </button>
+          </div>
         </div>
+
         <div className="mb-8">
           <SearchBar onSearch={searchChannels} />
         </div>
@@ -172,7 +269,8 @@ function FeedPage() {
         {searchResults.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">Search Results</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.map((channel) => (
                 <ChannelCard
                   key={channel.id.channelId}
@@ -200,6 +298,20 @@ function FeedPage() {
             ))}
           </div>
         )}
+
+        <EditFeedModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdateFeed={handleUpdateFeed}
+          feed={{
+            name: feedName,
+            image: currentFeed?.image || '',
+            channels: Object.entries(feedChannels).map(([channelId, channelTitle]) => ({
+              channelId,
+              channelTitle
+            }))
+          }}
+        />
       </div>
     </div>
   );

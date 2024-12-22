@@ -1,36 +1,105 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Trash2 } from 'lucide-react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { useAuth } from '../contexts/AuthContext';
 
 function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
+  const { user } = useAuth();
   const [feedName, setFeedName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [channels, setChannels] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (feed) {
       setFeedName(feed.name);
-      setImageUrl(feed.image);
-      const feedChannels = JSON.parse(localStorage.getItem(feed.name) || '{}');
-      setChannels(Object.entries(feedChannels).map(([id, title]) => ({ id, title })));
+      setImageUrl(feed.image || '');
+      setChannels(feed.channels || []);
     }
   }, [feed]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onUpdateFeed(feed.name, feedName, imageUrl);
+    await updateFeedInFirebase();
+    onUpdateFeed(feed.name, feedName, imageUrl, channels);
     onClose();
   };
 
-  const handleRemoveChannel = (channelId) => {
-    const updatedChannels = channels.filter(channel => channel.id !== channelId);
+  const updateFeedInFirebase = async () => {
+    if (!user) return;
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const updatedFeeds = userData.feeds.map(f => {
+          if (f.name === feed.name) {
+            return {
+              ...f,
+              name: feedName,
+              image: imageUrl,
+              channels: channels
+            };
+          }
+          return f;
+        });
+
+        await updateDoc(userDocRef, { feeds: updatedFeeds });
+      }
+    } catch (error) {
+      console.error('Error updating feed in Firebase:', error);
+    }
+  };
+
+  const handleRemoveChannel = async (channelId) => {
+    // Update local state
+    const updatedChannels = channels.filter(channel => channel.channelId !== channelId);
     setChannels(updatedChannels);
-    const updatedFeedChannels = Object.fromEntries(updatedChannels.map(c => [c.id, c.title]));
-    localStorage.setItem(feed.name, JSON.stringify(updatedFeedChannels));
+
+    // Update Firebase
+    if (user) {
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const updatedFeeds = userData.feeds.map(f => {
+            if (f.name === feed.name) {
+              return {
+                ...f,
+                channels: updatedChannels
+              };
+            }
+            return f;
+          });
+
+          await updateDoc(userDocRef, { feeds: updatedFeeds });
+        }
+      } catch (error) {
+        console.error('Error removing channel from Firebase:', error);
+      }
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <h2 className="text-2xl font-bold text-white mb-4">Edit Feed</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -43,53 +112,69 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
               id="feedName"
               value={feedName}
               onChange={(e) => setFeedName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white px-3 py-2"
               required
             />
           </div>
+          
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-200">
-              Image URL
+            <label className="block text-sm font-medium text-gray-200 mb-2">
+              Feed Image
             </label>
-            <input
-              type="url"
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              required
-            />
+            <div className="flex items-center space-x-4">
+              {imageUrl && (
+                <img
+                  src={imageUrl}
+                  alt="Feed thumbnail"
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
+                Upload Image
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
           </div>
+
           <div>
             <h3 className="text-lg font-medium text-gray-200 mb-2">Channels</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 max-h-60 overflow-y-auto">
               {channels.map((channel) => (
-                <li key={channel.id} className="flex justify-between items-center bg-gray-700 p-2 rounded">
-                  <span className="text-white">{channel.title}</span>
+                <li key={channel.channelId} className="flex justify-between items-center bg-gray-700 p-2 rounded">
+                  <span className="text-white">{channel.channelTitle}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveChannel(channel.id)}
+                    onClick={() => handleRemoveChannel(channel.channelId)}
                     className="text-red-500 hover:text-red-700"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="flex justify-end space-x-2">
+
+          <div className="flex justify-end space-x-2 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
             >
               Save Changes
             </button>
@@ -101,4 +186,3 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
 }
 
 export default EditFeedModal;
-

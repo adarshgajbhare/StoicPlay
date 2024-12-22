@@ -4,7 +4,7 @@ const EmptyFeedCallToAction = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="max-w-2xl  mx-auto rounded-lg shadow-xl  text-center">
+    <div className="max-w-2xl  mx-auto rounded-md shadow-xl  text-center">
       <div className="mb-8">
         <svg
           className="w-48 h-48 mx-auto text-gray-400"

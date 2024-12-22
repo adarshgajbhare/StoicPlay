@@ -83,7 +83,7 @@ const LearnMorePage = () => {
             </p>
           </div>
           {error && (
-            <div className="text-red-500 rounded-lg mt-2 lg:mt-8">
+            <div className="text-red-500 rounded-md mt-2 lg:mt-8">
              Oops! {error}
             </div>
           )}

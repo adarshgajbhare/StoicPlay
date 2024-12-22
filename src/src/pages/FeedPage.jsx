@@ -227,7 +227,7 @@ function FeedPage() {
           className="flex items-center gap-2">
             <div
               
-              className="text-white hover:text-pink-300 transition-colors duration-200"
+              className="text-white  hover:text-pink-300 transition-colors duration-200"
             >
               <IoChevronBack className="text-2xl md:text-3xl lg:text-4xl text-white" />
             </div>

@@ -46,7 +46,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-lg w-full max-w-md">
+      <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
         <h2 className="text-2xl font-medium tracking-tight mb-6">
           Create a new feed
         </h2>
@@ -81,7 +81,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
             <img
               src={imageUrl}
               alt="Feed thumbnail"
-              className="size-10 rounded-lg ring-[1px] ring-white/20 object-cover"
+              className="size-10 rounded-md ring-[1px] ring-white/20 object-cover"
             />
             <button
               type="button"

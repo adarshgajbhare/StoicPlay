@@ -134,7 +134,7 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
                 <img
                   src={imageUrl}
                   alt="Feed thumbnail"
-                  className="size-10 rounded-lg ring-[1px] ring-white/20 object-cover"
+                  className="size-10 rounded-md ring-[1px] ring-white/20 object-cover"
                 />
               )}
               <button

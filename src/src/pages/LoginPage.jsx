@@ -39,7 +39,7 @@ function LoginPage() {
         </p>
 
         {error && (
-          <div className="bg-red-500 text-white  rounded-lg mb-2">{error}</div>
+          <div className="bg-red-500 text-white  rounded-md mb-2">{error}</div>
         )}
 
         <div className="hero-buttons md:ml-4 mt-12 flex w-full    flex-col items-center gap-3 ">

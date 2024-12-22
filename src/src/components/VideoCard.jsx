@@ -72,12 +72,12 @@ function VideoCard({ video, channelDetails }) {
 
   
 
- console.log("!!!!!!!!!!!!",video?.snippet?.publishedAt);
+//  console.log("!!!!!!!!!!!!",video?.snippet?.publishedAt);
 
 
   return (
     <div
-      className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 cursor-pointer"
+      className="bg-black ring-[1px] ring-white/20 rounded-md overflow-hidden shadow-md transition-transform duration-500 hover:scale-105 cursor-pointer"
       onClick={handleClick}
     >
       <div className="relative group">
@@ -98,7 +98,7 @@ function VideoCard({ video, channelDetails }) {
       </div>
       <div className="p-4">
      
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white">
+        <h3 className="font-semibold text-lg/5 tracking-tight mb-2 line-clamp-2 text-white">
           {video.snippet.title}
         </h3>
         <div className="flex items-center mb-2">
@@ -106,14 +106,14 @@ function VideoCard({ video, channelDetails }) {
             <img
               src={channelDetails?.snippet?.thumbnails?.high?.url}
               alt={channelTitle}
-              className="w-6 h-6 rounded-full mr-2 border-2 border-white"
+              className="size-8 rounded-full ring-[1px] ring-white/20 mr-2 overflow-hidden border-white"
             />
           )}
-          <span className="text-sm text-gray-300 flex items-center">
+          <span className="text-lg/4 text-white tracking-tight flex items-center">
             {channelTitle}
           </span>
 
-          <p className="text-black text-xs mt-1  ml-5">
+          <p className="text-whtie text-xs mt-1  ml-5">
           {formatRelativeTime(video?.snippet?.publishedAt)}
       </p>
         </div>

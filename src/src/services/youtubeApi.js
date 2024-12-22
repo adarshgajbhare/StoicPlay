@@ -1,5 +1,5 @@
 export  const API_KEY = 'AIzaSyBw7B1moKVjKgh5dYDOD5bj8D1SCc5WEW0'; // Replace with your API key
-//const API_KEY = 'AIzaSyDvMTlhlNUZNfys0p0NEWfekINSS1EjsqM'; // Replace with your API key
+// const API_KEY = 'AIzaSyDvMTlhlNUZNfys0p0NEWfekINSS1EjsqM'; // Replace with your API key
 
 export const searchChannels = async (searchQuery) => {
   const maxResults = 10;

@@ -139,7 +139,7 @@ function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           <div
             onClick={() => setShowAddModal(true)}
-            className="bg-[#101010] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.2)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)] h-52 ring-[1px] ring-white/15 rounded-lg overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-[#555555]  flex-col items-center justify-center gap-2"
+            className="bg-[#101010] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.2)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)] h-52 ring-[1px] ring-white/15 rounded-md overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-[#555555]  flex-col items-center justify-center gap-2"
           >
             <Plus size={48} strokeWidth={2} />
 <span className="text-2xl/6 font-medium tracking-tight">Create feed</span>
@@ -147,7 +147,7 @@ function HomePage() {
           {feeds.map((feed) => (
             <div
               key={feed.name}
-              className="bg-[#151515] ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-105"
+              className="bg-[#151515] ring-[1px] ring-white/15 rounded-md shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-105"
             >
               <Link to={`/feed/${feed.name}`} className="block">
                 <img

@@ -83,7 +83,7 @@ function SearchPopover({ isOpen, onClose, onChannelAdded }) {
         transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       >
-        <div className="bg-black overflow-y-scroll h-4/5 p-6 rounded-lg shadow-lg w-full max-w-6xl relative">
+        <div className="bg-black overflow-y-scroll h-4/5 p-6 rounded-md shadow-lg w-full max-w-6xl relative">
           <button
             onClick={onClose}
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"

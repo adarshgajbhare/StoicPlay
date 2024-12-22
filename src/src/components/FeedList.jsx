@@ -10,7 +10,7 @@ function FeedList({ feeds, onDeleteFeed }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg overflow-hidden"
+          className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-md shadow-lg overflow-hidden"
         >
           <img
             src={localStorage.getItem(`${feed}-image`) || '/placeholder.png'}

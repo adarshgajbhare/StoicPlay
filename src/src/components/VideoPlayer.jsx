@@ -36,7 +36,7 @@ function VideoPlayer({ videoId, onClose }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="w-full h-full bg-black rounded-lg overflow-hidden">
+        <div className="w-full h-full bg-black rounded-md overflow-hidden">
           {error ? (
             <div className="w-full h-full flex items-center justify-center text-white">
               <p>Error loading video. Please try again.</p>

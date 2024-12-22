@@ -26,7 +26,7 @@ function SearchPopover({ isOpen, onClose, onSearch, searchResults, onAddChannel 
         transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       >
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-2xl">
           <button
             onClick={onClose}
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"

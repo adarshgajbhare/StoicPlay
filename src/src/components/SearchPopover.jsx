@@ -83,26 +83,14 @@ function SearchPopover({ isOpen, onClose, onChannelAdded }) {
         transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       >
-        <div className="bg-black overflow-y-scroll h-4/5 p-6 rounded-md shadow-lg w-full max-w-6xl relative">
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"
-            aria-label="Close"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <div className="bg-black overflow-y-scroll h-4/5 p-6 rounded-md shadow-lg w-full max-w-4xl relative ">
+        <button
+              onClick={onClose}
+              className="rounded-md px-6 py-4 text-base/4 font-medium
+               text-gray-50 ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto absolute top-5 right-4" 
+              aria-label="Delete feed"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+              Close
           </button>
           <SearchBar onSearch={searchChannels} />
           {searchResults.length > 0 && (

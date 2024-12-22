@@ -111,7 +111,7 @@ function HomePage() {
       <header className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-6xl font-extrabold  text-[#555555] uppercase">
+            <h1 className="text-3xl font-extrabold  text-[#555555] uppercase">
               ZenFeeds
             </h1>
             <div className="flex  items-center space-x-4">
@@ -139,7 +139,8 @@ function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           <div
             onClick={() => setShowAddModal(true)}
-            className="bg-[#151515] h-52 ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden tcursor-pointer flex  flex-col items-center justify-center gap-2"
+            className="bg-[#151515] h-52 ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden tcursor-pointer flex  
+            flex-col items-center justify-center gap-2 cursor-pointer"
           >
             <Plus size={56} strokeWidth={1.5} />
 <span className="text-2xl/6 font-medium tracking-tight">Create feed</span>

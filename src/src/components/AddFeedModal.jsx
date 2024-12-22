@@ -3,18 +3,25 @@ import { useState, useRef } from "react";
 function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   const [feedName, setFeedName] = useState("");
   const [feedImage, setFeedImage] = useState(null);
+  const [feedNameError, setFeedNameError] = useState("");
   const fileInputRef = useRef(null);
 
   const handleFeedNameChange = (event) => {
     setFeedName(event.target.value);
+    if (event.target.value.trim()) {
+      setFeedNameError("");
+    }
   };
 
   const handleImageChange = (event) => {
     setFeedImage(event.target.files[0]);
   };
 
-  // ...existing code...
   const handleSubmit = async () => {
+    if (!feedName.trim()) {
+      setFeedNameError("The feed name cannot be empty");
+      return;
+    }
     let imageUrl = "/default-thumb.webp";
     if (feedImage) {
       imageUrl = await convertImageToBase64(feedImage);
@@ -24,7 +31,6 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
     setFeedImage(null);
     onClose();
   };
-  // ...existing code...
 
   const convertImageToBase64 = (imageFile) => {
     return new Promise((resolve) => {
@@ -59,6 +65,9 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
             value={feedName}
             onChange={handleFeedNameChange}
           />
+          {feedNameError && (
+            <p className="text-red-500 text-sm mt-1">{feedNameError}</p>
+          )}
         </div>
         <div className="mb-4">
           <label
@@ -82,11 +91,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
             </button>
             <input
               type="file"
-              ref={
-                fileInputRef
-                  ? fileInputRef
-                  : "https://t4.ftcdn.net/jpg/00/65/48/25/360_F_65482539_C0ZozE5gUjCafz7Xq98WB4dW6LAhqKfs.jpg"
-              }
+              ref={fileInputRef}
               accept="image/*"
               className="hidden"
               onChange={handleImageChange}
@@ -102,8 +107,9 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
             Cancel
           </button>
           <button
-            className="bg-white  hover:bg-green-500 hover:text-white   flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+            className="bg-white hover:bg-green-500 hover:text-white flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
             onClick={handleSubmit}
+            disabled={!feedName.trim()}
           >
             Done
           </button>

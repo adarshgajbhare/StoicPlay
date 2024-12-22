@@ -111,7 +111,7 @@ function HomePage() {
       <header className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-6xl font-extrabold  text-[#555555] uppercase">
+            <h1 className="text-3xl font-extrabold  text-[#555555] uppercase">
               ZenFeeds
             </h1>
             <div className="flex  items-center space-x-4">

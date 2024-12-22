@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
-import { useAuth } from '../contexts/AuthContext';
-import AddFeedModal from '../components/AddFeedModal';
-import EditFeedModal from '../components/EditFeedModal';
-import FeedNavigation from '../components/FeedNavigation';
-import { collection, doc, getDoc, updateDoc, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
-import { Plus, LogOut, Edit2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth, db } from "../lib/firebase";
+import { useAuth } from "../contexts/AuthContext";
+import AddFeedModal from "../components/AddFeedModal";
+import EditFeedModal from "../components/EditFeedModal";
+import FeedNavigation from "../components/FeedNavigation";
+import {
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  setDoc,
+} from "firebase/firestore";
+import { Plus, LogOut, Edit2, Trash2 } from "lucide-react";
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -38,7 +46,7 @@ function HomePage() {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -49,34 +57,35 @@ function HomePage() {
 
     if (userDocSnap.exists()) {
       await updateDoc(userDocRef, {
-        feeds: arrayUnion(newFeed)
+        feeds: arrayUnion(newFeed),
       });
     } else {
       await setDoc(userDocRef, {
-        feeds: [newFeed]
+        feeds: [newFeed],
       });
     }
 
     setFeeds([...feeds, newFeed]);
   };
 
-
   const handleUpdateFeed = async (oldName, newName, newImageUrl) => {
     const userDocRef = doc(db, "users", user.uid);
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
-      const updatedFeeds = feeds.map(feed =>
-        feed.name === oldName ? { ...feed, name: newName, image: newImageUrl } : feed
+      const updatedFeeds = feeds.map((feed) =>
+        feed.name === oldName
+          ? { ...feed, name: newName, image: newImageUrl }
+          : feed
       );
-      const oldFeed = feeds.find(feed => feed.name === oldName);
-      const newFeed = updatedFeeds.find(feed => feed.name === newName);
-          
+      const oldFeed = feeds.find((feed) => feed.name === oldName);
+      const newFeed = updatedFeeds.find((feed) => feed.name === newName);
+
       await updateDoc(userDocRef, {
-        feeds: arrayRemove(oldFeed)
+        feeds: arrayRemove(oldFeed),
       });
       await updateDoc(userDocRef, {
-        feeds: arrayUnion(newFeed)
+        feeds: arrayUnion(newFeed),
       });
 
       setFeeds(updatedFeeds);
@@ -98,12 +107,14 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
-      <header className="bg-gray-800 shadow-md">
+    <div className="min-h-dvh bg-[#101010] text-white">
+      <header className="">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-blue-400">Youtube Feeds</h1>
-            <div className="flex items-center space-x-4">
+            <h1 className="text-6xl font-extrabold  text-[#555555] uppercase">
+              ZenFeeds
+            </h1>
+            <div className="flex  items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <img
                   src={user.photoURL}
@@ -114,10 +125,9 @@ function HomePage() {
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 flex items-center space-x-1"
+                className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20  drop-shadow-md flex items-center"
               >
-                <LogOut size={16} />
-                <span>Logout</span>
+                Logout
               </button>
             </div>
           </div>
@@ -126,31 +136,37 @@ function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <FeedNavigation feeds={feeds} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          <div
+            onClick={() => setShowAddModal(true)}
+            className="bg-[#151515] h-52 ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden tcursor-pointer flex  flex-col items-center justify-center gap-2"
+          >
+            <Plus size={56} strokeWidth={1.5} />
+<span className="text-2xl/6 font-medium tracking-tight">Create feed</span>
+          </div>
           {feeds.map((feed) => (
-            <div key={feed.name} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-105">
+            <div
+              key={feed.name}
+              className="bg-[#151515] ring-[1px] ring-white/15 rounded-lg shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-105"
+            >
               <Link to={`/feed/${feed.name}`} className="block">
                 <img
-                  src={feed.image || '/placeholder.png'}
+                  src={feed.image || "/placeholder.png"}
                   alt={feed.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-40 object-cover rounded-md"
                 />
                 <div className="p-4">
-                  <h2 className="text-lg font-semibold text-blue-400">{feed.name}</h2>
+                  <h2 className="text-lg/4 font-medium tracking-tight text-white">
+                    {feed.name}
+                  </h2>
                 </div>
               </Link>
-          
             </div>
           ))}
         </div>
       </main>
 
-      <button
-        className="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:bg-blue-600 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-        onClick={() => setShowAddModal(true)}
-      >
-        <Plus size={24} />
-      </button>
+      {/* <button className="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:bg-blue-600 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"></button> */}
 
       {showAddModal && (
         <AddFeedModal
@@ -172,4 +188,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

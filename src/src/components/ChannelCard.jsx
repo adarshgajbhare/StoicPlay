@@ -1,5 +1,7 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { CheckCircle, UserPlus } from 'lucide-react';
+import { FaCheckCircle } from 'react-icons/fa';
 
 function ChannelCard({ channel, onAddChannel }) {
   if (!channel || !channel.snippet) {
@@ -30,7 +32,7 @@ function ChannelCard({ channel, onAddChannel }) {
   };
     
   return (
-    <div className="bg-gray-900 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
+    <div className="bg-black ring-[1px] ring-white/20 rounded-md overflow-hidden shadow-lg">
       <div className="p-6 flex items-start gap-6">
         <div className="flex-shrink-0">
           <img
@@ -42,29 +44,28 @@ function ChannelCard({ channel, onAddChannel }) {
         <div className="flex-grow min-w-0 space-y-2">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-medium text-base text-white truncate max-w-[200px]">
-                  {channel.snippet.title || 'Untitled Channel'}
-                </h3>
-                {isVerified() && (
-                  <CheckCircle className="text-gray-400 w-4 h-4 flex-shrink-0" />
-                )}
-              </div>
+            <div className="flex items-center">
+          <h3 className="font-semibold text-xl/4  truncate">
+            {channel.snippet.title}
+          </h3>
+          {isVerified() && (
+            <FaCheckCircle className="text-lime-500 relative ml-2 size-4" />
+          )}
+        </div>
               {channel.statistics && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm/3 mt-2 bg-red-600  rounded-sm w-fit p-1 mb-2 font-medium text-white">
                   {formatSubscriberCount(channel.statistics.subscriberCount)} subscribers
                 </p>
               )}
             </div>
             <button
-              onClick={handleAddChannel}
-              className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-full text-sm flex items-center gap-2 flex-shrink-0 transition-colors duration-200"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Add</span>
-            </button>
+          onClick={handleAddChannel}
+          className="bg-white w-fit  hover:bg-green-500 hover:text-white    text-black font-medium tracking-tight text-base/3 py-3 px-4 rounded-md"
+        >
+          Add
+        </button>
           </div>
-          <p className="text-sm text-gray-400 line-clamp-1">
+          <p className="text-base/5 text-white/60 mb-4 text-pretty line-clamp-3">
             {channel.snippet.description || 'No description available'}
           </p>
         </div>

@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './src/contexts/AuthContext.jsx';
 import LoginPage from './src/pages/LoginPage';
 import HomePage from './src/pages/HomePage';
 import FeedPage from './src/pages/FeedPage';
+import LearnMorePage from './src/pages/LearnMorePage.jsx';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -29,6 +30,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/learn-more" element={<LearnMorePage />} />
           <Route
             path="/"
             element={

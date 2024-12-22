@@ -1,44 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import SearchBar from '../components/SearchBar';
-import ChannelCard from '../components/ChannelCard';
-import VideoCard from '../components/VideoCard';
-import EditFeedModal from '../components/EditFeedModal';
-import { Pencil, Trash2 } from 'lucide-react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
+import ChannelCard from "../components/ChannelCard";
+import VideoCard from "../components/VideoCard";
+import EditFeedModal from "../components/EditFeedModal";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   searchChannels as fetchChannelSearch,
   fetchChannelVideos,
   fetchChannelDetails,
-} from '../services/youtubeApi';
-import { db } from '../lib/firebase';
-import { useAuth } from '../contexts/AuthContext';
-import { doc, getDoc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
+} from "../services/youtubeApi";
+import { db } from "../lib/firebase";
+import { useAuth } from "../contexts/AuthContext";
+import { doc, getDoc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
+import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
+import SearchPopover from "../components/SearchPopover";
+import { IoChevronBack } from "react-icons/io5";
 
 function FeedPage() {
   const { user } = useAuth();
   const { feedName } = useParams();
   const navigate = useNavigate();
+
   const [videos, setVideos] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
   const [currentFeed, setCurrentFeed] = useState(null);
 
   useEffect(() => {
-    const loadFeedData = async () => {
-      if (user) {
+    loadFeedData();
+  }, [feedName, user]);
+
+  const loadFeedData = async () => {
+    if (user) {
+      try {
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          const currentFeed = userData.feeds.find(feed => feed.name === feedName);
-          if (currentFeed) {
-            setCurrentFeed(currentFeed);
+          const thisFeed = userData.feeds.find(
+            (feed) => feed.name === feedName
+          );
+          if (thisFeed) {
+            setCurrentFeed(thisFeed);
             setFeedChannels(
-              currentFeed.channels.reduce((acc, channel) => {
+              thisFeed.channels.reduce((acc, channel) => {
                 acc[channel.channelId] = channel.channelTitle;
                 return acc;
               }, {})
@@ -50,14 +61,19 @@ function FeedPage() {
           console.log("No such document!");
           setFeedChannels({});
         }
+      } catch (error) {
+        console.error("Error loading feed data:", error);
+        setFeedChannels({});
       }
-    };
-    loadFeedData();
-  }, [feedName, user]);
+    }
+  };
 
   useEffect(() => {
     if (Object.keys(feedChannels).length > 0) {
       loadChannelDetails();
+    } else {
+      setVideos([]);
+      setIsLoading(false);
     }
   }, [feedChannels]);
 
@@ -68,7 +84,10 @@ function FeedPage() {
         const channelDetail = await fetchChannelDetails(channelId);
         details[channelId] = channelDetail;
       } catch (error) {
-        console.error(`Error fetching details for channel ${channelId}:`, error);
+        console.error(
+          `Error fetching details for channel ${channelId}:`,
+          error
+        );
       }
     }
     setChannelDetails(details);
@@ -84,79 +103,36 @@ function FeedPage() {
         try {
           const channelVideos = await fetchChannelVideos(channelId);
           if (Array.isArray(channelVideos)) {
-            const videosWithChannel = channelVideos.map(video => ({
-              ...video,
-              channelDetails: channelDetailsMap[channelId]
-            }));
-            allVideos = allVideos.concat(videosWithChannel);
+            channelVideos.forEach((video) => {
+              video.channelDetails = channelDetailsMap[channelId];
+              allVideos.push(video);
+            });
           }
         } catch (error) {
-          console.error(`Error fetching videos for channel ${channelId}:`, error);
+          console.error(
+            `Error fetching videos for channel ${channelId}:`,
+            error
+          );
         }
       }
 
-      allVideos.sort((a, b) =>
-        new Date(b.snippet?.publishedAt || 0) - new Date(a.snippet?.publishedAt || 0)
+      allVideos.sort(
+        (a, b) =>
+          new Date(b.snippet?.publishedAt || 0) -
+          new Date(a.snippet?.publishedAt || 0)
       );
 
       setVideos(allVideos);
     } catch (error) {
-      console.error('Error loading feed videos:', error);
+      console.error("Error loading feed videos:", error);
       setVideos([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const searchChannels = async (query) => {
-    try {
-      const response = await fetchChannelSearch(query);
-      setSearchResults(response);
-    } catch (error) {
-      console.error('Error searching channels:', error);
-    }
-  };
-
-  const addChannelToFeed = async (channelId, channelTitle) => {
-    if (user) {
-      try {
-        const channelDetail = await fetchChannelDetails(channelId);
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          const updatedFeeds = userDocSnap.data().feeds.map(feed => {
-            if (feed.name === feedName) {
-              return {
-                ...feed,
-                channels: [...(feed.channels || []), { channelId, channelTitle }]
-              };
-            }
-            return feed;
-          });
-
-          await updateDoc(userDocRef, { feeds: updatedFeeds });
-        } else {
-          await setDoc(userDocRef, {
-            feeds: [{
-              name: feedName,
-              channels: [{ channelId, channelTitle }]
-            }]
-          });
-        }
-
-        setFeedChannels(prev => ({ ...prev, [channelId]: channelTitle }));
-        setChannelDetails(prev => ({ ...prev, [channelId]: channelDetail }));
-        setSearchResults([]);
-
-      } catch (error) {
-        console.error('Error adding channel:', error);
-      }
-    }
-  };
-
   const handleDeleteFeed = async () => {
-    if (!window.confirm('Are you sure you want to delete this feed?')) return;
+    if (!window.confirm("Are you sure you want to delete this feed?")) return;
 
     try {
       const userDocRef = doc(db, "users", user.uid);
@@ -164,42 +140,43 @@ function FeedPage() {
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        const updatedFeeds = userData.feeds.filter(feed => feed.name !== feedName);
-        
-        // Update Firebase
+        const updatedFeeds = userData.feeds.filter(
+          (feed) => feed.name !== feedName
+        );
         await updateDoc(userDocRef, { feeds: updatedFeeds });
-        
-        // Navigate away after successful deletion
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      console.error('Error deleting feed:', error);
+      console.error("Error deleting feed:", error);
     }
   };
 
-  const handleUpdateFeed = async (oldName, newName, newImage, updatedChannels) => {
+  const handleUpdateFeed = async (
+    oldName,
+    newName,
+    newImage,
+    updatedChannels
+  ) => {
     try {
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        const updatedFeeds = userData.feeds.map(feed => {
+        const updatedFeeds = userData.feeds.map((feed) => {
           if (feed.name === oldName) {
             return {
               ...feed,
               name: newName,
               image: newImage,
-              channels: updatedChannels
+              channels: updatedChannels,
             };
           }
           return feed;
         });
 
-        // Update Firebase
         await updateDoc(userDocRef, { feeds: updatedFeeds });
-        
-        // Update local state and refresh
+
         if (oldName !== newName) {
           navigate(`/feed/${newName}`);
         } else {
@@ -209,7 +186,6 @@ function FeedPage() {
               return acc;
             }, {})
           );
-          
           setChannelDetails({});
           setVideos([]);
           setIsLoading(true);
@@ -218,75 +194,75 @@ function FeedPage() {
             loadChannelDetails();
           }, 100);
 
-          setCurrentFeed(prev => ({
+          setCurrentFeed((prev) => ({
             ...prev,
             name: newName,
             image: newImage,
-            channels: updatedChannels
+            channels: updatedChannels,
           }));
         }
       }
     } catch (error) {
-      console.error('Error updating feed:', error);
+      console.error("Error updating feed:", error);
     }
   };
 
+  // Trigger a reload so newly added channel’s videos appear without manual refresh
+  const handleChannelAdded = () => {
+    setFeedChannels({});
+    setChannelDetails({});
+    setVideos([]);
+    setIsLoading(true);
+    setTimeout(() => {
+      loadFeedData();
+    }, 100);
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <Link to="/" className="text-white hover:text-pink-300 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+    <div className="min-h-dvh bg-[#121212] text-white p-8">
+      <div className="max-w-8xl mx-auto">
+        <div className="flex  justify-between items-center mb-8">
+          <Link
+          to="/"
+          className="flex items-center gap-2">
+            <div
+              
+              className="text-white hover:text-pink-300 transition-colors duration-200"
+            >
+              <IoChevronBack className="text-2xl md:text-3xl lg:text-4xl text-white" />
+            </div>
+            <h1 className="text-4xl font-medium text-center text-twhite tracking-tight">
+              {feedName}
+            </h1>
           </Link>
-          <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
-            {feedName}
-          </h1>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 w-full max-w-lg">
+            <button
+              onClick={() => setIsSearchPopoverOpen(true)}
+              className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"
+              aria-label="Add channel"
+            >
+              Add
+            </button>
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="p-2 hover:bg-purple-400 rounded-full transition-colors duration-200"
+              className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"
               aria-label="Edit feed"
             >
-              <Pencil className="h-6 w-6" />
+              Edit
             </button>
             <button
               onClick={handleDeleteFeed}
-              className="p-2 hover:bg-red-400 rounded-full transition-colors duration-200"
+              className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20 w-full text-center drop-shadow-md"
               aria-label="Delete feed"
             >
-              <Trash2 className="h-6 w-6" />
+              Delete
             </button>
           </div>
         </div>
 
-        <div className="mb-8">
-          <SearchBar onSearch={searchChannels} />
-        </div>
-
-        {searchResults.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Search Results</h2>
-            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.map((channel) => (
-                <ChannelCard
-                  key={channel.id.channelId}
-                  channel={channel}
-                  onAddChannel={addChannelToFeed}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
         <h2 className="text-2xl font-semibold mb-4">Latest Videos</h2>
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
-          </div>
+          <EmptyFeedCallToAction />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {videos.map((video) => (
@@ -305,12 +281,20 @@ function FeedPage() {
           onUpdateFeed={handleUpdateFeed}
           feed={{
             name: feedName,
-            image: currentFeed?.image || '',
-            channels: Object.entries(feedChannels).map(([channelId, channelTitle]) => ({
-              channelId,
-              channelTitle
-            }))
+            image: currentFeed?.image || "",
+            channels: Object.entries(feedChannels).map(
+              ([channelId, channelTitle]) => ({
+                channelId,
+                channelTitle,
+              })
+            ),
           }}
+        />
+
+        <SearchPopover
+          isOpen={isSearchPopoverOpen}
+          onClose={() => setIsSearchPopoverOpen(false)}
+          onChannelAdded={handleChannelAdded}
         />
       </div>
     </div>

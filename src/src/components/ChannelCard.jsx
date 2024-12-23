@@ -39,14 +39,14 @@ function ChannelCard({ channel, onAddChannel }) {
           <img
             src={channel.snippet.thumbnails?.default?.url || '/placeholder.svg'}
             alt={channel.snippet.title || 'Channel thumbnail'}
-            className="w-14 h-14 rounded-full object-cover"
+            className="size-10 md:size-16 rounded-md object-cover"
           />
         </div>
         <div className="flex-grow min-w-0 space-y-2">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
             <div className="flex items-center">
-          <h3 className="font-semibold text-xl/4  truncate">
+          <h3 className="font-semibold text-base/4 md:text-xl/4 truncate">
             {channel.snippet.title}
           </h3>
           {isVerified() && (
@@ -54,14 +54,14 @@ function ChannelCard({ channel, onAddChannel }) {
           )}
         </div>
               {channel.statistics && (
-                <p className="text-sm/3 mt-2 bg-red-600  rounded-sm w-fit p-1 mb-2 font-medium text-white">
+                <p className="md:text-sm/3 text-xs mt-2 bg-red-600  rounded-sm w-fit p-1 mb-2 font-medium text-white">
                   {formatSubscriberCount(channel.statistics.subscriberCount)} subscribers
                 </p>
               )}
             </div>
             <button
       onClick={handleAddChannel}
-      className={`w-fit py-3 px-4 rounded-md font-medium tracking-tight text-base/3 ${
+      className={`w-fit flex-shrink-0 py-3 px-4 rounded-md font-medium tracking-tight text-base/3 ${
         isAdded
           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
           : "bg-white text-black hover:bg-green-500 hover:text-white"
@@ -71,7 +71,7 @@ function ChannelCard({ channel, onAddChannel }) {
       {isAdded ? "Added" : "Add"}
     </button>
           </div>
-          <p className="text-base/5 text-white/60 mb-4 text-pretty line-clamp-3">
+          <p className="md:text-base/5 text-sm text-white/60 mb-4 text-pretty line-clamp-3">
             {channel.snippet.description || 'No description available'}
           </p>
         </div>

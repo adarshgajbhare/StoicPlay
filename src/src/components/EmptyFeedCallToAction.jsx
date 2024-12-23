@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import SearchPopover from "./SearchPopover";
 
 const EmptyFeedCallToAction = () => {
-  const [isHovered, setIsHovered] = useState(false);  
-    const [feedChannels, setFeedChannels] = useState({});
-    const [channelDetails, setChannelDetails] = useState({});
+  const [isHovered, setIsHovered] = useState(false);
+  const [feedChannels, setFeedChannels] = useState({});
+  const [channelDetails, setChannelDetails] = useState({});
 
-    const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
-    const [currentFeed, setCurrentFeed] = useState(null);
+  const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
+  const [currentFeed, setCurrentFeed] = useState(null);
   const handleChannelAdded = () => {
     setFeedChannels({});
     setChannelDetails({});
@@ -18,7 +18,7 @@ const EmptyFeedCallToAction = () => {
     }, 100);
   };
   return (
-    <div className="max-w-2xl  mx-auto rounded-md shadow-xl  text-center">
+    <div className="max-w-2xl bg-[#121212]  mx-auto rounded-md  text-center">
       <div className="mb-8">
         <svg
           className="w-48 h-48 mx-auto text-gray-400"
@@ -43,25 +43,26 @@ const EmptyFeedCallToAction = () => {
         ZenFeed.
       </p>
       <button
-        className={`rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  md:w-3/5 text-center  drop-shadow-md transition duration-300 ease-in-out transform ${
+        className={`rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  md:w-1/2 text-center  drop-shadow-md transition duration-300 ease-in-out transform ${
           isHovered ? "scale-105" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => setIsSearchPopoverOpen(true)}>
+        onClick={() => setIsSearchPopoverOpen(true)}
+      >
         Add Your First Channel
       </button>
       <div className="mt-12 text-sm text-gray-500">
         <p>Need help getting started?</p>
         <a href="#" className="text-blue-500 hover:underline">
-          Check out our quick start guide
+          Watch a video tutorial to get started
         </a>
       </div>
       <SearchPopover
-          isOpen={isSearchPopoverOpen}
-          onClose={() => setIsSearchPopoverOpen(false)}
-          onChannelAdded={handleChannelAdded}
-        />
+        isOpen={isSearchPopoverOpen}
+        onClose={() => setIsSearchPopoverOpen(false)}
+        onChannelAdded={handleChannelAdded}
+      />
     </div>
   );
 };

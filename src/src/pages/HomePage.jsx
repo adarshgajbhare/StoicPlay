@@ -33,6 +33,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import Navbar from "../components/Navbar";
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -59,13 +60,7 @@ function HomePage() {
     loadFeeds();
   }, [user]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+  
 
   const handleAddFeed = async (feedName, imageUrl) => {
     const newFeed = { name: feedName, image: imageUrl, channels: [] };
@@ -157,36 +152,10 @@ function HomePage() {
 
   return (
     <div className="min-h-dvh bg-[#101010] text-white">
-      <header className="">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-extrabold  text-[#555555] uppercase">
-              ZenFeeds
-            </h1>
-            <div className="flex  items-center space-x-4">
-              <div className="flex  items-center space-x-2">
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName}
-                  className="size-10 rounded-full  ring-[1px] ring-white/50 object-cover"
-                />
-                <span className="text-lg/4 tracking-tight  font-medium">
-                  {user.displayName}
-                </span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20  drop-shadow-md flex items-center hover:bg-red-800"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <FeedNavigation feeds={feeds} />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        {/* <FeedNavigation feeds={feeds} /> */}
+        <Navbar />
 
         <DndContext
           sensors={sensors}

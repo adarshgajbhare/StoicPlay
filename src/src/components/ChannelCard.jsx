@@ -1,20 +1,21 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckCircle, UserPlus } from 'lucide-react';
 import { FaCheckCircle } from 'react-icons/fa';
 
 function ChannelCard({ channel, onAddChannel }) {
+
+  const [isAdded, setIsAdded] = useState(false);
+
   if (!channel || !channel.snippet) {
     return null;
   }
 
   const handleAddChannel = () => {
-    onAddChannel(
-      channel.id.channelId,
-      channel.snippet.title,
-      channel.statistics,
-    );
+    onAddChannel(channel.id.channelId, channel.snippet.title, channel.statistics);
+    setIsAdded(true);
   };
+
 
   function formatSubscriberCount(count) {
     if (!count) return '0';
@@ -59,11 +60,16 @@ function ChannelCard({ channel, onAddChannel }) {
               )}
             </div>
             <button
-          onClick={handleAddChannel}
-          className="bg-white w-fit  hover:bg-green-500 hover:text-white    text-black font-medium tracking-tight text-base/3 py-3 px-4 rounded-md"
-        >
-          Add
-        </button>
+      onClick={handleAddChannel}
+      className={`w-fit py-3 px-4 rounded-md font-medium tracking-tight text-base/3 ${
+        isAdded
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-white text-black hover:bg-green-500 hover:text-white"
+      }`}
+      disabled={isAdded}
+    >
+      {isAdded ? "Added" : "Add"}
+    </button>
           </div>
           <p className="text-base/5 text-white/60 mb-4 text-pretty line-clamp-3">
             {channel.snippet.description || 'No description available'}

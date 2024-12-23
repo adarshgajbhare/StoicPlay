@@ -1,8 +1,22 @@
 import React, { useState } from "react";
+import SearchPopover from "./SearchPopover";
 
 const EmptyFeedCallToAction = () => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);  
+    const [feedChannels, setFeedChannels] = useState({});
+    const [channelDetails, setChannelDetails] = useState({});
 
+    const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
+    const [currentFeed, setCurrentFeed] = useState(null);
+  const handleChannelAdded = () => {
+    setFeedChannels({});
+    setChannelDetails({});
+    setVideos([]);
+    setIsLoading(true);
+    setTimeout(() => {
+      loadFeedData();
+    }, 100);
+  };
   return (
     <div className="max-w-2xl  mx-auto rounded-md shadow-xl  text-center">
       <div className="mb-8">
@@ -34,8 +48,7 @@ const EmptyFeedCallToAction = () => {
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => alert("Add Channel functionality to be implemented")}
-      >
+        onClick={() => setIsSearchPopoverOpen(true)}>
         Add Your First Channel
       </button>
       <div className="mt-12 text-sm text-gray-500">
@@ -44,6 +57,11 @@ const EmptyFeedCallToAction = () => {
           Check out our quick start guide
         </a>
       </div>
+      <SearchPopover
+          isOpen={isSearchPopoverOpen}
+          onClose={() => setIsSearchPopoverOpen(false)}
+          onChannelAdded={handleChannelAdded}
+        />
     </div>
   );
 };

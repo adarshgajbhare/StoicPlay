@@ -33,48 +33,43 @@ function VideoCard({ video, channelDetails }) {
   };
 
   // Get channel thumbnail, title, and verified status (if available)
-  const channelThumbnail = channelDetails?.snippet?.thumbnails?.default?.url;
   const channelTitle = channelDetails?.snippet?.title || video.snippet.channelTitle;
-  const isVerified = channelDetails?.badges?.includes("VERIFIED"); // Assuming you have this info
 
-  // Function to format the published date/time
-  const formatPublishedAt = (publishedAt) => {
-    const now = new Date();
-    const publishedDate = new Date(publishedAt);
-    const diffInSeconds = Math.floor((now - publishedDate) / 1000);
 
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
-    }
+  // // Function to format the published date/time
+  // const formatPublishedAt = (publishedAt) => {
+  //   const now = new Date();
+  //   const publishedDate = new Date(publishedAt);
+  //   const diffInSeconds = Math.floor((now - publishedDate) / 1000);
 
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
-    }
+  //   if (diffInSeconds < 60) {
+  //     return `${diffInSeconds} seconds ago`;
+  //   }
 
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
-    }
+  //   const diffInMinutes = Math.floor(diffInSeconds / 60);
+  //   if (diffInMinutes < 60) {
+  //     return `${diffInMinutes} minutes ago`;
+  //   }
 
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-      return `${diffInDays} days ago`;
-    }
+  //   const diffInHours = Math.floor(diffInMinutes / 60);
+  //   if (diffInHours < 24) {
+  //     return `${diffInHours} hours ago`;
+  //   }
 
-    // If more than a week, return the formatted date
-    return publishedDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  //   const diffInDays = Math.floor(diffInHours / 24);
+  //   if (diffInDays < 7) {
+  //     return `${diffInDays} days ago`;
+  //   }
+
+  //   // If more than a week, return the formatted date
+  //   return publishedDate.toLocaleDateString('en-US', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric',
+  //   });
+  // };
 
   
-
-//  console.log("!!!!!!!!!!!!",video?.snippet?.publishedAt);
-
-
   return (
     <div
       className="bg-black ring-[1px] ring-white/20 rounded-md overflow-hidden shadow-md transition-transform duration-500 hover:scale-105 cursor-pointer"

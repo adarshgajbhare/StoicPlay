@@ -1,11 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import SearchBar from "../components/SearchBar";
-import ChannelCard from "../components/ChannelCard";
 import VideoCard from "../components/VideoCard";
 import EditFeedModal from "../components/EditFeedModal";
-import { Pencil, Trash2 } from "lucide-react";
 import {
   searchChannels as fetchChannelSearch,
   fetchChannelVideos,
@@ -25,6 +22,8 @@ function FeedPage() {
 
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasChannels, setHasChannels] = useState(false); // Track if the feed has channels
+  const [initialLoad, setInitialLoad] = useState(true); // Track initial load state
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -54,28 +53,37 @@ function FeedPage() {
                 return acc;
               }, {})
             );
+            setHasChannels(thisFeed.channels.length > 0); // Set hasChannels based on channel count
           } else {
             setFeedChannels({});
+            setHasChannels(false);
+            setInitialLoad(false);
           }
         } else {
           console.log("No such document!");
           setFeedChannels({});
+          setHasChannels(false);
+          setInitialLoad(false);
         }
       } catch (error) {
         console.error("Error loading feed data:", error);
         setFeedChannels({});
+        setHasChannels(false);
+        setInitialLoad(false);
       }
     }
   };
 
   useEffect(() => {
-    if (Object.keys(feedChannels).length > 0) {
+    if (hasChannels) {
+      // Only load channel details and videos if we know there are channels
       loadChannelDetails();
     } else {
       setVideos([]);
       setIsLoading(false);
+      setInitialLoad(false);
     }
-  }, [feedChannels]);
+  }, [hasChannels]);
 
   const loadChannelDetails = async () => {
     const details = {};
@@ -128,6 +136,7 @@ function FeedPage() {
       setVideos([]);
     } finally {
       setIsLoading(false);
+      setInitialLoad(false);
     }
   };
 
@@ -189,6 +198,7 @@ function FeedPage() {
           setChannelDetails({});
           setVideos([]);
           setIsLoading(true);
+          setHasChannels(updatedChannels.length > 0);
 
           setTimeout(() => {
             loadChannelDetails();
@@ -222,13 +232,8 @@ function FeedPage() {
     <div className="min-h-dvh bg-[#121212] text-white p-8">
       <div className="max-w-8xl mx-auto">
         <div className="flex  justify-between items-center mb-8">
-          <Link
-          to="/"
-          className="flex items-center gap-2">
-            <div
-              
-              className="text-white  hover:text-pink-300 transition-colors duration-200"
-            >
+          <Link to="/" className="flex items-center gap-2">
+            <div className="text-white  hover:text-pink-300 transition-colors duration-200">
               <IoChevronBack className="text-2xl md:text-3xl lg:text-4xl text-white" />
             </div>
             <h1 className="text-4xl font-medium text-center text-twhite tracking-tight">
@@ -261,8 +266,20 @@ function FeedPage() {
         </div>
 
         <h2 className="text-2xl font-semibold mb-4">Latest Videos</h2>
-        {isLoading ? (
+
+        {/* Conditional rendering based on initialLoad, hasChannels, and isLoading */}
+        {initialLoad ? (
+          // Show spinner while initially loading
+          <div className="flex justify-center items-center h-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+          </div>
+        ) : !hasChannels ? (
           <EmptyFeedCallToAction />
+        ) : isLoading ? (
+          // Show spinner when loading videos after initial load
+          <div className="flex justify-center items-center h-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {videos.map((video) => (

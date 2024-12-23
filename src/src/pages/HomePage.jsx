@@ -15,12 +15,24 @@ import {
   arrayRemove,
   setDoc,
 } from "firebase/firestore";
-import { Plus, LogOut, Edit2, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 
-import { DndContext } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
-import { Draggable } from '../components/Draggable';
-import { Droppable } from '../components/Droppable';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 function HomePage() {
   const { user, loading } = useAuth();
@@ -79,12 +91,12 @@ function HomePage() {
 
     if (userDocSnap.exists()) {
       const updatedFeeds = feeds.map((feed) =>
-        feed.name === oldName
+        feed?.name === oldName
           ? { ...feed, name: newName, image: newImageUrl }
           : feed
       );
-      const oldFeed = feeds.find((feed) => feed.name === oldName);
-      const newFeed = updatedFeeds.find((feed) => feed.name === newName);
+      const oldFeed = feeds.find((feed) => feed?.name === oldName);
+      const newFeed = updatedFeeds.find((feed) => feed?.name === newName);
 
       await updateDoc(userDocRef, {
         feeds: arrayRemove(oldFeed),
@@ -111,15 +123,34 @@ function HomePage() {
     return <Navigate to="/login" />;
   }
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   function handleDragEnd(event) {
     const { active, over } = event;
 
     if (active.id !== over.id) {
       setFeeds((feeds) => {
-        const oldIndex = feeds.findIndex(feed => `draggable-${feed.name}` === active.id);
-        const newIndex = feeds.findIndex(feed => `draggable-${feed.name}` === over.id);
+        const oldIndex = feeds.findIndex(
+          (feed) => `draggable-${feed?.name}` === active.id
+        );
+        const newIndex = feeds.findIndex(
+          (feed) => `draggable-${feed?.name}` === over.id
+        );
 
-        return arrayMove(feeds, oldIndex, newIndex);
+        const updatedFeeds = arrayMove(feeds, oldIndex, newIndex);
+
+        // Update Firestore with the new order
+        const userDocRef = doc(db, "users", user.uid);
+        updateDoc(userDocRef, {
+          feeds: updatedFeeds,
+        });
+
+        return updatedFeeds;
       });
     }
   }
@@ -139,7 +170,9 @@ function HomePage() {
                   alt={user.displayName}
                   className="size-10 rounded-full  ring-[1px] ring-white/50 object-cover"
                 />
-                <span className="text-lg/4 tracking-tight  font-medium">{user.displayName}</span>
+                <span className="text-lg/4 tracking-tight  font-medium">
+                  {user.displayName}
+                </span>
               </div>
               <button
                 onClick={handleLogout}
@@ -155,43 +188,29 @@ function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <FeedNavigation feeds={feeds} />
 
-        <DndContext onDragEnd={handleDragEnd}>
-          <SortableContext items={feeds.map(feed => `draggable-${feed.name}`)}>
-            <Droppable id="grid-area">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={feeds.map((feed) => `draggable-${feed?.name}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
               <div
-                id="grid-area"
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8"
+                onClick={() => setShowAddModal(true)}
+                className="bg-[#101010] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.2)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)] h-52 ring-[1px] ring-white/15 rounded-md overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-[#555555]  flex-col items-center justify-center gap-2"
               >
-                <div
-                  onClick={() => setShowAddModal(true)}
-                  className="bg-[#101010] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.2)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)] h-52 ring-[1px] ring-white/15 rounded-md overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-[#555555]  flex-col items-center justify-center gap-2"
-                >
-                  <Plus size={48} strokeWidth={2} />
-                  <span className="text-2xl/6 font-medium tracking-tight">Create feed</span>
-                </div>
-                {feeds.map((feed) => (
-                  <Draggable key={feed.name} id={`draggable-${feed.name}`}>
-                    <div
-                      id="draggableFeeds"
-                      className="bg-[#151515] ring-[1px] ring-white/15 rounded-md shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-105"
-                    >
-                      <Link to={`/feed/${feed.name}`} className="block">
-                        <img
-                          src={feed.image || "/placeholder.png"}
-                          alt={feed.name}
-                          className="w-full h-40 object-cover rounded-md"
-                        />
-                        <div className="p-4">
-                          <h2 className="text-lg/4 font-medium tracking-tight text-white">
-                            {feed.name}
-                          </h2>
-                        </div>
-                      </Link>
-                    </div>
-                  </Draggable>
-                ))}
+                <Plus size={48} strokeWidth={2} />
+                <span className="text-2xl/6 font-medium tracking-tight">
+                  Create feed
+                </span>
               </div>
-            </Droppable>
+              {feeds.map((feed) => (
+                <SortableFeedItem key={feed?.name} feed={feed} />
+              ))}
+            </div>
           </SortableContext>
         </DndContext>
       </main>
@@ -211,6 +230,35 @@ function HomePage() {
           feed={editingFeed}
         />
       )}
+    </div>
+  );
+}
+
+function SortableFeedItem({ feed }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: `draggable-${feed?.name}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <div className="bg-[#151515] ring-[1px] ring-white/15 rounded-md shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-105">
+        <Link to={`/feed/${feed?.name}`} className="block">
+          <img
+            src={feed?.image || "/placeholder.png"}
+            alt={feed?.name}
+            className="w-full h-40 object-cover rounded-md"
+          />
+          <div className="p-4">
+            <h2 className="text-lg/4 font-medium tracking-tight text-white">
+              {feed?.name}
+            </h2>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

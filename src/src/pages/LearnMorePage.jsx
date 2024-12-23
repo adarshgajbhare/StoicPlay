@@ -19,34 +19,33 @@ const LearnMorePage = () => {
   };
   return (
     <>
-      <div className="min-h-dvh text-white overflow-hidden bg-[#050505] p-8 md:p-16 lg:p-24 xl:p-32">
+      <div className="min-h-dvh text-white overflow-hidden bg-[#050505] p-6 md:p-10 ">
         <div className="fixed top-2 left-2 md:top-4 md:left-4 z-50 flex items-center gap-1 cursor-pointer">
-            <a href="/login" className="flex items-center gap-1">
-                <IoChevronBack
-                className="text-2xl ml-4 md:text-3xl lg:text-4xl text-white" />
-                <span className="text-xl font-medium tracking-tight">Back to Homepage</span>
-            </a>
+          <a href="/login" className="flex items-center gap-1">
+            <IoChevronBack className="text-2xl ml-2 md:text-3xl lg:text-4xl text-white" />
+            <span className="text-xl/4 font-medium tracking-tight">
+              Back to Homepage
+            </span>
+          </a>
         </div>
-        <div className="max-w-7xl mt-4 mx-auto">
-          <h1 className="text-3xl md:text-6xl lg:text-7xl font-semibold max-w-3xl lg:max-w-4xl text-balance tracking-tight text-left mb-2 lg:mb-8">
-            ZenFeeds: Take Back the Wheel from the Algorithm
+        <div className="max-w-xl mt-6 ">
+          <h1 className="text-2xl  md:text-4xl  font-medium max-w-3xl text-base text-balance tracking-tight text-left my-2 md:my-2">
+            ZenFeeds, Take Back the control from the Algorithm
           </h1>
-          <p className="text-lg/6 md:text-xl/7 lg:text-2xl/8 text-left max-w-2xl lg:max-w-4xl mb-4 lg:mb-12">
+          <p className="text-base/6 md:text-xl/7 text-left text-pretty   mb-4 ">
             Imagine a world where you're in charge of your video feed, not some
             faceless algorithm bent on keeping you glued to your screen. That's
-            ZenFeeds. <br />
-            We strip away the distractions, so you get the content you want, no
-            strings attached.
+            ZenFeeds.
           </p>
           <div className="text-left space-y-4 lg:space-y-8">
             <div>
-              <h2 className="text-xl lg:text-3xl font-semibold text-pretty">
+              <h2 className="text-xl/4 my-3 lg:text-2xl font-medium text-pretty">
                 Why ZenFeeds?
               </h2>
-              <ul className="text-left list-none w-4/5 lg:w-3/5 space-y-2 lg:space-y-4 mt-2 lg:mt-6">
+              <ul className="text-left text-nowrap list-none w-4/5 lg:w-3/5 space-y-2  mt-2">
                 <li>
-                  <span className="text-lg/6 lg:text-xl/7">🎯</span>{" "}
-                  <span className="font-semibold text-pretty">
+                  <span className="text-base/6 lg:text-xl/7">🎯</span>{" "}
+                  <span className="font-medium text-pretty">
                     Escape the Rabbit Hole
                   </span>
                   <br />
@@ -55,8 +54,8 @@ const LearnMorePage = () => {
                   </span>
                 </li>
                 <li>
-                  <span className="text-lg/6 lg:text-xl/7">🛠️</span>{" "}
-                  <span className="font-semibold text-pretty">
+                  <span className="text-base/6 lg:text-xl/7">🛠️</span>{" "}
+                  <span className="font-medium text-pretty">
                     Control the Narrative
                   </span>
                   <br />
@@ -65,8 +64,8 @@ const LearnMorePage = () => {
                   </span>
                 </li>
                 <li>
-                  <span className="text-lg/6 lg:text-xl/7">🌿</span>{" "}
-                  <span className="font-semibold text-pretty">
+                  <span className="text-base/6 lg:text-xl/7">🌿</span>{" "}
+                  <span className="font-medium text-pretty">
                     Digital Minimalism
                   </span>
                   <br />
@@ -76,7 +75,7 @@ const LearnMorePage = () => {
                 </li>
               </ul>
             </div>
-            <p className="text-lg/6 md:text-xl/7 lg:text-2xl/8 max-w-2xl lg:max-w-4xl">
+            <p className="text-base/6 md:text-xl/7  max-w-2xl ">
               You don't need to quit YouTube to escape its traps. With ZenFeeds,
               reconnect with your favorite creators, rediscover purposeful
               browsing, and log off <em>on your schedule</em>.
@@ -84,24 +83,24 @@ const LearnMorePage = () => {
           </div>
           {error && (
             <div className="text-red-500 rounded-md mt-2 lg:mt-8">
-             Oops! {error}
+              Oops! {error}
             </div>
           )}
 
-<div className="hero-buttons md:ml-4 mt-12 flex w-full md:max-w-md   flex-col items-center gap-3 ">
+          <div className="hero-buttons mt-6 flex w-full md:max-w-md   flex-col items-center gap-3 ">
             <a
               href="#"
               onClick={handleGoogleSignIn}
               className="
               
-              rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  w-full text-center  drop-shadow-md
+              rounded-md bg-white px-6 py-4 text-base/4 font-medium text-gray-950  w-full text-center  drop-shadow-md
               "
             >
               Sign up with Google
             </a>
             <a
               href="/learn-more"
-              className="rounded-md bg-black  w-full text-center px-6 py-4 text-lg/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
+              className="rounded-md bg-black  w-full text-center px-6 py-4 text-base/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
             >
               Learn more
             </a>

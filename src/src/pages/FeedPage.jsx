@@ -14,6 +14,7 @@ import { doc, getDoc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
 import { IoChevronBack } from "react-icons/io5";
+import { IconChevronsLeft } from "@tabler/icons-react";
 
 function FeedPage() {
   const { user } = useAuth();
@@ -229,18 +230,22 @@ function FeedPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#121212] text-white p-8">
-      <div className="max-w-8xl mx-auto">
-        <div className="flex  justify-between items-center mb-8">
+    <div className="min-h-dvh bg-[#121212] text-white p-4">
+      <div className="max-w-8xl   mx-auto">
+        <div className="flex  md:flex-row justify-between flex-col gap-4  mb-8">
           <Link to="/" className="flex items-center gap-2">
-            <div className="text-white  hover:text-pink-300 transition-colors duration-200">
-              <IoChevronBack className="text-2xl md:text-3xl lg:text-4xl text-white" />
+            <div className="text-white  transition-colors duration-500">
+              <IconChevronsLeft
+                size={36}
+                strokeWidth={1}
+                className=" scale-150 text-white"
+              />
             </div>
-            <h1 className="text-4xl font-medium text-center text-twhite tracking-tight">
+            <h1 className="text-2xl lg:text-4xl font-medium text-center text-twhite tracking-tight">
               {feedName}
             </h1>
           </Link>
-          <div className="flex space-x-4 w-full max-w-lg">
+          <div className="flex  space-x-4 w-full max-w-lg">
             <button
               onClick={() => setIsSearchPopoverOpen(true)}
               className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"

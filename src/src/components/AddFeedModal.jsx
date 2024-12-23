@@ -42,7 +42,9 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
 
   if (!isOpen) return null;
 
-  const imageUrl = feedImage ? URL.createObjectURL(feedImage) : "/default-thumb.webp";
+  const imageUrl = feedImage
+    ? URL.createObjectURL(feedImage)
+    : "/default-thumb.webp";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -74,9 +76,9 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
             htmlFor="feedImage"
             className="block mb-3 tracking-tight text-lg/4 text-white"
           >
-            Set up a cover image 
+            Set up a cover image
           </label>
-        
+
           <div className="flex items-center space-x-4">
             <img
               src={imageUrl}
@@ -110,7 +112,6 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
           <button
             className="bg-white hover:bg-green-500 hover:text-white flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
             onClick={handleSubmit}
-          
           >
             Done
           </button>

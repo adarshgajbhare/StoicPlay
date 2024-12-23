@@ -11,6 +11,7 @@ import {
   searchChannels as fetchChannelSearch,
   fetchChannelDetails,
 } from "../services/youtubeApi";
+import { IconX } from "@tabler/icons-react";
 
 function SearchPopover({ isOpen, onClose, onChannelAdded }) {
   const { user } = useAuth();
@@ -81,18 +82,23 @@ function SearchPopover({ isOpen, onClose, onChannelAdded }) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/50 filter backdrop-blur-lg  flex items-center justify-center z-50"
       >
-        <div className="bg-black overflow-y-scroll h-4/5 p-6 rounded-md shadow-lg w-full max-w-4xl relative ">
-        <button
-              onClick={onClose}
-              className="rounded-md px-6 py-4 text-base/4 font-medium
-               text-gray-50 ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto absolute top-5 right-4" 
-              aria-label="Delete feed"
-            >
-              Close
-          </button>
-          <SearchBar onSearch={searchChannels} />
+        <div className="popover overflow-y-scroll h-4/5 bg-[#202020] p-4 rounded-md shadow-lg w-full max-w-4xl relative ">
+       
+          <div className="flex items-center  gap-4">
+            <div className="grow">
+              <SearchBar onSearch={searchChannels} />
+            </div>
+            <button
+                onClick={onClose}
+                className="rounded-md p-3 text-base/4 font-medium bg-[#101010] text-black
+                 ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto "
+                aria-label="Delete feed"
+              >
+                <IconX  size={20} strokeWidth={2} color="white" />
+            </button>
+          </div>
           {searchResults.length > 0 && (
             <div className="mt-6">
               <h2 className="text-lg font-semibold mb-4">Search Results</h2>

@@ -53,6 +53,19 @@ label {
   line-height: 1.1;
 }
 
+
+/* Hide scrollbar but allow scrolling */
+.popover {
+  overflow: auto;
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+/* For Chrome, Edge, and Safari */
+.popover::-webkit-scrollbar {
+  display: none;
+} 
+
 ul[role="list"],
 ol[role="list"] {
   list-style: none;

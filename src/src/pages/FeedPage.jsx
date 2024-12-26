@@ -107,14 +107,19 @@ function FeedPage() {
     setIsLoading(true);
     try {
       let allVideos = [];
-
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  
       for (const channelId in feedChannels) {
         try {
           const channelVideos = await fetchChannelVideos(channelId);
           if (Array.isArray(channelVideos)) {
             channelVideos.forEach((video) => {
-              video.channelDetails = channelDetailsMap[channelId];
-              allVideos.push(video);
+              const publishedDate = new Date(video.snippet?.publishedAt);
+              if (publishedDate >= oneMonthAgo) {
+                video.channelDetails = channelDetailsMap[channelId];
+                allVideos.push(video);
+              }
             });
           }
         } catch (error) {
@@ -124,13 +129,13 @@ function FeedPage() {
           );
         }
       }
-
+  
       allVideos.sort(
         (a, b) =>
           new Date(b.snippet?.publishedAt || 0) -
           new Date(a.snippet?.publishedAt || 0)
       );
-
+  
       setVideos(allVideos);
     } catch (error) {
       console.error("Error loading feed videos:", error);

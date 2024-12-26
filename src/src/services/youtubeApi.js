@@ -62,7 +62,34 @@ export const fetchVideosForChannel = async (uploadsPlaylistId) => {
     throw new Error('Error fetching videos for channel');
   }
   const data = await response.json();
-  return data.items;
+  const videoIds = data.items.map((item) => item.snippet.resourceId.videoId).join(',');
+
+  // Fetch video details to get the duration
+  const detailsApiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${API_KEY}`;
+  const detailsResponse = await fetch(detailsApiUrl);
+  if (!detailsResponse.ok) {
+    throw new Error('Error fetching video details');
+  }
+  const detailsData = await detailsResponse.json();
+
+  // Filter out videos with duration less than 60 seconds (YouTube Shorts)
+  const filteredVideos = data.items.filter((item) => {
+    const videoDetails = detailsData.items.find((detail) => detail.id === item.snippet.resourceId.videoId);
+    const duration = videoDetails.contentDetails.duration;
+    const durationInSeconds = parseDuration(duration);
+    return durationInSeconds >= 60;
+  });
+
+  return filteredVideos;
+};
+
+// Helper function to parse ISO 8601 duration to seconds
+const parseDuration = (duration) => {
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  const hours = (parseInt(match[1]) || 0) * 3600;
+  const minutes = (parseInt(match[2]) || 0) * 60;
+  const seconds = parseInt(match[3]) || 0;
+  return hours + minutes + seconds;
 };
 
 export const fetchChannelDetails = async (channelId) => {

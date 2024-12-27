@@ -1,8 +1,19 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-import { formatRelativeTime } from "../services/youtubeApi";
+import React, { useState } from "react";
+import { formatRelativeTime, getChannelThumbnailUrl, getVideoThumbnailUrl } from "../services/youtubeApi";
 
 function VideoCard({ video, channelDetails }) {
+  const [videoImageError, setVideoImageError] = useState(false);
+  const [channelImageError, setChannelImageError] = useState(false);
+
+  const handleVideoImageError = () => {
+    setVideoImageError(true);
+  };
+
+  const handleChannelImageError = () => {
+    setChannelImageError(true);
+  };
+
   if (!video?.snippet) {
     return null;
   }
@@ -32,42 +43,10 @@ function VideoCard({ video, channelDetails }) {
     }
   };
 
+
   // Get channel thumbnail, title, and verified status (if available)
   const channelTitle =
     channelDetails?.snippet?.title || video.snippet.channelTitle;
-
-  // // Function to format the published date/time
-  // const formatPublishedAt = (publishedAt) => {
-  //   const now = new Date();
-  //   const publishedDate = new Date(publishedAt);
-  //   const diffInSeconds = Math.floor((now - publishedDate) / 1000);
-
-  //   if (diffInSeconds < 60) {
-  //     return `${diffInSeconds} seconds ago`;
-  //   }
-
-  //   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  //   if (diffInMinutes < 60) {
-  //     return `${diffInMinutes} minutes ago`;
-  //   }
-
-  //   const diffInHours = Math.floor(diffInMinutes / 60);
-  //   if (diffInHours < 24) {
-  //     return `${diffInHours} hours ago`;
-  //   }
-
-  //   const diffInDays = Math.floor(diffInHours / 24);
-  //   if (diffInDays < 7) {
-  //     return `${diffInDays} days ago`;
-  //   }
-
-  //   // If more than a week, return the formatted date
-  //   return publishedDate.toLocaleDateString('en-US', {
-  //     year: 'numeric',
-  //     month: 'long',
-  //     day: 'numeric',
-  //   });
-  // };
 
   return (
     <div
@@ -75,11 +54,21 @@ function VideoCard({ video, channelDetails }) {
       onClick={handleClick}
     >
       <div className="relative group">
-        <img
-          src={video?.snippet?.thumbnails?.high?.url || "/placeholder.png"}
-          alt={video.snippet.title}
-          className="w-full h-48 object-cover"
-        />
+        {/* Video Thumbnail with Error Handling */}
+        {!videoImageError ? (
+          <img
+            src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
+            alt={video.snippet.title}
+            className="w-full h-48 object-cover"
+            onError={handleVideoImageError}
+          />
+        ) : (
+          <img
+            src="/placeholder.png"
+            alt="Placeholder"
+            className="w-full h-48 object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-500 flex items-center justify-center">
           <svg
             className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -95,11 +84,13 @@ function VideoCard({ video, channelDetails }) {
           {video.snippet.title}
         </h3>
         <div className="flex items-center mb-2">
-          {channelDetails?.snippet?.thumbnails?.high?.url && (
+          {/* Channel Image with Error Handling */}
+          {!channelImageError && channelDetails?.snippet?.thumbnails && (
             <img
-              src={channelDetails?.snippet?.thumbnails?.high?.url}
+              src={getChannelThumbnailUrl(channelDetails.snippet.thumbnails)}
               alt={channelTitle}
               className="size-8 rounded-full ring-[1px] ring-white/20 mr-2 overflow-hidden border-white"
+              onError={handleChannelImageError}
             />
           )}
           <span className="text-lg/4 text-white tracking-tight flex items-center">
@@ -115,4 +106,4 @@ function VideoCard({ video, channelDetails }) {
   );
 }
 
-export default VideoCard;
+export default VideoCard;                                                                                                                                                                                                                                                                                                                                                                          

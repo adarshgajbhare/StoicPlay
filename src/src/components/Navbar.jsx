@@ -5,7 +5,7 @@ import { useState } from "react";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 
-const Navbar = () => {
+function Navbar({ onImportClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading } = useAuth();
 
@@ -59,6 +59,12 @@ const Navbar = () => {
             {user.displayName}
           </span>
         </div>
+        <button
+            onClick={onImportClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3"
+          >
+            Import Feed
+          </button>
         <button
           onClick={handleLogout}
           className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20  drop-shadow-md flex items-center hover:bg-red-800"

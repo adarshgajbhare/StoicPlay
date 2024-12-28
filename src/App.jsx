@@ -5,6 +5,7 @@ import LoginPage from './src/pages/LoginPage';
 import HomePage from './src/pages/HomePage';
 import FeedPage from './src/pages/FeedPage';
 import LearnMorePage from './src/pages/LearnMorePage.jsx';
+import ShareRedirect from './src/components/ShareRedirect.jsx';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -39,6 +40,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/share/:shareId" element={<ShareRedirect />} />
           <Route
             path="/feed/:feedName"
             element={
@@ -54,4 +56,3 @@ function App() {
 }
 
 export default App;
-

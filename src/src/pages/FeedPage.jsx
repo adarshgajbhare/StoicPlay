@@ -15,6 +15,7 @@ import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
 import { IoChevronBack } from "react-icons/io5";
 import { IconChevronsLeft } from "@tabler/icons-react";
+import { createSharedFeed } from "../services/shareService";
 
 function FeedPage() {
   const { user } = useAuth();
@@ -233,7 +234,30 @@ function FeedPage() {
       loadFeedData();
     }, 100);
   };
+  const handleShareFeed = async () => {
+    try {
+      const shareId = await createSharedFeed(user.uid, currentFeed);
+      const shareableLink = `${window.location.origin}/share/${shareId}`;
+      
+      await navigator.clipboard.writeText(shareableLink);
+      alert("Feed link copied to clipboard!");
+    } catch (error) {
+      console.error("Error sharing feed:", error);
+      alert("Failed to share feed. Please try again.");
+    }
+  };
 
+  // Placeholder function to generate a shareable link
+  async function generateShareableLink(feedName) {
+    // Replace this with actual link shortening logic (e.g., using an API)
+    const uniqueId = Math.random().toString(36).substring(7); // Generate a random ID
+    const shortLink = `https://your-app-url/share/${uniqueId}`; // Replace with your app's URL
+
+    // TODO: Store the mapping of `uniqueId` to `feedName` and user ID in a database
+    // This is necessary to retrieve the feed data when the link is accessed
+
+    return shortLink;
+  }
   return (
     <div className="min-h-dvh bg-[#121212] text-white p-4">
       <div className="max-w-8xl   mx-auto">
@@ -251,6 +275,13 @@ function FeedPage() {
             </h1>
           </Link>
           <div className="flex  space-x-4 w-full max-w-lg">
+          <button
+              onClick={handleShareFeed}
+              className="rounded-md bg-blue-500 px-6 py-4 text-lg/4 font-medium text-white w-full text-center drop-shadow-md"
+              aria-label="Share feed"
+            >
+              Share
+            </button>
             <button
               onClick={() => setIsSearchPopoverOpen(true)}
               className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"

@@ -5,7 +5,6 @@ import { auth, db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import AddFeedModal from "../components/AddFeedModal";
 import EditFeedModal from "../components/EditFeedModal";
-import FeedNavigation from "../components/FeedNavigation";
 import {
   collection,
   doc,
@@ -34,11 +33,13 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Navbar from "../components/Navbar";
+import ImportFeedModal from "../components/ImportFeedModal";
 
 function HomePage() {
   const { user, loading } = useAuth();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false); // State for import modal
   const [feeds, setFeeds] = useState([]);
   const [editingFeed, setEditingFeed] = useState(null);
 
@@ -150,13 +151,19 @@ function HomePage() {
     }
   }
 
+  const handleImportFeed = async (feedUrl) => {
+    // TODO: Implement logic to parse the feed URL and add it to the user's feeds
+    console.log("Importing feed from URL:", feedUrl);
+    // Placeholder for now
+    alert(`Importing feed from ${feedUrl}. This feature is not fully implemented yet.`);
+  };
+
   return (
     <div className="min-h-dvh bg-[#101010] text-white">
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        {/* <FeedNavigation feeds={feeds} /> */}
-        <Navbar />
+      <Navbar onImportClick={() => setShowImportModal(true)} />
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -197,6 +204,13 @@ function HomePage() {
           onClose={() => setShowEditModal(false)}
           onUpdateFeed={handleUpdateFeed}
           feed={editingFeed}
+        />
+      )}
+      {showImportModal && (
+        <ImportFeedModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImportFeed={handleImportFeed}
         />
       )}
     </div>

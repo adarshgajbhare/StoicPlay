@@ -94,7 +94,7 @@ export const fetchVideosForChannel = async (uploadsPlaylistId) => {
     const duration = videoDetails.contentDetails.duration;
 
     // Log for debugging
-    console.log(`Video ID: ${item.snippet.resourceId.videoId}, Duration: ${duration}`);
+  //  console.log(`Video ID: ${item.snippet.resourceId.videoId}, Duration: ${duration}`);
 
     const durationInSeconds = parseDuration(duration);
     return durationInSeconds >= 60;

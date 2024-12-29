@@ -1,12 +1,8 @@
-
-//API Keys 
-export  const API_KEY = 'AIzaSyBw7B1moKVjKgh5dYDOD5bj8D1SCc5WEW0'; 
-//const API_KEY = 'AIzaSyDvMTlhlNUZNfys0p0NEWfekINSS1EjsqM'; 
-
+import { config } from '../config/config.js';
 
 export const searchChannels = async (searchQuery) => {
   const maxResults = 10;
-  const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=${maxResults}&q=${searchQuery}&key=${API_KEY}`;
+  const apiUrl = `${config.youtube.baseUrl}/search?part=snippet&type=channel&maxResults=${maxResults}&q=${searchQuery}&key=${config.youtube.apiKey}`;
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
@@ -15,44 +11,36 @@ export const searchChannels = async (searchQuery) => {
   const data = await response.json();
   const channelIds = data.items.map((item) => item.id.channelId).join(',');
 
-  // Fetch statistics for the found channels
-  const statsApiUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelIds}&key=${API_KEY}`;
+  const statsApiUrl = `${config.youtube.baseUrl}/channels?part=statistics&id=${channelIds}&key=${config.youtube.apiKey}`;
   const statsResponse = await fetch(statsApiUrl);
   if (!statsResponse.ok) {
     throw new Error('Error fetching channel statistics');
   }
   const statsData = await statsResponse.json();
 
-  // Combine data and check for verification badge
-  const combinedData = data.items.map((item) => {
+  return data.items.map((item) => {
     const statsItem = statsData.items.find(
       (stats) => stats.id === item.id.channelId
     );
-
-    // Check if the channel has the "verified" badge in the snippet
     const isVerified = item.snippet.badges
       ? item.snippet.badges.includes('VERIFIED')
       : false;
-
-    // Get the profile image URL, handling different cases
     const profileImageUrl =
       item.snippet.thumbnails?.high?.url ||
       item.snippet.thumbnails?.default?.url ||
-      '/default-profile.jpg'; // Provide a default image path here
+      '/default-profile.jpg';
 
     return {
       ...item,
       statistics: statsItem ? statsItem.statistics : null,
-      isVerified: isVerified,
-      profileImageUrl: profileImageUrl,
+      isVerified,
+      profileImageUrl,
     };
   });
-
-  return combinedData;
 };
 
 export const fetchChannelUploadsPlaylistId = async (channelId) => {
-  const apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${API_KEY}`;
+  const apiUrl = `${config.youtube.baseUrl}/channels?part=contentDetails&id=${channelId}&key=${config.youtube.apiKey}`;
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
@@ -64,7 +52,7 @@ export const fetchChannelUploadsPlaylistId = async (channelId) => {
 
 export const fetchVideosForChannel = async (uploadsPlaylistId) => {
   const maxResults = 50;
-  const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${API_KEY}`;
+  const apiUrl = `${config.youtube.baseUrl}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${config.youtube.apiKey}`;
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
@@ -73,24 +61,20 @@ export const fetchVideosForChannel = async (uploadsPlaylistId) => {
   const data = await response.json();
   const videoIds = data.items.map((item) => item.snippet.resourceId.videoId).join(',');
 
-  // Fetch video details to get the duration
-  const detailsApiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${API_KEY}`;
+  const detailsApiUrl = `${config.youtube.baseUrl}/videos?part=contentDetails&id=${videoIds}&key=${config.youtube.apiKey}`;
   const detailsResponse = await fetch(detailsApiUrl);
   if (!detailsResponse.ok) {
     throw new Error('Error fetching video details');
   }
   const detailsData = await detailsResponse.json();
 
-  // Calculate date 15 days ago
   const fifteenDaysAgo = new Date();
   fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
 
-  // Filter videos by duration and date
-  const filteredVideos = data.items.filter((item) => {
+  return data.items.filter((item) => {
     const videoDetails = detailsData.items.find(
       (detail) => detail.id === item.snippet.resourceId.videoId
     );
-    
     if (!videoDetails?.contentDetails) return false;
 
     const publishedDate = new Date(item.snippet.publishedAt);
@@ -99,12 +83,8 @@ export const fetchVideosForChannel = async (uploadsPlaylistId) => {
 
     return durationInSeconds >= 60 && publishedDate >= fifteenDaysAgo;
   });
-
-  return filteredVideos;
 };
 
-
-// Helper function to parse ISO 8601 duration to seconds
 const parseDuration = (duration) => {
   if (!duration) {
     console.warn("Duration is null or undefined");
@@ -122,8 +102,7 @@ const parseDuration = (duration) => {
 };
 
 export const fetchChannelDetails = async (channelId) => {
-  // Fetch both snippet and statistics
-  const apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${API_KEY}`;
+  const apiUrl = `${config.youtube.baseUrl}/channels?part=snippet,statistics&id=${channelId}&key=${config.youtube.apiKey}`;
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
@@ -187,26 +166,53 @@ export function formatRelativeTime(publishedAt) {
   return years + ' years ago';
 }
 
-
- // Function to get the best available thumbnail for videos
- export const getVideoThumbnailUrl = (thumbnails) => {
+export const getVideoThumbnailUrl = (thumbnails) => {
   return (
     thumbnails?.maxres?.url ||
     thumbnails?.standard?.url ||
     thumbnails?.high?.url ||
     thumbnails?.medium?.url ||
     thumbnails?.default?.url ||
-    "/placeholder.png" // Your default placeholder image
+    "/placeholder.png"
   );
 };
 
-// Function to get the best available thumbnail for channels
 export const getChannelThumbnailUrl = (thumbnails) => {
   return (
     thumbnails?.high?.url ||
     thumbnails?.medium?.url ||
     thumbnails?.default?.url ||
-    "/placeholder.png" // Your default placeholder image
+    "/placeholder.png"
   );
 };
 
+export const fetchPlaylistDetails = async (playlistId) => {
+  try {
+    const response = await fetch(
+      `${config.youtube.baseUrl}/playlists?part=snippet,contentDetails&id=${playlistId}&key=${config.youtube.apiKey}`
+    );
+    const data = await response.json();
+    
+    if (!data.items?.length) {
+      throw new Error('Playlist not found');
+    }
+    
+    return data.items[0];
+  } catch (error) {
+    console.error('Error fetching playlist:', error);
+    throw error;
+  }
+};
+
+export const fetchPlaylistVideos = async (playlistId) => {
+  try {
+    const response = await fetch(
+      `${config.youtube.baseUrl}/playlistItems?part=snippet,contentDetails&playlistId=${playlistId}&maxResults=${config.youtube.maxResults}&key=${config.youtube.apiKey}`
+    );
+    const data = await response.json();
+    return data.items || [];
+  } catch (error) {
+    console.error('Error fetching playlist videos:', error);
+    throw error;
+  }
+};

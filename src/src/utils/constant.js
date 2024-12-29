@@ -8,6 +8,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { compressImage } from "./imageUtils";
+import { fetchPlaylistDetails } from "../services/youtubeApi";
+
+
+
+
 // HomePage Methods
 export const handleFeedImage = async (file) => {
   if (!file) return "/default-thumb.webp";
@@ -272,5 +277,50 @@ export const generateShareableLink = async (feedName) => {
 
 
 
-// Handnign feed image
+// playlistPage Methods
+
+export const loadUserPlaylists = async (user, setPlaylists) => {
+  if (user) {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      setPlaylists(userDocSnap.data().playlists || []);
+    } else {
+      setPlaylists([]);
+    }
+  }
+};
+
+
+export const handleAddPlaylist = async (user, playlistUrl) => {
+  try {
+    // Extract playlist ID from URL
+    const playlistId = playlistUrl.match(/[?&]list=([^&]+)/)?.[1];
+    if (!playlistId) {
+      throw new Error('Invalid playlist URL');
+    }
+
+    // Fetch playlist details
+    const playlistData = await fetchPlaylistDetails(playlistId);
+    
+    const newPlaylist = {
+      id: playlistId,
+      title: playlistData.snippet.title,
+      thumbnail: playlistData.snippet.thumbnails.high.url,
+      videoCount: playlistData.contentDetails.itemCount,
+    };
+
+    const userDocRef = doc(db, "users", user.uid);
+    await updateDoc(userDocRef, {
+      playlists: arrayUnion(newPlaylist)
+    });
+
+    return newPlaylist;
+  } catch (error) {
+    console.error("Error adding playlist:", error);
+    throw error;
+  }
+};
+
 

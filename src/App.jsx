@@ -1,11 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './src/contexts/AuthContext.jsx';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import LoginPage from './src/pages/LoginPage';
 import HomePage from './src/pages/HomePage';
 import FeedPage from './src/pages/FeedPage';
-import LearnMorePage from './src/pages/LearnMorePage.jsx';
-import ShareRedirect from './src/components/ShareRedirect.jsx';
+import PlaylistPage from './src/pages/PlaylistPage';
+
+import LearnMorePage from './src/pages/LearnMorePage';
+import ShareRedirect from './src/components/ShareRedirect';
+import PlaylistDetailPage from './src/components/PlaylistDetailPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -30,9 +33,11 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-        <Route path="/" element={<RootRedirect />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
+          
+          {/* Protected Routes */}
           <Route
             path="/feeds"
             element={
@@ -41,7 +46,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/share/:shareId" element={<ShareRedirect />} />
           <Route
             path="/feed/:feedName"
             element={
@@ -50,14 +54,44 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/playlists"
+            element={
+              <PrivateRoute>
+                <PlaylistPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/playlist/:playlistId"
+            element={
+              <PrivateRoute>
+                <PlaylistDetailPage />
+              </PrivateRoute>
+            }
+          />
+          {/* <Route
+            path="/liked"
+            element={
+              <PrivateRoute>
+                <LikedVideosPage />
+              </PrivateRoute>
+            }
+          /> */}
+          {/* <Route
+            path="/watch-later"
+            element={
+              <PrivateRoute>
+                <WatchLaterPage />
+              </PrivateRoute>
+            }
+          /> */}
+          <Route path="/share/:shareId" element={<ShareRedirect />} />
         </Routes>
       </Router>
     </AuthProvider>
   );
 }
-
-export default App;
-
 
 function RootRedirect() {
   const { user, loading } = useAuth();
@@ -72,3 +106,5 @@ function RootRedirect() {
 
   return user ? <Navigate to="/feeds" /> : <Navigate to="/login" />;
 }
+
+export default App;

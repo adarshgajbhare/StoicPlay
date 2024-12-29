@@ -1,14 +1,29 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createSharedFeed } from "../services/shareService";
-import { fetchChannelDetails, fetchChannelVideos } from "../services/youtubeApi";
+import { 
+  doc, 
+  getDoc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove, 
+  setDoc 
+} from "firebase/firestore";
 import { db } from "../lib/firebase";
-
-
-
+import { compressImage } from "./imageUtils";
 // HomePage Methods
-
-
-// ...existing code...
+export const handleFeedImage = async (file) => {
+  if (!file) return "/default-thumb.webp";
+  
+  try {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  } catch (error) {
+    console.error("Error processing image:", error);
+    return "/default-thumb.webp";
+  }
+};
 
 export const loadHomeFeeds = async (user, setFeeds) => {
   if (user) {
@@ -24,22 +39,47 @@ export const loadHomeFeeds = async (user, setFeeds) => {
   }
 };
 
-export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageUrl) => {
-  const newFeed = { name: feedName, image: imageUrl, channels: [] };
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
+export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFile) => {
+  try {
+    let imageUrl = "/default-thumb.webp";
+    
+    if (imageFile) {
+      try {
+        const compressedBlob = await compressImage(imageFile);
+        const reader = new FileReader();
+        imageUrl = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(compressedBlob);
+        });
+      } catch (error) {
+        console.error("Error processing image:", error);
+      }
+    }
 
-  if (userDocSnap.exists()) {
-    await updateDoc(userDocRef, {
-      feeds: arrayUnion(newFeed),
-    });
-  } else {
-    await setDoc(userDocRef, {
-      feeds: [newFeed],
-    });
+    const newFeed = { 
+      name: feedName, 
+      image: imageUrl, 
+      channels: [] 
+    };
+
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      await updateDoc(userDocRef, {
+        feeds: arrayUnion(newFeed)
+      });
+    } else {
+      await setDoc(userDocRef, {
+        feeds: [newFeed]
+      });
+    }
+
+    setFeeds([...feeds, newFeed]);
+  } catch (error) {
+    console.error("Error adding feed:", error);
+    throw error;
   }
-
-  setFeeds([...feeds, newFeed]);
 };
 
 export const handleUpdateHomeFeed = async (user, feeds, setFeeds, oldName, newName, newImageUrl) => {
@@ -229,4 +269,8 @@ export const generateShareableLink = async (feedName) => {
   const shortLink = `https://your-app-url/share/${uniqueId}`;
   return shortLink;
 };
+
+
+
+// Handnign feed image
 

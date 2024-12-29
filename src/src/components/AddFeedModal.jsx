@@ -1,10 +1,44 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { compressImage } from "../utils/imageUtils";
 
 function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   const [feedName, setFeedName] = useState("");
   const [feedImage, setFeedImage] = useState(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState("/default-thumb.webp");
   const [feedNameError, setFeedNameError] = useState("");
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewImageUrl && previewImageUrl !== "/default-thumb.webp") {
+        URL.revokeObjectURL(previewImageUrl);
+      }
+    };
+  }, [previewImageUrl]);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        if (previewImageUrl && previewImageUrl !== "/default-thumb.webp") {
+          URL.revokeObjectURL(previewImageUrl);
+        }
+
+        const compressedBlob = await compressImage(file);
+        const compressedFile = new File([compressedBlob], file.name, {
+          type: "image/webp",
+        });
+
+        const newPreviewUrl = URL.createObjectURL(compressedBlob);
+        setPreviewImageUrl(newPreviewUrl);
+        setFeedImage(compressedFile);
+      } catch (error) {
+        console.error("Error processing image:", error);
+        setPreviewImageUrl("/default-thumb.webp");
+        setFeedImage(null);
+      }
+    }
+  };
 
   const handleFeedNameChange = (event) => {
     setFeedName(event.target.value);
@@ -13,34 +47,29 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
     }
   };
 
-  const handleImageChange = (event) => {
-    setFeedImage(event.target.files[0]);
-  };
-
   const handleSubmit = async () => {
     if (!feedName.trim()) {
       setFeedNameError("The feed name cannot be empty");
       return;
     }
-    let imageUrl = "/default-thumb.webp";
-    if (feedImage) {
-      imageUrl = await convertImageToBase64(feedImage);
-    }
-    onAddFeed(feedName, imageUrl);
+
+    await onAddFeed(feedName, feedImage);
     setFeedName("");
     setFeedImage(null);
+    setPreviewImageUrl("/default-thumb.webp");
     onClose();
   };
 
-  const convertImageToBase64 = (imageFile) => {
+  const convertImageToBase64 = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(imageFile);
+      reader.readAsDataURL(file);
     });
   };
 
   if (!isOpen) return null;
+
 
   const imageUrl = feedImage
     ? URL.createObjectURL(feedImage)
@@ -49,7 +78,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
-        <h2 className="text-2xl font-medium tracking-tight mb-6">
+       <h2 className="text-2xl font-medium tracking-tight mb-6">
           Create a new feed
         </h2>
         <div className="mb-6">
@@ -81,7 +110,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
 
           <div className="flex items-center space-x-4">
             <img
-              src={imageUrl}
+              src={previewImageUrl}
               alt="Feed thumbnail"
               className="size-10 rounded-md ring-[1px] ring-white/20 object-cover"
             />
@@ -96,8 +125,8 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
               type="file"
               ref={fileInputRef}
               accept="image/*"
-              className="hidden"
               onChange={handleImageChange}
+              className="hidden"
             />
           </div>
         </div>

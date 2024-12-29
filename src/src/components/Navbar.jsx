@@ -4,7 +4,6 @@ import { signOut } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
-
 function Navbar({ onImportClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading } = useAuth();

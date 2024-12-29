@@ -30,10 +30,11 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+        <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
           <Route
-            path="/"
+            path="/feeds"
             element={
               <PrivateRoute>
                 <HomePage />
@@ -56,3 +57,18 @@ function App() {
 }
 
 export default App;
+
+
+function RootRedirect() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  return user ? <Navigate to="/feeds" /> : <Navigate to="/login" />;
+}

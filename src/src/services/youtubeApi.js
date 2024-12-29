@@ -81,27 +81,28 @@ export const fetchVideosForChannel = async (uploadsPlaylistId) => {
   }
   const detailsData = await detailsResponse.json();
 
-  // Filter out videos with duration less than 60 seconds (YouTube Shorts)
+  // Calculate date 15 days ago
+  const fifteenDaysAgo = new Date();
+  fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
+
+  // Filter videos by duration and date
   const filteredVideos = data.items.filter((item) => {
-    const videoDetails = detailsData.items.find((detail) => detail.id === item.snippet.resourceId.videoId);
+    const videoDetails = detailsData.items.find(
+      (detail) => detail.id === item.snippet.resourceId.videoId
+    );
+    
+    if (!videoDetails?.contentDetails) return false;
 
-    // Check if videoDetails or contentDetails is undefined
-    if (!videoDetails || !videoDetails.contentDetails) {
-      console.warn(`Missing details for video ID: ${item.snippet.resourceId.videoId}`);
-      return false; // Exclude videos without details
-    }
-
+    const publishedDate = new Date(item.snippet.publishedAt);
     const duration = videoDetails.contentDetails.duration;
-
-    // Log for debugging
-  //  console.log(`Video ID: ${item.snippet.resourceId.videoId}, Duration: ${duration}`);
-
     const durationInSeconds = parseDuration(duration);
-    return durationInSeconds >= 60;
+
+    return durationInSeconds >= 60 && publishedDate >= fifteenDaysAgo;
   });
 
   return filteredVideos;
 };
+
 
 // Helper function to parse ISO 8601 duration to seconds
 const parseDuration = (duration) => {

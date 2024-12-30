@@ -31,9 +31,9 @@ function Navbar({ onImportClick }) {
   };
 
   return (
-    <nav className="relative flex items-center justify-between text-white py-3">
-      <div className="inline-flex items-center gap-6">
-        <span className="text-2xl/4 md:text-xl/4 font-bold italic tracking-tight text-white">
+    <nav className="relative max-w-7xl mx-auto flex items-center justify-between  text-white py-3">
+      <div className="inline-flex border items-center gap-6">
+        <span className=" text-2xl/4  font-black italic  tracking-tight text-white">
           zenfeeds
         </span>
         <div className="hidden md:flex items-center space-x-2">
@@ -62,8 +62,8 @@ function Navbar({ onImportClick }) {
       </div>
 
       {/* Desktop Menu */}
-      <div className="hidden items-center gap-8 md:inline-flex">
-        <div className="flex items-center space-x-2">
+      <div className="hidden border items-center gap-8 md:inline-flex">
+        <div className="flex  items-center space-x-2">
           <img
             src={photoError ? "/default-profile.jpeg" : user.photoURL}
             alt={user.displayName}

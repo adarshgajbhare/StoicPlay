@@ -11,9 +11,6 @@ import { compressImage } from "./imageUtils";
 import { fetchPlaylistDetails } from "../services/youtubeApi";
 import { createSharedFeed } from "../services/shareService";
 
-
-
-
 // HomePage Methods
 export const handleFeedImage = async (file) => {
   if (!file) return "/default-thumb.webp";
@@ -325,3 +322,68 @@ export const handleAddPlaylist = async (user, playlistUrl) => {
 };
 
 
+export const saveLikedVideo = async (userId, videoData) => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, { likedVideos: [] });
+    }
+    
+    await updateDoc(userDocRef, {
+      likedVideos: arrayUnion(videoData)
+    });
+  } catch (error) {
+    console.error('Error saving liked video:', error);
+    throw error;
+  }
+};
+
+export const saveWatchLater = async (userId, videoData) => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, { watchLater: [] });
+    }
+    
+    await updateDoc(userDocRef, {
+      watchLater: arrayUnion(videoData)
+    });
+  } catch (error) {
+    console.error('Error saving watch later:', error);
+    throw error;
+  }
+};
+
+
+
+export const getLikedVideos = async (userId) => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data().likedVideos || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching liked videos:', error);
+    throw error;
+  }
+};
+
+export const getWatchLaterVideos = async (userId) => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data().watchLater || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching watch later videos:', error);
+    throw error;
+  }
+};

@@ -7,12 +7,16 @@ import {
 } from "../services/youtubeApi";
 import { IconClock, IconDotsVertical, IconHeart } from "@tabler/icons-react";
 import DropdownMenu from "./DropdownMenu";
+import { saveLikedVideo, saveWatchLater } from '../utils/constant';
+import { useAuth } from '../contexts/AuthContext';
 
 function VideoCard({ video, channelDetails }) {
   const [videoImageError, setVideoImageError] = useState(false);
   const [channelImageError, setChannelImageError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
 
+  
   const handleVideoImageError = () => {
     setVideoImageError(true);
   };
@@ -41,36 +45,27 @@ function VideoCard({ video, channelDetails }) {
     return null;
   };
 
-  const handleLikeVideo = (e) => {
+  const handleLikeVideo = async (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
     
     try {
-      const likedVideos = JSON.parse(localStorage.getItem('likedVideos') || '[]');
       const videoId = video.id?.videoId || video.id;
+      const videoToSave = {
+        ...video,
+        channelDetails,
+        id: videoId,
+        snippet: {
+          ...video.snippet,
+          thumbnails: video.snippet.thumbnails || {},
+          channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
+        }
+      };
       
-      const isAlreadyLiked = likedVideos.some(v => 
-        v.id?.videoId === videoId || v.id === videoId
-      );
-    
-      if (!isAlreadyLiked) {
-        const videoToSave = {
-          ...video,
-          channelDetails,
-          id: videoId,
-          snippet: {
-            ...video.snippet,
-            thumbnails: video.snippet.thumbnails || {},
-            channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
-          }
-        };
-        
-        const updatedLikedVideos = [...likedVideos, videoToSave];
-        localStorage.setItem('likedVideos', JSON.stringify(updatedLikedVideos));
-        console.log('Video liked:', videoId);
-      }
+      await saveLikedVideo(user.uid, videoToSave);
+      console.log('Video liked:', videoId);
     } catch (error) {
       console.error('Failed to save liked video:', error);
     }
@@ -78,44 +73,33 @@ function VideoCard({ video, channelDetails }) {
     setIsMenuOpen(false);
   };
 
-  const handleWatchLater = (e) => {
+  const handleWatchLater = async (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
     
     try {
-      const watchLaterVideos = JSON.parse(localStorage.getItem('watchLaterVideos') || '[]');
       const videoId = video.id?.videoId || video.id;
+      const videoToSave = {
+        ...video,
+        channelDetails,
+        id: videoId,
+        snippet: {
+          ...video.snippet,
+          thumbnails: video.snippet.thumbnails || {},
+          channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
+        }
+      };
       
-      const isAlreadyAdded = watchLaterVideos.some(v => 
-        v.id?.videoId === videoId || v.id === videoId
-      );
-    
-      if (!isAlreadyAdded) {
-        const videoToSave = {
-          ...video,
-          channelDetails,
-          id: videoId,
-          snippet: {
-            ...video.snippet,
-            thumbnails: video.snippet.thumbnails || {},
-            channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
-          }
-        };
-    
-        localStorage.setItem('watchLaterVideos', 
-          JSON.stringify([...watchLaterVideos, videoToSave])
-        );
-        console.log('Added to watch later:', videoId);
-      }
+      await saveWatchLater(user.uid, videoToSave);
+      console.log('Added to watch later:', videoId);
     } catch (error) {
       console.error('Failed to save to watch later:', error);
     }
     
     setIsMenuOpen(false);
   };
-
   const menuItems = [
     [
       {

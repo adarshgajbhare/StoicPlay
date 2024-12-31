@@ -9,6 +9,8 @@ import PlaylistPage from './src/pages/PlaylistPage';
 import LearnMorePage from './src/pages/LearnMorePage';
 import ShareRedirect from './src/components/ShareRedirect';
 import PlaylistDetailPage from './src/components/PlaylistDetailPage';
+import LikedVideosPage from './src/pages/LikedVideosPage';
+import WatchLaterPage from './src/pages/WatchLaterPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -70,22 +72,22 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* <Route
+          <Route
             path="/liked"
             element={
               <PrivateRoute>
                 <LikedVideosPage />
               </PrivateRoute>
             }
-          /> */}
-          {/* <Route
+          />
+          <Route
             path="/watch-later"
             element={
               <PrivateRoute>
                 <WatchLaterPage />
               </PrivateRoute>
             }
-          /> */}
+          />
           <Route path="/share/:shareId" element={<ShareRedirect />} />
         </Routes>
       </Router>

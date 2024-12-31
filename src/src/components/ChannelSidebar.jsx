@@ -1,65 +1,85 @@
-import React, { useState } from 'react';
-import { Trash2, ChevronRight, ChevronLeft, Layout } from 'lucide-react';
+import React, { useState } from "react";
+import { Trash2, ChevronRight, ChevronLeft, Layout } from "lucide-react";
+import { IconMenu, IconMenu2, IconX } from "@tabler/icons-react";
 
-const ChannelSidebar = ({ 
-  channels, 
-  channelDetails, 
-  selectedChannel, 
-  onChannelSelect, 
+const ChannelSidebar = ({
+  channels,
+  channelDetails,
+  selectedChannel,
+  onChannelSelect,
   onChannelDelete,
   totalVideosCount,
-  videos 
+  videos,
+  isCollapsed,    // Add this prop
+  onCollapse  
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+
 
   // Function to count videos for a specific channel
   const getChannelVideoCount = (channelId) => {
-    return videos.filter(video => video.snippet?.channelId === channelId).length;
+    return videos.filter((video) => video.snippet?.channelId === channelId)
+      .length;
   };
 
   return (
-    <div 
-      className={`bg-gray-900 border-l border-white/10 h-screen fixed right-0 top-0 overflow-y-auto transition-all duration-300 ${
-        isCollapsed ? 'w-16' : 'w-64'
+    <div
+    id="channel-sidebar"
+      className={`bg-[#202020]   hidden md:block 
+         border-white/10 min-h-dvh fixed right-0 top-0 z-50 overflow-y-auto transition-all duration-300 ${
+        isCollapsed ? "w-16" : "w-full md:w-64 "
       }`}
     >
-      <div className="flex items-center justify-between p-4">
-        {!isCollapsed && <h3 className="text-xl font-semibold text-white">Channels</h3>}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 hover:bg-gray-700 rounded transition-colors ml-auto"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
+      <div className="flex items-center justify-between p-2">
+        {!isCollapsed && (
+          <h3 className="text-lg/4 font-medium text-white">Channels</h3>
+        )}
+        
           {isCollapsed ? (
-            <ChevronLeft size={20} className="text-white" />
+            <button
+            onClick={() => onCollapse(!isCollapsed)}
+            className="p-1 hover:bg-gray-700 rounded transition-colors mx-auto"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <IconMenu size={24} className="text-white" />
+            </button>
           ) : (
-            <ChevronRight size={20} className="text-white" />
+            <button
+            onClick={() => onCollapse(!isCollapsed)}
+            className="p-1 hover:bg-gray-700 rounded transition-colors"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <IconX size={24} className="text-white" />
+            </button>
           )}
-        </button>
+        
       </div>
 
-      <div className="space-y-4 p-2">
+      <div className="space-y-2 p-2">
         {/* All Channels Option */}
-        <div 
+        <div
           className={`flex items-center justify-between ${
-            isCollapsed ? 'p-2' : 'p-3'
-          } rounded-lg cursor-pointer transition-colors ${
-            selectedChannel === null 
-              ? 'bg-blue-500 hover:bg-blue-600' 
-              : 'bg-gray-800 hover:bg-gray-700'
+            isCollapsed ? "p-1" : "p-1.5"
+          } rounded cursor-pointer transition-colors ${
+            selectedChannel === null
+              ? "bg-white"
+              : "bg-gray-800 hover:bg-gray-700"
           }`}
           onClick={() => onChannelSelect(null)}
         >
-          <div className="flex items-center space-x-3">
-            <div className={`rounded-full bg-gray-700 flex items-center justify-center ${
-              isCollapsed ? 'w-10 h-10' : 'w-8 h-8'
-            }`}>
-              <Layout size={isCollapsed ? 24 : 20} className="text-white" />
+          <div className="flex  w-full space-x-2">
+            <div
+              className={`rounded bg-white  flex items-center justify-center ${
+                isCollapsed ? "size-10" : "size-10"
+              }`}
+            >
+              <Layout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-black  " />
             </div>
             {!isCollapsed && (
               <div>
-                <span className="text-sm font-medium text-white">All Channels</span>
-                <span className="text-xs text-gray-400 block">
+                <span className="text-sm/3 font-medium tracking-tight text-black  ">
+                  All Channels
+                </span>
+                <span className="text-xs/3 text-gray-600 block">
                   {totalVideosCount} videos
                 </span>
               </div>
@@ -69,30 +89,35 @@ const ChannelSidebar = ({
 
         {/* Individual Channels */}
         {Object.entries(channels).map(([channelId, channelTitle]) => (
-          <div 
+          <div
             key={channelId}
             className={`flex items-center justify-between ${
-              isCollapsed ? 'p-2' : 'p-3'
-            } rounded-lg cursor-pointer transition-colors ${
-              selectedChannel === channelId 
-                ? 'bg-blue-500 hover:bg-blue-600' 
-                : 'bg-gray-800 hover:bg-gray-700'
+              isCollapsed ? "p-1" : "p-1.5"
+            } rounded cursor-pointer transition-colors ${
+              selectedChannel === null
+                ? "bg-black/0 hover:ring-[1px] ring-white/50"
+                : "bg-gray-800 hover:bg-gray-700"
             }`}
             onClick={() => onChannelSelect(channelId)}
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex w-full space-x-2">
               <img
-                src={channelDetails[channelId]?.snippet?.thumbnails?.default?.url || '/api/placeholder/48/48'}
+                src={
+                  channelDetails[channelId]?.snippet?.thumbnails?.default
+                    ?.url || "/api/placeholder/48/48"
+                }
                 alt={channelTitle}
-                className={`rounded-full ${isCollapsed ? 'w-10 h-10' : 'w-8 h-8'}`}
-                title={isCollapsed ? channelTitle : ''}
+                className={`rounded ${
+                  isCollapsed ? "size-10" : "size-10"
+                }`}
+                title={isCollapsed ? channelTitle : ""}
               />
               {!isCollapsed && (
                 <div>
-                  <span className="text-sm font-medium text-white truncate max-w-[120px]">
+                  <span className="text-sm/3 font-medium tracking-tight text-white truncate">
                     {channelTitle}
                   </span>
-                  <span className="text-xs text-gray-400 block">
+                  <span className="text-xs/3 text-gray-400 block">
                     {getChannelVideoCount(channelId)} videos
                   </span>
                 </div>
@@ -108,9 +133,9 @@ const ChannelSidebar = ({
                 aria-label={`Remove ${channelTitle}`}
                 title="Remove channel"
               >
-                <Trash2 
-                  size={16} 
-                  className="text-white opacity-60 group-hover:opacity-100" 
+                <Trash2
+                  size={16}
+                  className="text-white opacity-60 group-hover:opacity-100"
                 />
               </button>
             )}

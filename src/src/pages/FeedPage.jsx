@@ -19,6 +19,15 @@ import {
   handleDeleteFeed,
   handleShareFeed,
 } from "../utils/constant";
+import {
+  IconDotsVertical,
+  IconShare,
+  IconPlus,
+  IconEdit,
+  IconTrash,
+} from "@tabler/icons-react";
+import DropdownMenu from "../components/DropdownMenu";
+import FilterTags from "../components/FilterTags";
 
 function FeedPage() {
   const { user } = useAuth();
@@ -41,7 +50,34 @@ function FeedPage() {
     end: new Date(),
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false); // Renamed from isSidebarCollapsed
 
+  const actionMenuItems = [
+    [
+      {
+        label: "Share",
+        icon: <IconShare size={20} />,
+        onClick: () => handleShareFeed(user, currentFeed),
+      },
+      {
+        label: "Add Channel",
+        icon: <IconPlus size={20} />,
+        onClick: () => setIsSearchPopoverOpen(true),
+      },
+      {
+        label: "Edit Feed",
+        icon: <IconEdit size={20} />,
+        onClick: () => setIsEditModalOpen(true),
+      },
+      {
+        label: "Delete Feed",
+        icon: <IconTrash size={20} />,
+        onClick: () => handleDeleteFeed(user, feedName, navigate),
+        destructive: true,
+      },
+    ],
+  ];
   useEffect(() => {
     if (selectedChannel) {
       const channelVideos = videos.filter(
@@ -54,7 +90,14 @@ function FeedPage() {
   }, [selectedChannel, videos]);
 
   useEffect(() => {
-    loadFeedData(user, feedName, setCurrentFeed, setFeedChannels, setHasChannels, setInitialLoad);
+    loadFeedData(
+      user,
+      feedName,
+      setCurrentFeed,
+      setFeedChannels,
+      setHasChannels,
+      setInitialLoad
+    );
   }, [feedName, user]);
 
   useEffect(() => {
@@ -74,27 +117,14 @@ function FeedPage() {
         const channelDetail = await fetchChannelDetails(channelId);
         details[channelId] = channelDetail;
       } catch (error) {
-        console.error(`Error fetching details for channel ${channelId}:`, error);
+        console.error(
+          `Error fetching details for channel ${channelId}:`,
+          error
+        );
       }
     }
     setChannelDetails(details);
     loadFeedVideos(details);
-  };
-
-  const handleLoadMore = () => {
-    const newStartDate = new Date(
-      currentDateRange.start.setDate(currentDateRange.start.getDate() - 15)
-    );
-    const newEndDate = new Date(
-      currentDateRange.end.setDate(currentDateRange.end.getDate() - 15)
-    );
-
-    setCurrentDateRange({
-      start: newStartDate,
-      end: newEndDate,
-    });
-
-    loadFeedVideos(channelDetails, true);
   };
 
   const loadFeedVideos = async (channelDetailsMap, loadMore = false) => {
@@ -118,7 +148,10 @@ function FeedPage() {
             });
           }
         } catch (error) {
-          console.error(`Error fetching videos for channel ${channelId}:`, error);
+          console.error(
+            `Error fetching videos for channel ${channelId}:`,
+            error
+          );
         }
       }
 
@@ -145,18 +178,29 @@ function FeedPage() {
     setVideos([]);
     setIsLoading(true);
     setTimeout(() => {
-      loadFeedData(user, feedName, setCurrentFeed, setFeedChannels, setHasChannels, setInitialLoad);
+      loadFeedData(
+        user,
+        feedName,
+        setCurrentFeed,
+        setFeedChannels,
+        setHasChannels,
+        setInitialLoad
+      );
     }, 100);
   };
 
   return (
     <div className="min-h-dvh bg-[#121212] text-white p-4">
       <div
-        className={`max-w-8xl mx-auto ${
-          isSidebarCollapsed ? "pr-16" : "pr-64"
-        } transition-all duration-300`}
+        id="feed-side"
+        className={`  
+          ${
+            isCollapsed
+              ? " max-w-8xl md:pr-16  transition-all duration-300"
+              : " max-w-8xl md:pr-64 transition-all duration-300"
+          }`}
       >
-        <div className="flex md:flex-row justify-between flex-col gap-4 mb-8">
+        <div className="flex justify-between  gap-4 mb-8  ">
           <Link to="/" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
               <IconChevronsLeft
@@ -169,43 +213,57 @@ function FeedPage() {
               {feedName}
             </h1>
           </Link>
-          <div className="flex space-x-4 w-full max-w-lg">
+          <div className="relative">
             <button
-              onClick={() => handleShareFeed(user, currentFeed)}
-              className="rounded-md bg-blue-500 px-6 py-4 text-lg/4 font-medium text-white w-full text-center drop-shadow-md"
-              aria-label="Share feed"
+              onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
+              className="rounded-full p-2 hover:bg-white/10 transition-colors"
+              aria-label="Feed actions"
             >
-              Share
+              <IconDotsVertical size={24} />
             </button>
-            <button
-              onClick={() => setIsSearchPopoverOpen(true)}
-              className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"
-              aria-label="Add channel"
-            >
-              Add
-            </button>
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 w-full text-center drop-shadow-md"
-              aria-label="Edit feed"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDeleteFeed(user, feedName, navigate)}
-              className="rounded-md px-6 py-4 text-lg/4 font-medium text-gray-50 ring-[1px] ring-white/20 w-full text-center drop-shadow-md"
-              aria-label="Delete feed"
-            >
-              Delete
-            </button>
+            <div className="">
+              <DropdownMenu
+                isOpen={isActionMenuOpen}
+                onClose={() => setIsActionMenuOpen(false)}
+                items={actionMenuItems}
+                position="left"
+                width="w-48"
+              />
+            </div>
           </div>
+          {/* <div className="flex space-x-4 w-full max-w-lg justify-end relative z-50">
+         
+          </div> */}
         </div>
-
-        <h2 className="text-2xl font-semibold mb-4">
-          {selectedChannel
+        {/* {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
-            : "All Videos"}
-        </h2>
+            : "All Videos"} */}
+
+        <FilterTags
+          channels={feedChannels}
+          channelDetails={channelDetails}
+          selectedChannel={selectedChannel}
+          onChannelSelect={setSelectedChannel}
+          onChannelDelete={(channelIdToDelete) =>
+            handleChannelDelete(
+              user,
+              feedName,
+              channelIdToDelete,
+              selectedChannel,
+              setSelectedChannel,
+              () =>
+                loadFeedData(
+                  user,
+                  feedName,
+                  setCurrentFeed,
+                  setFeedChannels,
+                  setHasChannels,
+                  setInitialLoad
+                )
+            )
+          }
+          videos={videos}
+        />
 
         {initialLoad ? (
           <div className="flex justify-center items-center h-20">
@@ -218,7 +276,7 @@ function FeedPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredVideos.map((video) => (
               <VideoCard
                 key={video.id?.videoId || video.id}
@@ -235,12 +293,27 @@ function FeedPage() {
           selectedChannel={selectedChannel}
           onChannelSelect={setSelectedChannel}
           onChannelDelete={(channelIdToDelete) =>
-            handleChannelDelete(user, feedName, channelIdToDelete, selectedChannel, setSelectedChannel, () =>
-              loadFeedData(user, feedName, setCurrentFeed, setFeedChannels, setHasChannels, setInitialLoad)
+            handleChannelDelete(
+              user,
+              feedName,
+              channelIdToDelete,
+              selectedChannel,
+              setSelectedChannel,
+              () =>
+                loadFeedData(
+                  user,
+                  feedName,
+                  setCurrentFeed,
+                  setFeedChannels,
+                  setHasChannels,
+                  setInitialLoad
+                )
             )
           }
           totalVideosCount={videos.length}
           videos={videos}
+          isCollapsed={isCollapsed} 
+          onCollapse={setIsCollapsed}
         />
 
         <EditFeedModal
@@ -275,7 +348,7 @@ function FeedPage() {
           }}
         />
 
-        <SearchPopover 
+        <SearchPopover
           isOpen={isSearchPopoverOpen}
           onClose={() => setIsSearchPopoverOpen(false)}
           onChannelAdded={handleChannelAdded}

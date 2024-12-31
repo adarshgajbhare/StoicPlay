@@ -51,7 +51,7 @@ function FeedPage() {
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false); // Renamed from isSidebarCollapsed
+  const [isCollapsed, setIsCollapsed] = useState(false); 
 
   const actionMenuItems = [
     [

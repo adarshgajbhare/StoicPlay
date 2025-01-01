@@ -231,13 +231,13 @@ function FeedPage() {
               />
             </div>
           </div>
-          {/* <div className="flex space-x-4 w-full max-w-lg justify-end relative z-50">
-         
-          </div> */}
+       
         </div>
-        {/* {selectedChannel
+        <h2 className="text-2xl font-semibold mb-4 hidden md:block">
+          {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
-            : "All Videos"} */}
+            : "All Videos"}
+        </h2>
 
         <FilterTags
           channels={feedChannels}

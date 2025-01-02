@@ -1,24 +1,83 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import SearchPopover from "./SearchPopover";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { fetchChannelDetails } from "../services/youtubeApi";
 
 const EmptyFeedCallToAction = () => {
+  const { user } = useAuth();
+  const { feedName } = useParams();
   const [isHovered, setIsHovered] = useState(false);
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
-
   const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
-  const [currentFeed, setCurrentFeed] = useState(null);
-  const handleChannelAdded = () => {
-    setFeedChannels({});
-    setChannelDetails({});
-    setVideos([]);
-    setIsLoading(true);
-    setTimeout(() => {
-      loadFeedData();
-    }, 100);
+  const [isLoading, setIsLoading] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [hasChannels, setHasChannels] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loadChannelDetails = async () => {
+    try {
+      const details = {};
+      for (const channelId of Object.keys(feedChannels)) {
+        const channelDetail = await fetchChannelDetails(channelId);
+        details[channelId] = channelDetail;
+      }
+      setChannelDetails(details);
+      return details;
+    } catch (error) {
+      console.error("Error loading channel details:", error);
+      setError("Failed to load channel details");
+    }
   };
+
+  const loadFeedData = async () => {
+    if (!user) return;
+    
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const currentFeed = userData.feeds.find(feed => feed.name === feedName);
+        
+        if (currentFeed && currentFeed.channels) {
+          const channels = {};
+          currentFeed.channels.forEach(channel => {
+            channels[channel.channelId] = channel.channelTitle;
+          });
+          setFeedChannels(channels);
+          setHasChannels(true);
+          await loadChannelDetails();
+        }
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error loading feed data:", error);
+      setError("Failed to load feed data");
+      setIsLoading(false);
+    }
+  };
+
+  const handleChannelAdded = async () => {
+    setIsLoading(true);
+    setVideos([]);
+    try {
+      await loadFeedData();
+      setHasChannels(true);
+    } catch (error) {
+      console.error("Error handling channel addition:", error);
+      setError("Failed to update channel list");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-2xl bg-[#121212]  mx-auto rounded-md  text-center">
+    <div className="max-w-2xl bg-[#121212] mx-auto rounded-md text-center">
       <div className="mb-8">
         <svg
           className="w-48 h-48 mx-auto text-gray-400"
@@ -35,33 +94,43 @@ const EmptyFeedCallToAction = () => {
           />
         </svg>
       </div>
+      
+      {error && (
+        <div className="text-red-500 mb-4">
+          {error}
+        </div>
+      )}
+
       <h2 className="text-3xl font-semibold tracking-tight text-white mb-4">
-        Your feed is empty, add more
+        Your feed is empty, add Channels
       </h2>
+      
       <p className="text-white/75 text-xl/7 max-w-md mx-auto mb-8">
         Start adding your favorite YouTube channels to create your personalized
         ZenFeed.
       </p>
+      
       <button
-        className={`rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  md:w-1/2 text-center  drop-shadow-md transition duration-300 ease-in-out transform ${
+        className={`rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 md:w-1/2 text-center drop-shadow-md transition duration-300 ease-in-out transform ${
           isHovered ? "scale-105" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setIsSearchPopoverOpen(true)}
+        disabled={isLoading}
       >
-        Add Your First Channel
+        {isLoading ? "Adding Channel..." : "Add Your First Channel"}
       </button>
-      <div className="mt-12 text-sm text-gray-500">
-        <p>Need help getting started?</p>
-        <a href="#" className="text-blue-500 hover:underline">
-          Watch a video tutorial to get started
-        </a>
-      </div>
+
       <SearchPopover
         isOpen={isSearchPopoverOpen}
         onClose={() => setIsSearchPopoverOpen(false)}
         onChannelAdded={handleChannelAdded}
+        setIsLoading={setIsLoading}
+        setVideos={setVideos}
+        setHasChannels={setHasChannels}
+        loadChannelDetails={loadChannelDetails}
+        feedName={feedName}
       />
     </div>
   );

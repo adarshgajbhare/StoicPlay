@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import VideoCard from "../components/VideoCard";
@@ -29,6 +28,7 @@ import {
 import DropdownMenu from "../components/DropdownMenu";
 import FilterTags from "../components/FilterTags";
 
+
 function FeedPage() {
   const { user } = useAuth();
   const { feedName } = useParams();
@@ -51,7 +51,7 @@ function FeedPage() {
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false); 
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const actionMenuItems = [
     [
@@ -161,6 +161,7 @@ function FeedPage() {
           new Date(a.snippet?.publishedAt || 0)
       );
 
+  
       setVideos(allVideos);
       setHasMoreVideos(allVideos.length > 0);
     } catch (error) {
@@ -193,11 +194,10 @@ function FeedPage() {
     <div className="min-h-dvh bg-[#121212] text-white p-4">
       <div
         id="feed-side"
-        className={`  
-          ${
-            isCollapsed
-              ? " max-w-8xl md:pr-16  transition-all duration-300"
-              : " max-w-8xl md:pr-64 transition-all duration-300"
+        className={`
+          ${isCollapsed
+            ? " max-w-8xl md:pr-16  transition-all duration-300"
+            : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
         <div className="flex justify-between  gap-4 mb-8  ">
@@ -231,7 +231,6 @@ function FeedPage() {
               />
             </div>
           </div>
-       
         </div>
         <h2 className="text-2xl font-semibold mb-4 hidden md:block">
           {selectedChannel
@@ -312,7 +311,7 @@ function FeedPage() {
           }
           totalVideosCount={videos.length}
           videos={videos}
-          isCollapsed={isCollapsed} 
+          isCollapsed={isCollapsed}
           onCollapse={setIsCollapsed}
         />
 
@@ -352,6 +351,10 @@ function FeedPage() {
           isOpen={isSearchPopoverOpen}
           onClose={() => setIsSearchPopoverOpen(false)}
           onChannelAdded={handleChannelAdded}
+          setIsLoading={setIsLoading}
+          setVideos={setVideos}
+          setHasChannels={setHasChannels}
+          loadChannelDetails={loadChannelDetails}
         />
       </div>
     </div>

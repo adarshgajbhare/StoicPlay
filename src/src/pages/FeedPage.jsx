@@ -191,7 +191,7 @@ function FeedPage() {
   };
 
   return (
-    <div className="h-dvh overflow-hidden bg-[#121212] text-white p-4">
+    <div className="min-h-dvh overflow-y-scroll bg-[#121212] text-white p-4">
       <div
         id="feed-side"
         className={`
@@ -276,7 +276,7 @@ function FeedPage() {
           </div>
         ) : (
           <section className="flex gap-8 lg:px-8">
-            <div className="min-h-dvh relative w-1/2  p-6 overflow-hidden rounded-2xl">
+            <div className="max-h-screen relative  w-1/2  p-6 overflow-hidden rounded-2xl">
             <div className="absolute inset-0 overflow-hidden size-full bg-gradient-to-t from-[#121212] from-50% via-transparent to-transparent z-30">
 
             </div>

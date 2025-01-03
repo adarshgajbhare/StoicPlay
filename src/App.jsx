@@ -1,16 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './src/contexts/AuthContext';
-import LoginPage from './src/pages/LoginPage';
-import HomePage from './src/pages/HomePage';
-import FeedPage from './src/pages/FeedPage';
-import PlaylistPage from './src/pages/PlaylistPage';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import LoginPage from './pages/LoginPage';
+import HomePage from './pages/HomePage';
+import FeedPage from './pages/FeedPage';
+import PlaylistPage from './pages/PlaylistPage';
 
-import LearnMorePage from './src/pages/LearnMorePage';
-import ShareRedirect from './src/components/ShareRedirect';
-import PlaylistDetailPage from './src/components/PlaylistDetailPage';
-import LikedVideosPage from './src/pages/LikedVideosPage';
-import WatchLaterPage from './src/pages/WatchLaterPage';
+import LearnMorePage from './pages/LearnMorePage';
+import ShareRedirect from './components/ShareRedirect';
+import PlaylistDetailPage from './components/PlaylistDetailPage';
+import LikedVideosPage from './pages/LikedVideosPage';
+import WatchLaterPage from './pages/WatchLaterPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();

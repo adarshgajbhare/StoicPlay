@@ -87,10 +87,12 @@ function PlaylistCard({ playlist, onVideoSelect }) {
       if (video.contentDetails?.videoId) return video.contentDetails.videoId;
     }
     return null;
-  };
+  };  
 
   return (
-    <div className="bg-[#151515] ring-[1px] ring-white/15 rounded shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
+     <Link
+        to={`/playlist/${playlist.id}`}> 
+        <div className="bg-[#151515] ring-[1px] ring-white/15 rounded shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
       <div 
         className="relative group cursor-pointer" 
         onClick={() => {
@@ -111,14 +113,12 @@ function PlaylistCard({ playlist, onVideoSelect }) {
           </div>
         </div>
       </div>
-      <Link
-        to={`/playlist/${playlist.id}`}
-        className="block p-4"
-      >
+      <div className="p-4">
         <h3 className="text-lg font-medium text-white">{playlist.title}</h3>
         <p className="text-sm text-gray-400">{playlist.videoCount} videos</p>
-      </Link>
-    </div>
+      </div>
+    
+    </div>  </Link>
   );
 }
 

@@ -1,10 +1,12 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import {
   formatRelativeTime,
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconClock, IconDotsVertical, IconHeart } from "@tabler/icons-react";
+import { IconBookmark, IconClock, IconDotsVertical, IconThumbUp } from "@tabler/icons-react";
 import DropdownMenu from "./DropdownMenu";
 import { saveLikedVideo, saveWatchLater } from '../utils/constant';
 import { useAuth } from '../contexts/AuthContext';
@@ -104,13 +106,18 @@ function VideoCard({ video, channelDetails }) {
   const menuItems = [
     [
       {
-        label: "Watch Later",
+        label: "Watch later",
         icon: <IconClock size={20} />,
         onClick: handleWatchLater,
       },
       {
-        label: "Like Video",
-        icon: <IconHeart size={20} />,
+        label: "Like video",
+        icon: <IconThumbUp size={20} />,
+        onClick: handleLikeVideo,
+      },
+      {
+        label: "Save for later",
+        icon: <IconBookmark size={20} />,
         onClick: handleLikeVideo,
       },
     ],
@@ -123,45 +130,38 @@ function VideoCard({ video, channelDetails }) {
   const channelTitle = channelDetails?.snippet?.title || video.snippet.channelTitle;
 
   return (
-    <>
-      <div className="bg-transparent overflow-hidden shadow-md md:transition-transform duration-500 cursor-pointer relative">
-        <div className="relative group" onClick={handleClick}>
-          {!videoImageError ? (
-            <div className="relative">
-              <img
-                src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
-                alt={video.snippet.title}
-                className="w-full h-40 object-cover rounded-md"
-                onError={handleVideoImageError}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" className="w-6 h-6">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <img
-              src="/placeholder.png"
-              alt="Placeholder"
-              className="w-full h-40 object-cover rounded-md"
-            />
-          )}
+    <div
+      className="bg-transparent  flex items-start gap-4 overflow-hidden shadow-md md:transition-transform duration-500 cursor-pointer relative"
+      onClick={handleClick}
+    >
+      <div className="relative group flex-shrink-0">
+        {!videoImageError ? (
+          <img
+            src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
+            alt={video.snippet.title}
+            className="h-36 w-60   rounded-lg  flex-shrink-0"
+            onError={handleVideoImageError}
+          />
+        ) : (
+          <img
+            src="/placeholder.png"
+            alt="Placeholder"
+            className="w-full h-40 object-cover rounded "
+          />
+        )}
 
-          <div className="absolute top-2 right-2 z-20" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsMenuOpen(!isMenuOpen);
-              }}
-              className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 
-                         opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <IconDotsVertical size={20} />
-            </button>
+        <div className="absolute top-1 right-1 z-20" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="p-1 rounded-full bg-black/50 hover:bg-black 
+                       transition-opacity"
+          >
+            <IconDotsVertical size={16} />
+          </button>
 
             <DropdownMenu
               isOpen={isMenuOpen}
@@ -171,27 +171,28 @@ function VideoCard({ video, channelDetails }) {
           </div>
         </div>
 
-        <div className="flex items-start mt-2 gap-1">
-          {!channelImageError && channelDetails?.snippet?.thumbnails && (
+      <div className="flex items-start self-stretch  w-full gap-2">
+        {!channelImageError && channelDetails?.snippet?.thumbnails && (
+          <div className="size-8 rounded-full ring-[1px]  ring-white/20  overflow-hidden border-white flex-shrink-0">
             <img
               src={getChannelThumbnailUrl(channelDetails.snippet.thumbnails)}
               alt={channelTitle}
-              className="size-8 rounded-full ring-[1px] flex-shrink-0 ring-white/20 mr-1 overflow-hidden border-white"
+              className=""
               onError={handleChannelImageError}
             />
-          )}
-          <div className="flex flex-col break-words gap-1">
-            <h3 className="font-semibold text-pretty text-base/5 line-clamp-2 text-white">
-              {video.snippet.title}
-            </h3>
-            <div className="flex flex-col gap-1 mt-1">
-              <span className="text-sm/3 text-gray-500 font-medium flex">
-                {channelTitle}
-              </span>
-              <p className="text-white font-medium text-xs/3 ">
-                {formatRelativeTime(video?.snippet?.publishedAt)}
-              </p>
-            </div>
+          </div>
+        )}
+        <div className="flex flex-col break-words gap-1.5">
+          <h3 className="font-medium  text-pretty text-lg/5 line-clamp-3 text-white">
+            {video.snippet.title}
+          </h3>
+          <div className="flex flex-col gap-1 mt-1">
+            <span className="text-sm/3 text-gray-300 font-medium flex">
+              {channelTitle}
+            </span>
+            <p className="text-gray-300 fostretchnt-medium text-xs/3">
+              {formatRelativeTime(video?.snippet?.publishedAt)}
+            </p>
           </div>
         </div>
       </div>
@@ -202,7 +203,7 @@ function VideoCard({ video, channelDetails }) {
           onClose={() => setIsVideoOpen(false)}
         />
       )}
-    </>
+    </div>
   );
 }
 

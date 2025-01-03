@@ -39,20 +39,20 @@ function LoginPage() {
         </p>
 
         {error && (
-          <div className="bg-red-500 text-white  rounded-md mb-2">{error}</div>
+          <div className="bg-red-500 text-white  rounded  mb-2">{error}</div>
         )}
 
         <div className="hero-buttons md:ml-4 mt-6 flex w-full    flex-col items-center gap-4 ">
           <a
             href="#"
             onClick={handleGoogleSignIn}
-            className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  w-full text-center  drop-shadow-md"
+            className="rounded  bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  w-full text-center  drop-shadow-md"
           >
             Continue with Google
           </a>
           <a
             href="/learn-more"
-            className="rounded-md bg-black  w-full text-center px-6 py-4 text-lg/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
+            className="rounded  bg-black  w-full text-center px-6 py-4 text-lg/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
           >
             Learn more
           </a>

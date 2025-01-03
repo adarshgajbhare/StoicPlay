@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronsLeft } from "@tabler/icons-react";
+import { IconChevronLeft, IconChevronsLeft } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -191,7 +191,7 @@ function FeedPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#121212] text-white p-4">
+    <div className="h-dvh overflow-hidden bg-[#121212] text-white p-4">
       <div
         id="feed-side"
         className={`
@@ -200,16 +200,16 @@ function FeedPage() {
             : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
-        <div className="flex justify-between  gap-4 mb-8  ">
-          <Link to="/" className="flex items-center gap-2">
+        <div className="flex justify-between   gap-4 mb-8  ">
+          <Link to="/" className="flex items-center">
             <div className="text-white transition-colors duration-500">
-              <IconChevronsLeft
-                size={36}
-                strokeWidth={1}
-                className="scale-150 text-white"
+              <IconChevronLeft
+                size={24}
+                strokeWidth={1.5}
+                className="scale-125 text-white"
               />
             </div>
-            <h1 className="text-2xl lg:text-4xl font-medium text-center text-white tracking-tight">
+            <h1 className="text-2xl/4  font-medium  text-white tracking-tight">
               {feedName}
             </h1>
           </Link>
@@ -266,24 +266,46 @@ function FeedPage() {
 
         {initialLoad ? (
           <div className="flex justify-center items-center h-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-16 w-16 -t-2 -b-2 -white"></div>
           </div>
         ) : !hasChannels ? (
           <EmptyFeedCallToAction />
         ) : isLoading ? (
           <div className="flex justify-center items-center h-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-16 w-16 -t-2 -b-2 -white"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredVideos.map((video) => (
-              <VideoCard
-                key={video.id?.videoId || video.id}
-                video={video}
-                channelDetails={video.channelDetails}
-              />
-            ))}
-          </div>
+          <section className="flex gap-8 lg:px-8">
+            <div className="min-h-dvh relative w-1/2  p-6 overflow-hidden rounded-2xl">
+            <div className="absolute inset-0 overflow-hidden size-full bg-gradient-to-t from-[#121212] from-50% via-transparent to-transparent z-30">
+
+            </div>
+              <div className="absolute overflow-hidden inset-0 w-full h-full ">
+                <img
+                  src="https://i.ytimg.com/vi/3uq6ym5FkEc/maxresdefault.jpg"
+                  alt=""
+                  className="size-full object-cover object-center"
+                />
+              </div>
+
+              <div className="absolute inset-0  bg-black/10 filter backdrop-blur-xl"></div>
+              <div className="mx-auto isolate  cursor-pointer rounded-xl overflow-hidden">
+                <img
+                  src="https://i.ytimg.com/vi/3uq6ym5FkEc/maxresdefault.jpg"
+                  alt=""
+                />
+              </div>
+            </div>
+            <div className="grid   grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+              {filteredVideos.map((video) => (
+                <VideoCard
+                  key={video.id?.videoId || video.id}
+                  video={video}
+                  channelDetails={video.channelDetails}
+                />
+              ))}
+            </div>
+          </section>
         )}
 
         <ChannelSidebar

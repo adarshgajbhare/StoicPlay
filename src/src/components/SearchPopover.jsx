@@ -100,22 +100,24 @@ function SearchPopover({
         transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black/50 filter backdrop-blur-lg flex items-center justify-center z-50"
       >
-        <div className="popover overflow-y-scroll h-4/5 bg-[#202020] p-4 rounded-md shadow-lg w-full max-w-4xl relative">
-          <div className="flex items-center gap-4">
+        <div className="popover overflow-y-scroll h-4/5 bg-[#070707] p-8 ring-[1px] ring-white/30 rounded  shadow-lg w-full max-w-4xl relative ">
+       
+          <div className="flex items-center  gap-4">
             <div className="grow">
               <SearchBar onSearch={searchChannels} />
             </div>
             <button
-              onClick={onClose}
-              className="rounded-md p-3 text-base/4 font-medium bg-[#101010] text-black ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto"
-              aria-label="Close search"
-            >
-              <IconX size={20} strokeWidth={2} color="white" />
+                onClick={onClose}
+                className="rounded  p-3 text-base/4 font-medium bg-[#101010] text-black
+                 ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto "
+                aria-label="Delete feed"
+              >
+                <IconX  size={20} strokeWidth={2} color="white" />
             </button>
           </div>
           {searchResults.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4">Search Results</h2>
+              <h2 className="text-xl text-left font-medium  mb-2">Search Results</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {searchResults.map((channel) => (
                   <ChannelCard

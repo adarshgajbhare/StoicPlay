@@ -14,7 +14,7 @@ const FilterTags = ({
 
   return (
     <div
-      className="flex items-center flex-nowrap gap-2 text-sm/3 font-semibold mb-4 overflow-x-scroll
+      className="flex items-center flex-nowrap gap-2 text-sm/3 font-medium  mb-4 overflow-x-scroll
         md:hidden
       
       "

@@ -15,7 +15,7 @@ function SearchBar({ onSearch }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search channels..."
-        className="w-full grow-1 p-3 text-lg/4 text-white placeholder:text-white/35 ring-[1px] ring-white/20 bg-[#101010] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full grow-1 p-3 text-lg/4 text-white placeholder:text-white/35 ring-[1px] ring-white/20 bg-[#101010] rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
         type="submit"

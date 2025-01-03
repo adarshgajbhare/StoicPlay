@@ -77,7 +77,7 @@ const EmptyFeedCallToAction = () => {
   };
 
   return (
-    <div className="max-w-2xl bg-[#121212] mx-auto rounded-md text-center">
+    <div className="max-w-2xl bg-[#121212]  mx-auto rounded   text-center">
       <div className="mb-8">
         <svg
           className="w-48 h-48 mx-auto text-gray-400"
@@ -111,7 +111,7 @@ const EmptyFeedCallToAction = () => {
       </p>
       
       <button
-        className={`rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950 md:w-1/2 text-center drop-shadow-md transition duration-300 ease-in-out transform ${
+        className={`rounded  bg-white px-6 py-4 text-lg/4 font-medium text-gray-950  md:w-2/5 text-center  drop-shadow-md transition duration-300 ease-in-out transform ${
           isHovered ? "scale-105" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
@@ -121,7 +121,16 @@ const EmptyFeedCallToAction = () => {
       >
         {isLoading ? "Adding Channel..." : "Add Your First Channel"}
       </button>
-
+      <div className="mt-12 text-sm text-gray-500">
+        <p>Need help getting started?</p>
+        <a
+          href="https://www.youtube.com/watch?v=BBJa32lCaaY"
+          target="_blank"
+          className="text-blue-500 hover:underline"
+        >
+          Watch a video tutorial to get started
+        </a>
+      </div>
       <SearchPopover
         isOpen={isSearchPopoverOpen}
         onClose={() => setIsSearchPopoverOpen(false)}

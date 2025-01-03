@@ -82,7 +82,7 @@ const LearnMorePage = () => {
             </p>
           </div>
           {error && (
-            <div className="text-red-500 rounded-md mt-2 lg:mt-8">
+            <div className="text-red-500 rounded  mt-2 lg:mt-8">
               Oops! {error}
             </div>
           )}
@@ -93,14 +93,14 @@ const LearnMorePage = () => {
               onClick={handleGoogleSignIn}
               className="
               
-              rounded-md bg-white px-6 py-4 text-base/4 font-medium text-gray-950  w-full text-center  drop-shadow-md
+              rounded  bg-white px-6 py-4 text-base/4 font-medium text-gray-950  w-full text-center  drop-shadow-md
               "
             >
               Sign up with Google
             </a>
             <a
               href="/learn-more"
-              className="rounded-md bg-black  w-full text-center px-6 py-4 text-base/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
+              className="rounded  bg-black  w-full text-center px-6 py-4 text-base/4 font-medium text-white  shadow-[inset_0_0_1px_1px_rgba(255,255,255,1)] "
             >
               Learn more
             </a>

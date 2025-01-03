@@ -25,11 +25,11 @@ const ChannelSidebar = ({
     <div
     id="channel-sidebar"
       className={`bg-[#202020]   hidden md:block 
-         border-white/10 min-h-dvh fixed right-0 top-0 z-50 overflow-y-auto transition-all duration-300 ${
+         border-white/10 min-h-dvh py-2.5 fixed right-0 top-0 z-50 overflow-y-auto transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-full md:w-64 "
       }`}
     >
-      <div className="flex items-center justify-between p-2">
+      <div className="flex items-center justify-between py-2 px-4">
         {!isCollapsed && (
           <h3 className="text-lg/4 font-medium text-white">Channels</h3>
         )}
@@ -40,7 +40,7 @@ const ChannelSidebar = ({
             className="p-1 hover:bg-gray-700 rounded transition-colors mx-auto"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <IconMenu size={24} className="text-white" />
+            <IconMenu size={28} className="text-white" />
             </button>
           ) : (
             <button
@@ -54,7 +54,7 @@ const ChannelSidebar = ({
         
       </div>
 
-      <div className="space-y-2 p-2">
+      <div className="space-y-2  mt-5 p-2">
         {/* All Channels Option */}
         <div
           className={`flex items-center justify-between ${

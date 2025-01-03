@@ -52,7 +52,7 @@ function Navbar({ onImportClick }) {
   return (
     <nav className="relative max-w-7xl  mx-auto flex items-center justify-between  text-white p-3">
       <div className="inline-flex  items-center gap-3">
-        <span className=" text-xl/4 uppercase font-semibold text-lime-500">
+        <span className=" text-xl/4 uppercase font-medium  text-lime-500">
           zenfeeds
         </span>
         <div className="hidden md:flex items-center space-x-2">
@@ -193,13 +193,13 @@ http://www.w3.org/2000/svg
                   onImportClick();
                   setIsMenuOpen(false);
                 }}
-                className="rounded-md bg-white px-6 py-4 text-lg/4 font-medium text-gray-950"
+                className="rounded  bg-white px-6 py-4 text-lg/4 font-medium text-gray-950"
               >
                 Import Feed
               </button>
               <button
                 onClick={handleLogout}
-                className="rounded-md px-6 py-4 text-lg/4 font-medium text-white ring-1 ring-white/30"
+                className="rounded  px-6 py-4 text-lg/4 font-medium text-white ring-1 ring-white/30"
               >
                 Logout
               </button>

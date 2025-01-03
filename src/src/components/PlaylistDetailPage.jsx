@@ -39,7 +39,7 @@ function PlaylistDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#101010] flex items-center justify-center">
+      <div className="min-h-dvh bg-[#101010] flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
       </div>
     );
@@ -63,18 +63,20 @@ function PlaylistDetailPage() {
             </h1>
           </Link>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videos.map((video) => (
-            <VideoCard
-              key={video.contentDetails.videoId}
-              video={video}
-              channelDetails={{
-                title: video.snippet.channelTitle,
-              }}
-            />
-          ))}
-        </div>
+        <section className="flex gap-4">
+          <div className="min-h-dvh bg-red-500 w-1/3 border"></div>
+          <div className="grid grid-cols-1 border w-2/3 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+            {videos.map((video) => (
+              <VideoCard
+                key={video.contentDetails.videoId}
+                video={video}
+                channelDetails={{
+                  title: video.snippet.channelTitle,
+                }}
+              />
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );

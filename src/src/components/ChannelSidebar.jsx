@@ -114,10 +114,10 @@ const ChannelSidebar = ({
               />
               {!isCollapsed && (
                 <div>
-                  <span className="text-sm/3 font-medium tracking-tight text-white truncate">
+                  <span className="text-sm font-medium tracking-tight text-red-500  line-clamp-1  ">
                     {channelTitle}
                   </span>
-                  <span className="text-xs/3 text-gray-400 block">
+                  <span className="text-xs text-gray-400 block">
                     {getChannelVideoCount(channelId)} videos
                   </span>
                 </div>

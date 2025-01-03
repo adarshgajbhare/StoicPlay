@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { fetchPlaylistVideos } from "../services/youtubeApi";
 import VideoCard from "../components/VideoCard";
 import Navbar from "../components/Navbar";
-import { IconChevronsLeft } from "@tabler/icons-react";
+import { IconChevronLeft, IconChevronsLeft } from "@tabler/icons-react";
 
 function PlaylistDetailPage() {
   const { playlistId } = useParams();
@@ -47,36 +47,32 @@ function PlaylistDetailPage() {
 
   return (
     <div className="min-h-dvh bg-[#101010] text-white">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <main className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <Navbar />
         <div className="flex md:flex-row justify-between flex-col gap-4 mb-8">
-          <Link to="/playlists" className="flex items-center gap-2">
+          <Link to="/playlists" className="flex items-center">
             <div className="text-white transition-colors duration-500">
-              <IconChevronsLeft
-                size={36}
+              <IconChevronLeft
+                size={20}
                 strokeWidth={1}
                 className="scale-150 text-white"
               />
             </div>
-            <h1 className="text-2xl lg:text-4xl font-medium text-center text-white tracking-tight">
+            <h1 className="text-2xl font-medium text-center text-white tracking-tight">
               {playlistDetails?.title || "Playlist"}
             </h1>
           </Link>
         </div>
-        <section className="flex gap-4">
-          <div className="min-h-dvh bg-red-500 w-1/3 border"></div>
-          <div className="grid grid-cols-1 border w-2/3 sm:grid-cols-1 lg:grid-cols-1 gap-6">
-            {videos.map((video) => (
-              <VideoCard
-                key={video.contentDetails.videoId}
-                video={video}
-                channelDetails={{
-                  title: video.snippet.channelTitle,
-                }}
-              />
-            ))}
-          </div>
-        </section>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          {videos.map((video) => (
+            <VideoCard
+            key={video.id?.videoId || video.id}
+            video={video}
+            channelDetails={video.channelDetails}
+          />
+          ))}
+        </div>
       </main>
     </div>
   );

@@ -7,7 +7,11 @@ import EditFeedModal from "../components/EditFeedModal";
 import { Plus } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ImportFeedModal from "../components/ImportFeedModal";
-import { loadHomeFeeds, handleAddHomeFeed, handleUpdateHomeFeed } from "../utils/constant";
+import {
+  loadHomeFeeds,
+  handleAddHomeFeed,
+  handleUpdateHomeFeed,
+} from "../utils/constant";
 import { IconSquareRoundedPlusFilled } from "@tabler/icons-react";
 
 function HomePage() {
@@ -27,12 +31,21 @@ function HomePage() {
   };
 
   const handleUpdateFeed = async (oldName, newName, newImageUrl) => {
-    await handleUpdateHomeFeed(user, feeds, setFeeds, oldName, newName, newImageUrl);
+    await handleUpdateHomeFeed(
+      user,
+      feeds,
+      setFeeds,
+      oldName,
+      newName,
+      newImageUrl
+    );
   };
 
   const handleImportFeed = async (feedUrl) => {
     console.log("Importing feed from URL:", feedUrl);
-    alert(`Importing feed from ${feedUrl}. This feature is not fully implemented yet.`);
+    alert(
+      `Importing feed from ${feedUrl}. This feature is not fully implemented yet.`
+    );
   };
 
   if (loading) {
@@ -47,13 +60,12 @@ function HomePage() {
     return <Navigate to="/login" />;
   }
 
-
   return (
     <div className="min-h-dvh bg-[#101010] text-white">
       <Navbar onImportClick={() => setShowImportModal(true)} />
       <main className="max-w-7xl mx-auto px-4 ">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        <div
+          <div
             onClick={() => setShowAddModal(true)}
             className="bg-[#070707]  h-52 ring-[1px] ring-white/15 rounded  overflow-hidden cursor-pointer flex text-2xl/6 font-medium tracking-tight text-white hover:text-white/50 flex-col items-center justify-center gap-2"
           >
@@ -65,7 +77,7 @@ function HomePage() {
             <span className="text-lg/4  mt-2 font-normal">
               Create a new feed
             </span>
-          </div> 
+          </div>
           {feeds.map((feed) => (
             <FeedItem key={feed?.name} feed={feed} />
           ))}
@@ -101,12 +113,12 @@ function HomePage() {
 function FeedItem({ feed }) {
   return (
     <div className="bg-[#151515] ring-[1px] ring-white/15 rounded  shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl ">
-    <Link to={`/feed/${feed?.name}`} className="block">
-      <img
-        src={feed?.image || "/placeholder.png"}
-        alt={feed?.name}
-        className="w-full h-40 object-cover rounded "
-      /> 
+      <Link to={`/feed/${feed?.name}`} className="block">
+        <img
+          src={feed?.image || "/placeholder.png"}
+          alt={feed?.name}
+          className="w-full h-40 object-cover rounded "
+        />
         <div className="p-4">
           <h2 className="text-lg/4 font-medium tracking-tight text-white">
             {feed?.name}

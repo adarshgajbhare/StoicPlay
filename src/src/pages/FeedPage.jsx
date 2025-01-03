@@ -28,7 +28,6 @@ import {
 import DropdownMenu from "../components/DropdownMenu";
 import FilterTags from "../components/FilterTags";
 
-
 function FeedPage() {
   const { user } = useAuth();
   const { feedName } = useParams();
@@ -161,7 +160,6 @@ function FeedPage() {
           new Date(a.snippet?.publishedAt || 0)
       );
 
-  
       setVideos(allVideos);
       setHasMoreVideos(allVideos.length > 0);
     } catch (error) {
@@ -195,9 +193,10 @@ function FeedPage() {
       <div
         id="feed-side"
         className={`
-          ${isCollapsed
-            ? " max-w-8xl md:pr-16  transition-all duration-300"
-            : " max-w-8xl md:pr-64 transition-all duration-300"
+          ${
+            isCollapsed
+              ? " max-w-8xl md:pr-16  transition-all duration-300"
+              : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
         <div className="flex justify-between   gap-4 mb-8  ">
@@ -275,28 +274,27 @@ function FeedPage() {
             <div className="animate-spin rounded-full h-16 w-16 -t-2 -b-2 -white"></div>
           </div>
         ) : (
-          <section className="flex gap-8 lg:px-8">
-            <div className="max-h-screen relative  w-1/2  p-6 overflow-hidden rounded-2xl">
-            <div className="absolute inset-0 overflow-hidden size-full bg-gradient-to-t from-[#121212] from-50% via-transparent to-transparent z-30">
+          // <section className="flex gap-8 lg:px-8">
+          //   <div className="max-h-screen relative  w-1/2  p-6 overflow-hidden rounded-2xl">
+          //     <div className="absolute inset-0 overflow-hidden size-full bg-gradient-to-t from-[#121212] from-50% via-transparent to-transparent z-30"></div>
+          //     <div className="absolute overflow-hidden inset-0 w-full h-full ">
+          //       <img
+          //       id="cover-image"
+          //         src={currentFeed?.image || "/placeholder.png"}
+          //         alt=""
+          //         className="size-full object-cover object-center"
+          //       />
+          //     </div>
 
-            </div>
-              <div className="absolute overflow-hidden inset-0 w-full h-full ">
-                <img
-                  src="https://i.ytimg.com/vi/3uq6ym5FkEc/maxresdefault.jpg"
-                  alt=""
-                  className="size-full object-cover object-center"
-                />
-              </div>
-
-              <div className="absolute inset-0  bg-black/10 filter backdrop-blur-xl"></div>
-              <div className="mx-auto isolate  cursor-pointer rounded-xl overflow-hidden">
-                <img
-                  src="https://i.ytimg.com/vi/3uq6ym5FkEc/maxresdefault.jpg"
-                  alt=""
-                />
-              </div>
-            </div>
-            <div className="grid   grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+          //     <div className="absolute inset-0  bg-black/10 filter backdrop-blur-xl"></div>
+          //     <div className="mx-auto isolate  cursor-pointer rounded-xl overflow-hidden">
+          //       <img
+          //         src={currentFeed?.image || "/placeholder.png"}
+          //         alt=""
+          //       />
+          //     </div>
+          //   </div>
+            <div className="grid   grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-6">
               {filteredVideos.map((video) => (
                 <VideoCard
                   key={video.id?.videoId || video.id}
@@ -305,7 +303,7 @@ function FeedPage() {
                 />
               ))}
             </div>
-          </section>
+          // </section>
         )}
 
         <ChannelSidebar

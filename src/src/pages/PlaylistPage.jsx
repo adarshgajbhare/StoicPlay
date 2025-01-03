@@ -49,9 +49,9 @@ function PlaylistPage() {
           </div>
 
           {playlists.map((playlist) => (
-            <PlaylistCard 
-              key={playlist.id} 
-              playlist={playlist} 
+            <PlaylistCard
+              key={playlist.id}
+              playlist={playlist}
               onVideoSelect={(videoId) => setCurrentVideo(videoId)}
             />
           ))}
@@ -82,7 +82,8 @@ function PlaylistCard({ playlist, onVideoSelect }) {
     if (playlist.videos && playlist.videos.length > 0) {
       const video = playlist.videos[0];
       if (video.id?.videoId) return video.id.videoId;
-      if (video.snippet?.resourceId?.videoId) return video.snippet.resourceId.videoId;
+      if (video.snippet?.resourceId?.videoId)
+        return video.snippet.resourceId.videoId;
       if (typeof video.id === "string") return video.id;
       if (video.contentDetails?.videoId) return video.contentDetails.videoId;
     }
@@ -90,9 +91,13 @@ function PlaylistCard({ playlist, onVideoSelect }) {
   };
 
   return (
+    <Link
+    to={`/playlist/${playlist.id}`}
+    className=" "
+  >
     <div className="bg-[#151515] ring-[1px] ring-white/15 rounded shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
-      <div 
-        className="relative group cursor-pointer" 
+      <div
+        className="relative group cursor-pointer"
         onClick={() => {
           const videoId = getFirstVideoId();
           if (videoId) onVideoSelect(videoId);
@@ -105,20 +110,27 @@ function PlaylistCard({ playlist, onVideoSelect }) {
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" className="w-6 h-6">
-              <path d="M8 5v14l11-7z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="white"
+              viewBox="0 0 24 24"
+              className="w-6 h-6"
+            >
+              <path d="M8 5v14l11-7z" />
             </svg>
           </div>
         </div>
       </div>
-      <Link
-        to={`/playlist/${playlist.id}`}
-        className="block p-4"
-      >
-        <h3 className="text-lg font-medium text-white">{playlist.title}</h3>
-        <p className="text-sm text-gray-400">{playlist.videoCount} videos</p>
-      </Link>
+     
+        <div className="px-2 flex my-2 justify-between items-baseline">
+          <h3 className="text-lg font-medium text-white">
+            {playlist.title}
+          </h3>
+          <p className="text-sm text-gray-400">{playlist.videoCount} videos</p>
+        </div>
+      
     </div>
+    </Link>
   );
 }
 

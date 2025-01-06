@@ -9,8 +9,9 @@ import DropdownMenu from "./DropdownMenu";
 import { saveLikedVideo, saveWatchLater } from '../utils/constant';
 import { useAuth } from '../contexts/AuthContext';
 import VideoPlayer from './VideoPlayer';
+import PlaylistVideoCard from './PlaylistVideoCard';
 
-function VideoCard({ video, channelDetails }) {
+function VideoCard({ video, channelDetails, variant = 'default' }) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -122,6 +123,24 @@ function VideoCard({ video, channelDetails }) {
 
   const channelTitle = channelDetails?.snippet?.title || video.snippet.channelTitle;
 
+  if (variant === 'playlist') {
+    return (
+      <PlaylistVideoCard
+        video={video}
+        channelDetails={channelDetails}
+        onMenuOpen={setIsMenuOpen}
+        isMenuOpen={isMenuOpen}
+        menuItems={menuItems}
+        onVideoClick={handleClick}
+        videoImageError={videoImageError}
+        onVideoImageError={handleVideoImageError}
+        channelImageError={channelImageError}
+        onChannelImageError={handleChannelImageError}
+        getVideoId={getVideoId}
+      />
+    );
+  }
+
   return (
     <>
       <div className="bg-transparent overflow-hidden shadow-md md:transition-transform duration-500 cursor-pointer relative">
@@ -207,3 +226,4 @@ function VideoCard({ video, channelDetails }) {
 }
 
 export default VideoCard;
+

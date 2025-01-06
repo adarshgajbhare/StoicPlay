@@ -35,12 +35,17 @@ function PlaylistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           <div
             onClick={() => setShowAddModal(true)}
-            className="aspect-video bg-[#272727] rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f] transition-colors duration-200"
+            className="aspect-video bg-[#070707] 
+            
+
+            rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 
+            hover:bg-[#3f3f3f] transition-colors duration-200"
           >
             <IconSquareRoundedPlusFilled
               size={40}
               strokeWidth={1}
               color="white"
+              className="text-gray-300 "
             />
             <span className="text-white text-sm font-medium">
               Create new playlist

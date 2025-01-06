@@ -32,7 +32,7 @@ const WatchLaterPage = () => {
   if (error) {
     return (
       <div className="min-h-dvh bg-[#101010] text-white">
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container mx-auto px-4 py-8">
           <p className="text-red-500 text-center">Error: {error}</p>
         </div>
@@ -41,10 +41,10 @@ const WatchLaterPage = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-[#101010] text-white">
-      <Navbar />
+    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
+      {/* <Navbar /> */}
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Watch Later</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white">Watch Later</h1>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

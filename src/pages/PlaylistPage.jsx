@@ -29,8 +29,8 @@ function PlaylistPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#0f0f0f]">
-      <Navbar />
+    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
+      {/* <Navbar /> */}
       <main className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           <div

@@ -191,7 +191,7 @@ function FeedPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#121212] text-white p-4">
+    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
       <div
         id="feed-side"
         className={`
@@ -216,13 +216,14 @@ function FeedPage() {
           <div className="relative">
             <button
               onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
-              className="rounded-full p-2 hover:bg-white/10 transition-colors"
+              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white" 
               aria-label="Feed actions"
             >
               <IconDotsVertical size={24} />
             </button>
             <div className="">
               <DropdownMenu
+          
                 isOpen={isActionMenuOpen}
                 onClose={() => setIsActionMenuOpen(false)}
                 items={actionMenuItems}

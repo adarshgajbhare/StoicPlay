@@ -14,7 +14,7 @@ const FilterTags = ({
 
   return (
     <div
-      className="flex items-center flex-nowrap gap-2 text-sm/3 font-semibold mb-4 overflow-x-scroll
+      className="flex items-stretch p-1 flex-nowrap gap-2 text-sm/3 font-semibold mb-4 overflow-x-scroll
         md:hidden
       
       "
@@ -24,7 +24,7 @@ const FilterTags = ({
         onClick={() => onChannelSelect(null)}
         className={`cursor-pointer flex-shrink-0 p-2 rounded flex items-center gap-2 ${
           selectedChannel === null
-            ? "bg-white text-black"
+            ? "ring-[1px] ring-white/30 text-white"
             : "bg-gray-600 text-white hover:bg-gray-500"
         }`}
       >
@@ -38,8 +38,8 @@ const FilterTags = ({
           onClick={() => onChannelSelect(channelId)}
           className={`cursor-pointer flex-shrink-0 p-2 rounded flex items-center gap-2 ${
             selectedChannel === channelId
-              ? "bg-white text-black"
-              : "bg-gray-600 text-white hover:bg-gray-500"
+              ? "bg-white text-black "
+              : "bg-black ring-[1px] ring-white/30 text-white hover:bg-gray-500"
           }`}
         >
           <img

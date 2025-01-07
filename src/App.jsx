@@ -1,23 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import FeedPage from './pages/FeedPage';
-import PlaylistPage from './pages/PlaylistPage';
-
-import LearnMorePage from './pages/LearnMorePage';
-import ShareRedirect from './components/ShareRedirect';
-import PlaylistDetailPage from './components/PlaylistDetailPage';
-import LikedVideosPage from './pages/LikedVideosPage';
-import WatchLaterPage from './pages/WatchLaterPage';
+import { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { Layout } from "./components/Layout";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import FeedPage from "./pages/FeedPage";
+import PlaylistPage from "./pages/PlaylistPage";
+import LearnMorePage from "./pages/LearnMorePage";
+import ShareRedirect from "./components/ShareRedirect";
+import PlaylistDetailPage from "./components/PlaylistDetailPage";
+import LikedVideosPage from "./pages/LikedVideosPage";
+import WatchLaterPage from "./pages/WatchLaterPage";
+import ImportFeedModal from "./components/ImportFeedModal";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#101010] flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
       </div>
     );
@@ -31,6 +37,15 @@ function PrivateRoute({ children }) {
 }
 
 function App() {
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleImportFeed = async (feedUrl) => {
+    console.log("Importing feed from URL:", feedUrl);
+    alert(
+      `Importing feed from ${feedUrl}. This feature is not fully implemented yet.`
+    );
+  };
+
   return (
     <AuthProvider>
       <Router>
@@ -38,13 +53,16 @@ function App() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
-          
-          {/* Protected Routes */}
+          <Route path="/share/:shareId" element={<ShareRedirect />} />
+
+          {/* Protected Routes with Layout */}
           <Route
             path="/feeds"
             element={
               <PrivateRoute>
-                <HomePage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <HomePage />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -52,7 +70,9 @@ function App() {
             path="/feed/:feedName"
             element={
               <PrivateRoute>
-                <FeedPage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <FeedPage />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -60,7 +80,9 @@ function App() {
             path="/playlists"
             element={
               <PrivateRoute>
-                <PlaylistPage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <PlaylistPage />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -68,7 +90,9 @@ function App() {
             path="/playlist/:playlistId"
             element={
               <PrivateRoute>
-                <PlaylistDetailPage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <PlaylistDetailPage />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -76,7 +100,9 @@ function App() {
             path="/liked"
             element={
               <PrivateRoute>
-                <LikedVideosPage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <LikedVideosPage />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -84,12 +110,21 @@ function App() {
             path="/watch-later"
             element={
               <PrivateRoute>
-                <WatchLaterPage />
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <WatchLaterPage />
+                </Layout>
               </PrivateRoute>
             }
           />
-          <Route path="/share/:shareId" element={<ShareRedirect />} />
         </Routes>
+
+        {showImportModal && (
+          <ImportFeedModal
+            isOpen={showImportModal}
+            onClose={() => setShowImportModal(false)}
+            onImportFeed={handleImportFeed}
+          />
+        )}
       </Router>
     </AuthProvider>
   );
@@ -100,7 +135,7 @@ function RootRedirect() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#101010] flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
       </div>
     );

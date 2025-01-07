@@ -100,23 +100,23 @@ const ChannelSidebar = ({
             }`}
             onClick={() => onChannelSelect(channelId)}
           >
-            <div className="flex w-full space-x-2">
+            <div className="flex items-center w-full space-x-2">
               <img
                 src={
                   channelDetails[channelId]?.snippet?.thumbnails?.default
                     ?.url || "/api/placeholder/48/48"
-                }
+                }border
                 alt={channelTitle}
-                className={`rounded ${
+                className={`rounded-full flex-shrink-0 ${
                   isCollapsed ? "size-10" : "size-10"
                 }`}
                 title={isCollapsed ? channelTitle : ""}
               />
               {!isCollapsed && (
-                <div>
-                  <span className="text-sm/3 font-medium tracking-tight text-white truncate">
+                <div className=" w-full">
+                  <div className="text-sm font-medium tracking-tight text-white max-w-[15ch] truncate">
                     {channelTitle}
-                  </span>
+                  </div>
                   <span className="text-xs/3 text-gray-400 block">
                     {getChannelVideoCount(channelId)} videos
                   </span>

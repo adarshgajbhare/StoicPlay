@@ -24,11 +24,11 @@ function AddPlaylistModal({ isOpen, onClose, onAddPlaylist }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
-        <h2 className="text-2xl font-medium tracking-tight mb-6">
+        <h2 className="text-2xl text-white font-medium tracking-tight mb-6">
           Add YouTube Playlist
         </h2>
         <div className="mb-6">
-          <label className="block mb-3 tracking-tight text-lg/4">
+          <label className="block text-white mb-3 tracking-tight text-lg/4">
             Enter YouTube playlist URL
           </label>
           <input
@@ -47,13 +47,13 @@ function AddPlaylistModal({ isOpen, onClose, onAddPlaylist }) {
         <div className="flex items-center gap-4">
           <button
             onClick={onClose}
-            className="bg-black ring-[1px] ring-white/20 flex-1 hover:bg-red-500 text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+            className="bg-black ring-[1px] ring-white/20 flex-1  text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-white hover:bg-green-500 hover:text-white flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+            className="bg-white  flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
           >
             Add
           </button>

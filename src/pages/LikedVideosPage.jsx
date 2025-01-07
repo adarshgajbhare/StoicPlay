@@ -32,7 +32,7 @@ const LikedVideosPage = () => {
   if (error) {
     return (
       <div className="min-h-dvh bg-[#101010] text-white">
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container mx-auto px-4 py-8">
           <p className="text-red-500 text-center">Error: {error}</p>
         </div>
@@ -41,10 +41,10 @@ const LikedVideosPage = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-[#101010] text-white">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Liked Videos</h1>
+    <div className="w-full min-h-dvh rounded-2xl p-0 md:p-6 md:ring-[1px] md:ring-white/20">
+      {/* <Navbar /> */}
+      <div className="container mx-auto md:px-4 md:py-8">
+        <h1 className=" text-xl md:text-2xl text-white font-bold mb-4">Liked Videos</h1>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

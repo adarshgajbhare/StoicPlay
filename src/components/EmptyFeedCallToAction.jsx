@@ -77,7 +77,7 @@ const EmptyFeedCallToAction = () => {
   };
 
   return (
-    <div className="max-w-2xl bg-[#121212] mx-auto rounded-md text-center">
+    <div className="max-w-2xl  mx-auto rounded-md text-center">
       <div className="mb-8">
         <svg
           className="w-48 h-48 mx-auto text-gray-400"

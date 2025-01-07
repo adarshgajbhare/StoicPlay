@@ -8,23 +8,28 @@ const generateUniqueId = () => {
 };
 
 // Create a shared feed document
-export const createSharedFeed = async (userId, feedData) => {
+export const createSharedFeed = async (userId, feed) => {
+  if (!feed || !feed.name || !feed.image || !feed.channels) {
+    throw new Error("Invalid feed data provided");
+  }
+
   try {
-    const shareId = generateUniqueId();
-    const sharedFeedRef = doc(db, "sharedFeeds", shareId);
-    
-    // Store the feed data with metadata
-    await setDoc(sharedFeedRef, {
-      feedData,
-      sharedBy: userId,
-      createdAt: new Date().toISOString(),
-      shareId
+    const shareId = generateUniqueId(); // Use the generateUniqueId function
+    const sharedFeedDocRef = doc(db, "users", userId, "sharedFeeds", shareId);
+
+    // Save shared feed data
+    await setDoc(sharedFeedDocRef, {
+      userId,
+      feedName: feed.name,
+      feedImage: feed.image,
+      feedChannels: feed.channels,
+      createdAt: new Date(),
     });
 
-    return shareId;
+    return shareId; // Return the unique ID for the shared feed
   } catch (error) {
     console.error("Error creating shared feed:", error);
-    throw error;
+    throw new Error("Failed to create shared feed");
   }
 };
 
@@ -32,14 +37,18 @@ export const createSharedFeed = async (userId, feedData) => {
 export const importSharedFeed = async (userId, shareId) => {
   try {
     // Get the shared feed data
-    const sharedFeedRef = doc(db, "sharedFeeds", shareId);
+    const sharedFeedRef = doc(db, "users", userId, "sharedFeeds", shareId);
     const sharedFeedSnap = await getDoc(sharedFeedRef);
 
     if (!sharedFeedSnap.exists()) {
       throw new Error("Shared feed not found");
     }
 
-    const sharedFeedData = sharedFeedSnap.data().feedData;
+    const sharedFeedData = {
+      name: sharedFeedSnap.data().feedName,
+      image: sharedFeedSnap.data().feedImage,
+      channels: sharedFeedSnap.data().feedChannels,
+    };
 
     // Get the user's current feeds
     const userRef = doc(db, "users", userId);
@@ -52,6 +61,11 @@ export const importSharedFeed = async (userId, shareId) => {
 
     const userData = userSnap.data();
     
+    // Initialize feeds array if undefined
+    if (!userData.feeds) {
+      userData.feeds = [];
+    }
+
     // Check if feed name already exists
     let newFeedName = sharedFeedData.name;
     let counter = 1;

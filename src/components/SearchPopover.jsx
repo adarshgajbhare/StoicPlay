@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "react-router-dom";
@@ -107,7 +108,7 @@ function SearchPopover({
             </div>
             <button
               onClick={onClose}
-              className="rounded-md p-3 text-base/4 font-medium bg-[#101010] text-black ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto"
+              className="rounded-md p-3 text-base/4 font-medium bg-[#101010] text-white ring-[1px] ring-white/20 w-fit text-center drop-shadow-md ml-auto"
               aria-label="Close search"
             >
               <IconX size={20} strokeWidth={2} color="white" />
@@ -115,7 +116,7 @@ function SearchPopover({
           </div>
           {searchResults.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4">Search Results</h2>
+              <h2 className="text-lg font-semibold mb-4 text-white">Search Results</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {searchResults.map((channel) => (
                   <ChannelCard

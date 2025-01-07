@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { 
   doc, 
   getDoc, 
@@ -256,10 +257,16 @@ export const handleDeleteFeed = async (user, feedName, navigate) => {
 
 export const handleShareFeed = async (user, currentFeed) => {
   try {
+    // Step 1: Create shared feed and get its ID
     const shareId = await createSharedFeed(user.uid, currentFeed);
+    
+    // Step 2: Generate a shareable link
     const shareableLink = `${window.location.origin}/share/${shareId}`;
 
+    // Step 3: Copy the link to clipboard
     await navigator.clipboard.writeText(shareableLink);
+    
+    // Step 4: Notify the user about successful link copying
     alert("Feed link copied to clipboard!");
   } catch (error) {
     console.error("Error sharing feed:", error);
@@ -269,7 +276,7 @@ export const handleShareFeed = async (user, currentFeed) => {
 
 export const generateShareableLink = async (feedName) => {
   const uniqueId = Math.random().toString(36).substring(7);
-  const shortLink = `https://your-app-url/share/${uniqueId}`;
+  const shortLink = `https://zenfeeds.vercel.app/share/${uniqueId}`;
   return shortLink;
 };
 
@@ -324,66 +331,115 @@ export const handleAddPlaylist = async (user, playlistUrl) => {
 
 export const saveLikedVideo = async (userId, videoData) => {
   try {
-    const userDocRef = doc(db, 'users', userId);
+    const timestamp = new Date();
+    const videoDataWithDate = {
+      ...videoData,
+      addedAt: timestamp.toISOString(),
+    };
+
+    const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
-    
-    if (!userDoc.exists()) {
-      await setDoc(userDocRef, { likedVideos: [] });
+
+    if (userDoc.exists()) {
+      await updateDoc(userDocRef, {
+        likedVideos: arrayUnion(videoDataWithDate),
+      });
+    } else {
+      await setDoc(userDocRef, { likedVideos: [videoDataWithDate] });
     }
-    
-    await updateDoc(userDocRef, {
-      likedVideos: arrayUnion(videoData)
-    });
   } catch (error) {
-    console.error('Error saving liked video:', error);
+    console.error("Error saving liked video:", error);
+    throw error;
+  }
+};
+
+
+export const removeLikedVideo = async (userId, videoId) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists() && userDoc.data().likedVideos) {
+      const updatedLikedVideos = userDoc
+        .data()
+        .likedVideos.filter((video) => (video.id?.videoId || video.id) !== videoId);
+      await updateDoc(userDocRef, { likedVideos: updatedLikedVideos });
+    }
+  } catch (error) {
+    console.error("Error removing liked video:", error);
+    throw error;
+  }
+};
+export const getLikedVideos = async (userId) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      return userDoc.data().likedVideos || [];
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting liked videos:", error);
     throw error;
   }
 };
 
 export const saveWatchLater = async (userId, videoData) => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
+    try {
+        const timestamp = new Date();
+      const videoDataWithDate = {
+          ...videoData,
+          addedAt: timestamp.toISOString()
+      }
+
+    const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
-    
-    if (!userDoc.exists()) {
-      await setDoc(userDocRef, { watchLater: [] });
-    }
-    
-    await updateDoc(userDocRef, {
-      watchLater: arrayUnion(videoData)
-    });
-  } catch (error) {
-    console.error('Error saving watch later:', error);
-    throw error;
-  }
-};
 
-
-
-export const getLikedVideos = async (userId) => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userDocRef);
     if (userDoc.exists()) {
-      return userDoc.data().likedVideos || [];
+      await updateDoc(userDocRef, {
+        watchLater: arrayUnion(videoDataWithDate),
+      });
+    } else {
+      await setDoc(userDocRef, { watchLater: [videoDataWithDate] });
     }
-    return [];
   } catch (error) {
-    console.error('Error fetching liked videos:', error);
+    console.error("Error saving to watch later:", error);
     throw error;
   }
 };
 
 export const getWatchLaterVideos = async (userId) => {
   try {
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
+
     if (userDoc.exists()) {
       return userDoc.data().watchLater || [];
+    } else {
+      return [];
     }
-    return [];
   } catch (error) {
-    console.error('Error fetching watch later videos:', error);
+    console.error("Error getting watch later videos:", error);
+    throw error;
+  }
+};
+
+
+export const removeWatchLaterVideo = async (userId, videoId) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists() && userDoc.data().watchLater) {
+      const updatedWatchLater = userDoc
+        .data()
+        .watchLater.filter((video) => (video.id?.videoId || video.id) !== videoId);
+      await updateDoc(userDocRef, { watchLater: updatedWatchLater });
+    }
+  } catch (error) {
+    console.error("Error removing from watch later:", error);
     throw error;
   }
 };

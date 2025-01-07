@@ -1,22 +1,32 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect } from "react";
 import {
   formatRelativeTime,
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconClock, IconDotsVertical, IconHeart } from "@tabler/icons-react";
+import { IconClock, IconDotsVertical, IconHeart, IconTrash } from "@tabler/icons-react";
 import DropdownMenu from "./DropdownMenu";
-import { saveLikedVideo, saveWatchLater } from "../utils/constant";
+import {
+  saveLikedVideo,
+  saveWatchLater,
+  removeWatchLaterVideo,
+  getLikedVideos,
+  removeLikedVideo,
+  getWatchLaterVideos,
+} from "../utils/constant";
 import { useAuth } from "../contexts/AuthContext";
 import VideoPlayer from "./VideoPlayer";
 import PlaylistVideoCard from "./PlaylistVideoCard";
 
-function VideoCard({ video, channelDetails, variant = "default" }) {
+function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved }) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { user } = useAuth();
+  const [isLiked, setIsLiked] = useState(false);
+  const [isWatchLater, setIsWatchLater] = useState(false);
 
   const handleVideoImageError = () => {
     setVideoImageError(true);
@@ -25,10 +35,6 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
   const handleChannelImageError = () => {
     setChannelImageError(true);
   };
-
-  if (!video?.snippet) {
-    return null;
-  }
 
   const getVideoId = () => {
     if (video.id?.videoId) {
@@ -46,18 +52,57 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
     return null;
   };
 
+  useEffect(() => {
+    const checkIfLiked = async () => {
+      if (user?.uid && video?.id) {
+        const likedVideos = await getLikedVideos(user.uid);
+        const videoIdToCheck = getVideoId();
+        setIsLiked(likedVideos.some((likedVideo) => (likedVideo.id?.videoId || likedVideo.id) === videoIdToCheck));
+      } else {
+        setIsLiked(false);
+      }
+    };
+
+    const checkIfWatchLater = async () => {
+      if (user?.uid && video?.id) {
+        const watchLaterVideos = await getWatchLaterVideos(user.uid);
+        const videoIdToCheck = getVideoId();
+        setIsWatchLater(watchLaterVideos.some((watchLaterVideo) => (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToCheck));
+      } else {
+        setIsWatchLater(false);
+      }
+    };
+
+    checkIfLiked();
+    checkIfWatchLater();
+  }, [user?.uid, video?.id]);
+
+  if (!video?.snippet) {
+    return null;
+  }
+
   const handleLikeVideo = async (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
+    if (!user?.uid) return; // Ensure user is logged in
+
     try {
-      const videoId = video.id?.videoId || video.id;
+      const videoIdToSave = getVideoId();
+      const likedVideos = await getLikedVideos(user.uid);
+      const alreadyLiked = likedVideos.some((likedVideo) => (likedVideo.id?.videoId || likedVideo.id) === videoIdToSave);
+
+      if (alreadyLiked) {
+        console.log("Video already liked.");
+        return; // Prevent duplicate addition
+      }
+
       const videoToSave = {
         ...video,
         channelDetails,
-        id: videoId,
+        id: videoIdToSave,
         snippet: {
           ...video.snippet,
           thumbnails: video.snippet.thumbnails || {},
@@ -67,11 +112,50 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
       };
 
       await saveLikedVideo(user.uid, videoToSave);
-      console.log("Video liked:", videoId);
+      setIsLiked(true);
+      console.log("Video liked:", videoIdToSave);
     } catch (error) {
       console.error("Failed to save liked video:", error);
     }
 
+    setIsMenuOpen(false);
+  };
+
+  const handleRemoveLikedVideo = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      const videoIdToRemove = getVideoId();
+      await removeLikedVideo(user.uid, videoIdToRemove);
+      setIsLiked(false);
+      console.log('Removed from liked videos:', videoIdToRemove);
+      if (onVideoRemoved) {
+        onVideoRemoved(videoIdToRemove);
+      }
+    } catch (error) {
+      console.error('Failed to remove from liked videos', error);
+    }
+    setIsMenuOpen(false);
+  };
+
+  const handleRemoveWatchLater = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      const videoId = getVideoId();
+      await removeWatchLaterVideo(user.uid, videoId);
+      setIsWatchLater(false);
+      console.log('removed from watch later:', videoId);
+      if (onVideoRemoved) {
+        onVideoRemoved(videoId);
+      }
+    } catch (error) {
+      console.log('Failed to remove from watch later', error);
+    }
     setIsMenuOpen(false);
   };
 
@@ -81,12 +165,22 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
       e.stopPropagation();
     }
 
+    if (!user?.uid) return; // Ensure user is logged in
+
     try {
-      const videoId = video.id?.videoId || video.id;
+      const videoIdToSave = getVideoId();
+      const watchLaterVideos = await getWatchLaterVideos(user.uid);
+      const alreadyInWatchLater = watchLaterVideos.some((watchLaterVideo) => (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToSave);
+
+      if (alreadyInWatchLater) {
+        console.log("Video already in watch later.");
+        return; // Prevent duplicate addition
+      }
+
       const videoToSave = {
         ...video,
         channelDetails,
-        id: videoId,
+        id: videoIdToSave,
         snippet: {
           ...video.snippet,
           thumbnails: video.snippet.thumbnails || {},
@@ -96,7 +190,8 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
       };
 
       await saveWatchLater(user.uid, videoToSave);
-      console.log("Added to watch later:", videoId);
+      setIsWatchLater(true);
+      console.log("Added to watch later:", videoIdToSave);
     } catch (error) {
       console.error("Failed to save to watch later:", error);
     }
@@ -104,17 +199,17 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
     setIsMenuOpen(false);
   };
 
-  const menuItems = [
+  let menuItems = [
     [
       {
-        label: "Watch Later",
-        icon: <IconClock size={20} />,
-        onClick: handleWatchLater,
+        label: isWatchLater ? "Remove from Watch Later" : "Watch Later",
+        icon: isWatchLater ? <IconTrash size={20} /> : <IconClock size={20} />,
+        onClick: isWatchLater ? handleRemoveWatchLater : handleWatchLater,
       },
       {
-        label: "Like Video",
-        icon: <IconHeart size={20} />,
-        onClick: handleLikeVideo,
+        label: isLiked ? "Remove from Liked Videos" : "Like Video",
+        icon: isLiked ? <IconTrash size={20} /> : <IconHeart size={20} />,
+        onClick: isLiked ? handleRemoveLikedVideo : handleLikeVideo,
       },
     ],
   ];
@@ -189,7 +284,7 @@ function VideoCard({ video, channelDetails, variant = "default" }) {
               }}
               className="p-2 rounded-full bg-black/50"
             >
-              <IconDotsVertical size={18} 
+              <IconDotsVertical size={18}
               className="text-white"
               />
             </button>

@@ -22,13 +22,29 @@ const WatchLaterPage = () => {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     if (user) {
       fetchWatchLaterVideos();
     }
   }, [user]);
+  
 
+    const handleVideoRemoved = (removedVideoId) => {
+    setWatchLaterVideos(prevVideos => {
+        const updatedVideos = [...prevVideos];
+      const index = updatedVideos.findIndex(video => {
+          const videoId = video.id?.videoId || video.id;
+        return videoId === removedVideoId;
+      });
+      if (index > -1) {
+            updatedVideos.splice(index, 1)
+            
+        }
+      return updatedVideos;
+    });
+    
+  };
   if (error) {
     return (
       <div className="min-h-dvh bg-[#101010] text-white">
@@ -59,6 +75,8 @@ const WatchLaterPage = () => {
                 key={video.id?.videoId || video.id}
                 video={video}
                 channelDetails={video.channelDetails}
+                variant="watchlater"
+                onVideoRemoved={handleVideoRemoved}
               />
             ))}
           </div>

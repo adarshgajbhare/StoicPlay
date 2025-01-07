@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconMenu2,
   IconX,
@@ -11,11 +12,26 @@ import {
   IconPlaylist,
   IconHeart,
   IconClock,
+  IconTrash,
 } from "@tabler/icons-react";
-import { signOut } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { 
+  signOut, 
+  deleteUser, 
+  reauthenticateWithPopup, 
+  GoogleAuthProvider 
+} from "firebase/auth";
+import { auth, db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import DropdownMenu from "./DropdownMenu";
+import { 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  deleteDoc,
+  doc,
+  writeBatch
+} from 'firebase/firestore';
 
 export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -23,6 +39,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [photoError, setPhotoError] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { name: "Feeds", path: "/feeds", icon: <IconRss size={24} /> },
@@ -39,6 +56,56 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      try {
+        if (user) {
+          const provider = new GoogleAuthProvider();
+  
+          // Re-authenticate the user
+          await reauthenticateWithPopup(user, provider);
+  
+          const batch = writeBatch(db);
+  
+          // Delete user-specific data
+          const collections = ["feeds", "playlists", "liked", "watchLater"];
+          for (const collectionName of collections) {
+            const q = query(
+              collection(db, collectionName),
+              where("userId", "==", user.uid)
+            );
+            const snapshot = await getDocs(q);
+            snapshot.forEach((doc) => batch.delete(doc.ref));
+          }
+  
+          // Delete user document
+          const userDoc = doc(db, "users", user.uid);
+          batch.delete(userDoc);
+  
+          // Commit the batch
+          await batch.commit();
+  
+          // Delete the user from Firebase Auth
+          await deleteUser(user);
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        if (error.code === "auth/requires-recent-login") {
+          alert(
+            "For security reasons, please log out and log back in before deleting your account."
+          );
+        } else {
+          alert("Failed to delete account. Please try again.");
+        }
+      }
+    }
+  };
+  
   const dropdownItems = [
     [
       {
@@ -50,6 +117,12 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
         label: "Logout",
         icon: <IconLogout size={22} />,
         onClick: handleLogout,
+        destructive: true,
+      },
+      {
+        label: "Delete Account",
+        icon: <IconTrash size={22} />,
+        onClick: handleDeleteAccount,
         destructive: true,
       },
     ],
@@ -180,4 +253,3 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     </>
   );
 }
-

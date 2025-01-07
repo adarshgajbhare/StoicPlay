@@ -41,10 +41,10 @@ const WatchLaterPage = () => {
   }
 
   return (
-    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
+    <div className="w-full min-h-dvh  rounded-2xl md:p-6 md:ring-[1px] md:ring-white/20">
       {/* <Navbar /> */}
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8 text-white">Watch Later</h1>
+      <div className="container mx-auto md:py-8">
+        <h1 className="text-xl font-bold mb-4 text-white">Watch Later</h1>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

@@ -6,12 +6,12 @@ import {
 } from "../services/youtubeApi";
 import { IconClock, IconDotsVertical, IconHeart } from "@tabler/icons-react";
 import DropdownMenu from "./DropdownMenu";
-import { saveLikedVideo, saveWatchLater } from '../utils/constant';
-import { useAuth } from '../contexts/AuthContext';
-import VideoPlayer from './VideoPlayer';
-import PlaylistVideoCard from './PlaylistVideoCard';
+import { saveLikedVideo, saveWatchLater } from "../utils/constant";
+import { useAuth } from "../contexts/AuthContext";
+import VideoPlayer from "./VideoPlayer";
+import PlaylistVideoCard from "./PlaylistVideoCard";
 
-function VideoCard({ video, channelDetails, variant = 'default' }) {
+function VideoCard({ video, channelDetails, variant = "default" }) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,7 +51,7 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     try {
       const videoId = video.id?.videoId || video.id;
       const videoToSave = {
@@ -61,16 +61,17 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
         snippet: {
           ...video.snippet,
           thumbnails: video.snippet.thumbnails || {},
-          channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
-        }
+          channelTitle:
+            channelDetails?.snippet?.title || video.snippet.channelTitle,
+        },
       };
-      
+
       await saveLikedVideo(user.uid, videoToSave);
-      console.log('Video liked:', videoId);
+      console.log("Video liked:", videoId);
     } catch (error) {
-      console.error('Failed to save liked video:', error);
+      console.error("Failed to save liked video:", error);
     }
-    
+
     setIsMenuOpen(false);
   };
 
@@ -79,7 +80,7 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     try {
       const videoId = video.id?.videoId || video.id;
       const videoToSave = {
@@ -89,16 +90,17 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
         snippet: {
           ...video.snippet,
           thumbnails: video.snippet.thumbnails || {},
-          channelTitle: channelDetails?.snippet?.title || video.snippet.channelTitle
-        }
+          channelTitle:
+            channelDetails?.snippet?.title || video.snippet.channelTitle,
+        },
       };
-      
+
       await saveWatchLater(user.uid, videoToSave);
-      console.log('Added to watch later:', videoId);
+      console.log("Added to watch later:", videoId);
     } catch (error) {
-      console.error('Failed to save to watch later:', error);
+      console.error("Failed to save to watch later:", error);
     }
-    
+
     setIsMenuOpen(false);
   };
 
@@ -121,9 +123,10 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
     setIsVideoOpen(true);
   };
 
-  const channelTitle = channelDetails?.snippet?.title || video.snippet.channelTitle;
+  const channelTitle =
+    channelDetails?.snippet?.title || video?.snippet?.channelTitle;
 
-  if (variant === 'playlist') {
+  if (variant === "playlist") {
     return (
       <PlaylistVideoCard
         video={video}
@@ -149,14 +152,19 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
             <div className="relative">
               <img
                 src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
-                alt={video.snippet.title}
+                alt={"Video thumbnail"}
                 className="w-full h-40 object-cover rounded-md"
                 onError={handleVideoImageError}
               />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" className="w-6 h-6">
-                    <path d="M8 5v14l11-7z"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="white"
+                    viewBox="0 0 24 24"
+                    className="w-6 h-6"
+                  >
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
               </div>
@@ -169,17 +177,21 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
             />
           )}
 
-          <div className="absolute top-2 right-2 z-20" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="absolute top-2 right-2 z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setIsMenuOpen(!isMenuOpen);
               }}
-              className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 
-                         opacity-0 group-hover:opacity-100 transition-opacity"
+              className="p-2 rounded-full bg-black/50"
             >
-              <IconDotsVertical size={20} />
+              <IconDotsVertical size={18} 
+              className="text-white"
+              />
             </button>
 
             <DropdownMenu
@@ -193,7 +205,7 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
         <div className="flex items-start mt-2 gap-1">
           {!channelImageError && channelDetails?.snippet?.thumbnails && (
             <img
-              src={getChannelThumbnailUrl(channelDetails.snippet.thumbnails)}
+              src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
               alt={channelTitle}
               className="size-8 rounded-full ring-[1px] flex-shrink-0 ring-white/20 mr-1 overflow-hidden border-white"
               onError={handleChannelImageError}
@@ -201,13 +213,13 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
           )}
           <div className="flex flex-col break-words gap-1">
             <h3 className="font-semibold text-pretty text-base/5 line-clamp-2 text-white">
-              {video.snippet.title}
+              {video?.snippet?.title}
             </h3>
             <div className="flex flex-col gap-1 mt-1">
-              <span className="text-sm/3 text-gray-500 font-medium flex">
+              <span className="text-sm/3 text-gray-400 font-medium flex">
                 {channelTitle}
               </span>
-              <p className="text-white font-medium text-xs/3 ">
+              <p className="text-gray-400 font-medium text-xs/3 ">
                 {formatRelativeTime(video?.snippet?.publishedAt)}
               </p>
             </div>
@@ -226,4 +238,3 @@ function VideoCard({ video, channelDetails, variant = 'default' }) {
 }
 
 export default VideoCard;
-

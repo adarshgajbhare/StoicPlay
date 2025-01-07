@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronsLeft } from "@tabler/icons-react";
+import { IconChevronLeft, IconChevronsLeft } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -27,7 +27,6 @@ import {
 } from "@tabler/icons-react";
 import DropdownMenu from "../components/DropdownMenu";
 import FilterTags from "../components/FilterTags";
-
 
 function FeedPage() {
   const { user } = useAuth();
@@ -51,7 +50,7 @@ function FeedPage() {
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const actionMenuItems = [
     [
@@ -161,7 +160,6 @@ function FeedPage() {
           new Date(a.snippet?.publishedAt || 0)
       );
 
-  
       setVideos(allVideos);
       setHasMoreVideos(allVideos.length > 0);
     } catch (error) {
@@ -191,39 +189,39 @@ function FeedPage() {
   };
 
   return (
-    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-6 md:ring-[1px] md:ring-white/20">
       <div
         id="feed-side"
         className={`
-          ${isCollapsed
-            ? " max-w-8xl md:pr-16  transition-all duration-300"
-            : " max-w-8xl md:pr-64 transition-all duration-300"
+          ${
+            isCollapsed
+              ? " max-w-8xl md:pr-16  transition-all duration-300"
+              : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
         <div className="flex justify-between  gap-4 mb-8  ">
           <Link to="/" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
-              <IconChevronsLeft
-                size={36}
+              <IconChevronLeft
+                size={16}
                 strokeWidth={1}
-                className="scale-150 text-white"
+                className="scale-[2] text-white"
               />
             </div>
-            <h1 className="text-2xl lg:text-4xl font-medium text-center text-white tracking-tight">
+            <h1 className="text-xl  lg:text-2xl relative right-1.5 md:right-0 font-medium text-center text-white tracking-tight">
               {feedName}
             </h1>
           </Link>
           <div className="relative">
             <button
               onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
-              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white" 
+              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white"
               aria-label="Feed actions"
             >
               <IconDotsVertical size={24} />
             </button>
             <div className="">
               <DropdownMenu
-          
                 isOpen={isActionMenuOpen}
                 onClose={() => setIsActionMenuOpen(false)}
                 items={actionMenuItems}
@@ -233,7 +231,7 @@ function FeedPage() {
             </div>
           </div>
         </div>
-        <h2 className="text-2xl font-semibold mb-4 hidden md:block">
+        <h2 className="text-2xl text-white font-semibold mb-4 hidden md:block">
           {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
             : "All Videos"}

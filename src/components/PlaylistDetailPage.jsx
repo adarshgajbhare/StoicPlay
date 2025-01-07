@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchPlaylistVideos } from "../services/youtubeApi";
 import VideoCard from "../components/VideoCard";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
 import { IconChevronsLeft, IconDotsVertical } from "@tabler/icons-react";
 
 function PlaylistDetailPage() {
@@ -11,8 +11,10 @@ function PlaylistDetailPage() {
   const { user } = useAuth();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [playlistDetails, setPlaylistDetails] = useState(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const { state } = useLocation();
+  const passedData = state?.playlistDetails;
+  const [playlistDetails, setPlaylistDetails] = useState(passedData || null);
 
   useEffect(() => {
     const loadPlaylistVideos = async () => {
@@ -25,7 +27,9 @@ function PlaylistDetailPage() {
             title: data[0].snippet.playlistTitle,
             channelTitle: data[0].snippet.channelTitle,
             totalVideos: data.length,
-            thumbnail: data[0].snippet.thumbnails?.maxres?.url || data[0].snippet.thumbnails?.high?.url,
+            thumbnail:
+              data[0].snippet.thumbnails?.maxres?.url ||
+              data[0].snippet.thumbnails?.high?.url,
           });
         }
       } catch (error) {
@@ -49,26 +53,31 @@ function PlaylistDetailPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#0f0f0f] text-white">
-      <Navbar />
-      <main className="max-w-[1800px] mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6 p-4">
+    <div className="min-h-dvh bg-[#0f0f0f]  text-white">
+      {/* <Navbar /> */}
+      {/* {console.log("passssssssssssssssssssssssssssss", playlistDetails)} */}
+      <main className="max-w-[1800px]  mx-auto">
+        <div className="flex flex-col  w-full lg:flex-row gap-6 md:p-4">
           {/* Video Player Section */}
-          <div className="lg:flex-grow">
+          <div className="lg:flex-grow ">
             {videos[currentVideoIndex] && (
-              <div>
+              <div className=" ">
                 <div className="aspect-video bg-black rounded-xl overflow-hidden">
                   <iframe
-                    className="w-full h-full"
+                    className="w-full  h-full"
                     src={`https://www.youtube.com/embed/${videos[currentVideoIndex].contentDetails.videoId}`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   ></iframe>
                 </div>
                 <div className="mt-4">
-                  <h1 className="text-xl font-medium">{videos[currentVideoIndex].snippet.title}</h1>
+                  <h1 className="text-xl font-medium">
+                    {videos[currentVideoIndex].snippet.title}
+                  </h1>
                   <div className="flex items-center gap-4 mt-2">
-                    <span className="text-sm text-[#AAAAAA]">{playlistDetails?.channelTitle}</span>
+                    <span className="text-sm text-[#AAAAAA]">
+                      {playlistDetails?.channelTitle}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -76,12 +85,20 @@ function PlaylistDetailPage() {
           </div>
 
           {/* Playlist Section */}
-          <div className="lg:w-[400px] flex-shrink-0">
-            <div className="bg-[#272727] rounded-xl p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-medium">{playlistDetails?.title}</h2>
+          <div className="lg:w-[400px]   flex-shrink-0">
+            <div className="bg-[#0F0F0F]  ring-[1px] ring-white/20 rounded-xl p-4">
+              <div className="flex items-start  justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-lg/4 text-gray-200 mb-1.5">
+                    {passedData?.title}
+                  </h2>
+                  <h2 className="font-medium text-sm text-gray-300 z-50">
+                    by {playlistDetails?.channelTitle}
+                  </h2>
+                </div>
+                {/* <img src={playlistDetails?.thumbnail} alt="" /> */}
                 <button className="p-2 hover:bg-white/10 rounded-full">
-                  <IconDotsVertical size={20} />
+                  <IconDotsVertical size={24} />
                 </button>
               </div>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
@@ -89,7 +106,9 @@ function PlaylistDetailPage() {
                   <div
                     key={video.contentDetails.videoId}
                     className={`flex gap-2 p-2 rounded-lg cursor-pointer ${
-                      currentVideoIndex === index ? "bg-white/20" : "hover:bg-white/10"
+                      currentVideoIndex === index
+                        ? "bg-white/20"
+                        : "hover:bg-white/10"
                     }`}
                     onClick={() => setCurrentVideoIndex(index)}
                   >
@@ -104,8 +123,12 @@ function PlaylistDetailPage() {
                       </div>
                     </div>
                     <div className="flex-grow min-w-0">
-                      <h3 className="text-sm font-medium line-clamp-2">{video.snippet.title}</h3>
-                      <p className="text-xs text-[#AAAAAA] mt-1">{video.snippet.channelTitle}</p>
+                      <h3 className="text-sm font-medium line-clamp-2">
+                        {video.snippet.title}
+                      </h3>
+                      <p className="text-xs text-[#AAAAAA] mt-1">
+                        {video.snippet.channelTitle}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -119,4 +142,3 @@ function PlaylistDetailPage() {
 }
 
 export default PlaylistDetailPage;
-

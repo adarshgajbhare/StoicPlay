@@ -37,12 +37,12 @@ function HomePage() {
   };
 
   return (
-    <div className="w-full min-h-dvh bg-[#0A0A0A] rounded-2xl p-6 ring-[1px] ring-white/20">
+    <div className="w-full min-h-dvh overflow-hidden  rounded-2xl p-0 md:p-6 md:ring-[1px] md:ring-white/20">
       <div>
         <h1 className="text-white text-2xl font-medium  tracking-tight">
-          Hey, Adarsh
+          Hey, {user?.displayName || "there"}
         </h1>
-        <p className="text-[#555555] text-sm font-medium tracking-tight mb-6">
+        <p className="text-gray-500 text-sm font-semibold mb-6">
           {new Date().toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",

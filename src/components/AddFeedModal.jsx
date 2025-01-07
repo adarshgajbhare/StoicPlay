@@ -78,13 +78,13 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
-       <h2 className="text-2xl font-medium tracking-tight mb-6">
+       <h2 className="text-2xl text-white font-medium tracking-tight mb-6">
           Create a new feed
         </h2>
         <div className="mb-6">
           <label
             htmlFor="feedName"
-            className="block mb-3 traccking-tight text-lg/4"
+            className="block text-white mb-3 traccking-tight text-lg/4"
           >
             What do you want to call it?
           </label>
@@ -133,16 +133,16 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
 
         <div className="flex items-center gap-4 mt-6">
           <button
-            className="bg-black ring-[1px] ring-white/20 flex-1 hover:bg-red-500 text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md "
+            className="bg-black ring-[1px] ring-white/20 flex-1 hover:bg-black/50  text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md "
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="bg-white hover:bg-green-500 hover:text-white flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+            className="bg-white hover:bg-white/50  flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
             onClick={handleSubmit}
           >
-            Done
+            Add
           </button>
         </div>
       </div>

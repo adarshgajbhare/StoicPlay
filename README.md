@@ -8,4 +8,4 @@
 7. going back from full screen mobile video view
 8. popoever should autoclose once we clikc on done or when the task is done with some visual cue or notificaiton alert
 9. Remove liked and remove watcch later form their respective pages
-10. Sidebar shoudl autoclose once selected a menu item
+<!-- 10. Sidebar shoudl autoclose once selected a menu item -- done -->

@@ -128,6 +128,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={onClose}
                 className={`flex items-center justify-start gap-3 rounded-lg p-4 text-lg/4 font-medium transition-colors ${
                   location.pathname === item.path
                     ? "bg-white/10 text-white"

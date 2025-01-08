@@ -16,8 +16,6 @@ import {
   IconStack,
   IconStack2,
   IconDeviceTv,
-  IconLogout2,
-  IconCloudDownload,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -27,7 +25,6 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
-import DropdownMenu from "./DropdownMenu";
 import {
   collection,
   query,
@@ -40,63 +37,10 @@ import {
 
 export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [photoError, setPhotoError] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const navItems = [
-    {
-      name: "Feeds",
-      path: "/feeds",
-      icon: (
-        <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Playlists",
-      path: "/playlists",
-      icon: (
-        <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Liked",
-      path: "/liked",
-      icon: (
-        <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Watch Later",
-      path: "/watch-later",
-      icon: (
-        <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Import Feed",
-      path: "/watch-later",
-      icon: (
-        <IconCloudDownload size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Delete Account",
-      path: "/watch-later",
-      icon: (
-        <IconTrash size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-    {
-      name: "Logout",
-      path: "/watch-later",
-      icon: (
-        <IconLogout size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
-    },
-  ];
 
   const handleLogout = async () => {
     try {
@@ -156,29 +100,57 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     }
   };
 
-  const dropdownItems = [
-    [
-      {
-        label: "Import Feed",
-        icon: <IconDownload size={22} />,
-        onClick: onImportClick,
-      },
-      {
-        label: "Logout",
-        icon: <IconLogout size={22} />,
-        onClick: handleLogout,
-        destructive: true,
-      },
-      {
-        label: "Delete Account",
-        icon: <IconTrash size={22} />,
-        onClick: handleDeleteAccount,
-        destructive: true,
-      },
-    ],
+  const navItems = [
+    {
+      name: "Feeds",
+      onClick: onClose,
+      path: "/feeds",
+      icon: <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />,
+      isLink: true,
+    },
+    {
+      name: "Playlists",
+      onClick: onClose,
+      path: "/playlists",
+      icon: <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />,
+      isLink: true,
+    },
+    {
+      name: "Liked",
+      onClick: onClose,
+      path: "/liked",
+      icon: <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />,
+      isLink: true,
+    },
+    {
+      name: "Watch Later",
+      onClick: onClose,
+      path: "/watch-later",
+      icon: <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />,
+      isLink: true,
+    },
+    {
+      name: "Import Feed",
+      onClick: onImportClick,
+      icon: <IconDownload size={22} strokeWidth={1.5} className="text-gray-500"  />,
+      isLink: false,
+    },
+    {
+      name: "Logout",
+      onClick: handleLogout,
+      icon: <IconLogout size={22}  strokeWidth={1.5} className="text-gray-500" />,
+      destructive: true,
+      isLink: false,
+    },
+    {
+      name: "Delete Account",
+      onClick: handleDeleteAccount,
+      icon: <IconTrash size={22}  strokeWidth={1.5} className="text-gray-500" />,
+      destructive: true,
+      isLink: false,
+    },
   ];
 
-  // Handle click outside on mobile
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -187,7 +159,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
   return (
     <>
-      {/* Mobile backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden"
@@ -200,39 +171,35 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
           isCollapsed ? "w-24" : "w-full md:w-64"
         } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="flex h-full  flex-col">
-          <div className="flex h-16 items-center justify-between  px-4">
+        <div className="flex h-full flex-col">
+          <div className="flex h-16 items-center justify-between px-4">
             <span
-              className={`text-xl/4 uppercase font-bold  text-lime-500 transition-opacity ${
+              className={`text-xl/4 uppercase font-bold text-lime-500 transition-opacity ${
                 isCollapsed ? "hidden" : "block"
               }`}
             >
               zenfeeds
             </span>
-
-            {/* Mobile close button */}
             <button
               onClick={onClose}
               className="md:hidden rounded-lg p-1.5 ml-auto hover:bg-white/10"
             >
               <IconX size={24} className="text-white" />
             </button>
-            {/* Desktop collapse button */}
-
             <div className="flex">
               {isCollapsed ? (
                 <button
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden md:block text-white"
                 >
-                  <IconChevronRight size={28} className="ml-5 " />
+                  <IconChevronRight size={28} className="ml-5" />
                 </button>
               ) : (
                 <button
                   onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="hidden md:block  text-white"
+                  className="hidden md:block text-white"
                 >
-                  <IconChevronLeft size={28} className="ml-auto " />
+                  <IconChevronLeft size={28} className="ml-auto" />
                 </button>
               )}
             </div>
@@ -240,23 +207,16 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
           <div className="flex flex-1 flex-col gap-2 p-4">
             {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={onClose}
+              <Link to={item.path}
+                key={item.name}
+                onClick={item.onClick || (item.isLink && (() => navigate(item.path)))}
                 className={`flex items-center justify-start gap-3 rounded-lg p-4 text-lg/4 font-medium transition-colors ${
                   location.pathname === item.path
                     ? "bg-white/10 text-white"
                     : "text-white/75 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <div
-                  className={`flex items-center justify-center ${
-                    isCollapsed ? "w-full" : ""
-                  }`}
-                >
-                  {item.icon}
-                </div>
+                {item.icon}
                 {!isCollapsed && <span>{item.name}</span>}
               </Link>
             ))}
@@ -264,12 +224,10 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
           <div className="border-t border-white/10 p-4">
             <div
-              className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
+              className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5">
               <img
                 src={photoError ? "/default-profile.jpeg" : user?.photoURL}
-                alt={user?.displayName}
+                alt={"Profile"}
                 className="h-8 w-8 rounded-full ring-1 ring-white/20"
                 onError={() => setPhotoError(true)}
               />
@@ -282,13 +240,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                 </div>
               )}
             </div>
-            <DropdownMenu
-              isOpen={isDropdownOpen}
-              onClose={() => setIsDropdownOpen(false)}
-              items={dropdownItems}
-              position="top"
-              width={isCollapsed ? "w-56" : "w-48"}
-            />
           </div>
         </div>
       </aside>

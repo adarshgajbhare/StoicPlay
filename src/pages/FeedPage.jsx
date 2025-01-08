@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronLeft, IconChevronsLeft } from "@tabler/icons-react";
+import { IconChevronLeft, IconChevronsLeft, IconShare2 } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -55,8 +55,8 @@ function FeedPage() {
   const actionMenuItems = [
     [
       {
-        label: "Share",
-        icon: <IconShare size={20} />,
+        label: "Share Feed",
+        icon: <IconShare2 size={20} />,
         onClick: () => handleShareFeed(user, currentFeed),
       },
       {
@@ -69,12 +69,12 @@ function FeedPage() {
         icon: <IconEdit size={20} />,
         onClick: () => setIsEditModalOpen(true),
       },
-      {
-        label: "Delete Feed",
-        icon: <IconTrash size={20} />,
-        onClick: () => handleDeleteFeed(user, feedName, navigate),
-        destructive: true,
-      },
+      // {
+      //   label: "Delete Feed",
+      //   icon: <IconTrash size={20} />,
+      //   onClick: () => handleDeleteFeed(user, feedName, navigate),
+      //   destructive: true,
+      // },
     ],
   ];
   useEffect(() => {

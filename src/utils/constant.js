@@ -449,3 +449,19 @@ export const handleDeleteFeed = async (user, feedName, onSuccess, onError) => {
   }
 };
 
+// Delete Playlist 
+export const handleDeletePlaylist = async (user, playlistId) => {
+  try {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      const updatedPlaylists = userData.playlists.filter(playlist => playlist.id !== playlistId);
+      await updateDoc(userDocRef, { playlists: updatedPlaylists });
+    }
+  } catch (error) {
+    console.error("Error deleting playlist:", error);
+    throw error;
+  }
+};

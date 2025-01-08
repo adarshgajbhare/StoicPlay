@@ -16,6 +16,7 @@ import {
   IconStack,
   IconStack2,
   IconDeviceTv,
+  IconLayoutSidebar,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -135,13 +136,13 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       icon: <IconDownload size={22} strokeWidth={1.5} className="text-gray-500"  />,
       isLink: false,
     },
-    {
-      name: "Logout",
-      onClick: handleLogout,
-      icon: <IconLogout size={22}  strokeWidth={1.5} className="text-gray-500" />,
-      destructive: true,
-      isLink: false,
-    },
+    // {
+    //   name: "Logout",
+    //   onClick: handleLogout,
+    //   icon: <IconLogout size={22}  strokeWidth={1.5} className="text-gray-500" />,
+    //   destructive: true,
+    //   isLink: false,
+    // },
     {
       name: "Delete Account",
       onClick: handleDeleteAccount,
@@ -192,14 +193,14 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden md:block text-white"
                 >
-                  <IconChevronRight size={28} className="ml-5" />
+                  <IconLayoutSidebar size={28} className="ml-5" strokeWidth={1}/>
                 </button>
               ) : (
                 <button
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden md:block text-white"
                 >
-                  <IconChevronLeft size={28} className="ml-auto" />
+                  <IconLayoutSidebar size={28} className="ml-auto" strokeWidth={1} />
                 </button>
               )}
             </div>
@@ -236,7 +237,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                   <span className="text-lg/4 font-medium text-white">
                     {user?.displayName?.split(" ")?.[0] || "John Doe"}
                   </span>
-                  <IconChevronRight size={24} className="text-white/50" />
+                  <IconLogout onClick={handleLogout} size={24} className="text-white/50" />
                 </div>
               )}
             </div>

@@ -158,8 +158,7 @@ function HomePage() {
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                 Delete
               </button>
             </div>
@@ -193,17 +192,17 @@ function HomePage() {
 
 function FeedItem({ feed, isDeleteMode, onDeleteClick }) {
   return (
-    <div className="rounded overflow-hidden transition-all duration-500 relative group">
+    <div className="rounded  transition-all duration-500 relative group">
       {isDeleteMode && (
         <button
           onClick={(e) => {
             e.preventDefault();
             onDeleteClick();
           }}
-          className="absolute -left-1 -top-1 z-10 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow-md"
+          className="absolute -left-1 -top-1 z-20 size-5 bg-red-600 rounded-full flex items-center justify-center shadow-lg isolate"
           aria-label={`Delete ${feed.name}`}
         >
-          <IconMinus size={12} className="text-white" />
+          <IconMinus size={12} className="text-white" strokeWidth={2} />
         </button>
       )}
       <Link 

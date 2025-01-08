@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -17,6 +19,7 @@ import {
   handleUpdateHomeFeed,
   handleDeleteFeed,
 } from "../utils/constant";
+import Toast from "../components/Toast";
 
 function HomePage() {
   const { user } = useAuth();
@@ -63,7 +66,7 @@ function HomePage() {
           setTimeout(() => setShowToast(false), 3000);
           setFeedToDelete(null);
           setIsDeleteMode(false);
-          navigate("/"); // Navigate to home page after successful deletion
+          // navigate("/"); // Navigate to home page after successful deletion
         },
         (error) => {
           setToastMessage("Error deleting feed. Please try again.");
@@ -116,9 +119,9 @@ function HomePage() {
           </p>
         </div>
         {feeds.map((feed) => (
-          <FeedItem 
-            key={feed?.name} 
-            feed={feed} 
+          <FeedItem
+            key={feed?.name}
+            feed={feed}
             isDeleteMode={isDeleteMode}
             onDeleteClick={() => setFeedToDelete(feed.name)}
           />
@@ -145,9 +148,12 @@ function HomePage() {
       {feedToDelete && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-[#151515] rounded-2xl p-6 max-w-sm w-full">
-            <h3 className="text-xl font-semibold text-white mb-4">Delete Feed?</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">
+              Delete Feed?
+            </h3>
             <p className="text-gray-400 mb-6">
-              Are you sure you want to delete this feed? This action cannot be undone.
+              Are you sure you want to delete this feed? This action cannot be
+              undone.
             </p>
             <div className="flex justify-end gap-4">
               <button
@@ -158,7 +164,8 @@ function HomePage() {
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
                 Delete
               </button>
             </div>
@@ -168,24 +175,22 @@ function HomePage() {
 
       {/* Custom Toast Notification */}
       {showToast && (
-        <div className="fixed flex items-start w-80 gap-2.5 top-6 right-6 z-50 bg-[#151515] filter  backdrop-blur-xl  text-white p-4 rounded-2xl shadow-[inset_0.1px_0.5px_0.6px_0.5px_rgba(255,255,255,0.2)] text-sm font-medium saturate-200 overflow-hidden">
-          <div className=" flex-shrink-0">
-            <IconSquareCheckFilled
-              size={18}
-              strokeWidth={1}
-              className="relative top-[5px] text-gray-50"
-            />
-          </div>
-          <div>
-            <h1 className="text-lg font-[600] tracking-tight">
-              {toastMessage}
-            </h1>
-            <p className="text-base/5  font-[500] tracking-tight  text-[#555555]   max-w-70 pr-2">
-              {toastMessage.includes("created") ? "Try adding your favorite channels to personalize it further." : ""}
-            </p>
-          </div>
-        </div>
-      )}
+  <Toast
+    isOpen={showToast}
+    message={toastMessage}
+    secondaryText={
+      toastMessage.includes("created")
+        ? "Try adding your favorite channels..."
+        : "This action cannot be undone."
+    }
+    variant="info"
+    icon={IconSquareCheckFilled}
+    duration={5000}
+    onClose={() => setShowToast(false)}
+    position="top-right"
+    showCloseButton
+  />
+)}
     </div>
   );
 }
@@ -205,11 +210,11 @@ function FeedItem({ feed, isDeleteMode, onDeleteClick }) {
           <IconMinus size={12} className="text-white" strokeWidth={2} />
         </button>
       )}
-      <Link 
-        to={isDeleteMode ? "#" : `/feed/${feed?.name}`} 
-        className={`block ${isDeleteMode ? 'cursor-default' : ''}`}
+      <Link
+        to={isDeleteMode ? "#" : `/feed/${feed?.name}`}
+        className={`block ${isDeleteMode ? "cursor-default" : ""}`}
       >
-        <div className={`relative ${isDeleteMode ? 'animate-wiggle' : ''}`}>
+        <div className={`relative ${isDeleteMode ? "animate-wiggle" : ""}`}>
           <img
             src={feed?.image || "/placeholder.png"}
             alt={feed?.name}
@@ -227,4 +232,3 @@ function FeedItem({ feed, isDeleteMode, onDeleteClick }) {
 }
 
 export default HomePage;
-

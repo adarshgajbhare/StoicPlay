@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { Trash2, ChevronRight, ChevronLeft, Layout } from "lucide-react";
 import { IconMenu, IconMenu2, IconX } from "@tabler/icons-react";
@@ -105,7 +107,7 @@ const ChannelSidebar = ({
                 src={
                   channelDetails[channelId]?.snippet?.thumbnails?.default
                     ?.url || "/api/placeholder/48/48"
-                }border
+                }
                 alt={channelTitle}
                 className={`rounded-full flex-shrink-0 ${
                   isCollapsed ? "size-10" : "size-10"

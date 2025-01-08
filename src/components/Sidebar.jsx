@@ -16,6 +16,8 @@ import {
   IconStack,
   IconStack2,
   IconDeviceTv,
+  IconLogout2,
+  IconCloudDownload,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -71,6 +73,27 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       path: "/watch-later",
       icon: (
         <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Import Feed",
+      path: "/watch-later",
+      icon: (
+        <IconCloudDownload size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Delete Account",
+      path: "/watch-later",
+      icon: (
+        <IconTrash size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Logout",
+      path: "/watch-later",
+      icon: (
+        <IconLogout size={24} strokeWidth={1.5} className="text-gray-500" />
       ),
     },
   ];

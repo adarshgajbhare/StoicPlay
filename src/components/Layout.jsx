@@ -8,20 +8,16 @@ export function Layout({ children, onImportClick }) {
   return (
     <div className="min-h-dvh flex bg-[#0F0F0F] relative">
       {/* Mobile menu button */}
-      <div
-        onClick={() => setIsSidebarOpen(true)}
-        className="fixed left-4 top-4 md:hidden"
-      >
-        <span className=" text-lg/4 uppercase font-medium  text-lime-500">
-          zenfeeds
-        </span>
+      <div className="md:hidden fixed top-4 left-1/2 -translate-x-1/2  w-[94%]  z-10 flex items-center shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] justify-between px-3 py-2 rounded-lg   bg-[#0F0F0F]/60 filter backdrop-blur-sm">
+        <div onClick={() => setIsSidebarOpen(true)} className="">
+          <span className=" text-lg/4 uppercase font-medium  text-lime-500">
+            zenfeeds
+          </span>
+        </div>
+        <button onClick={() => setIsSidebarOpen(true)} className="f">
+          <IconMenu2 size={24} className="text-white" />
+        </button>
       </div>
-      <button
-        onClick={() => setIsSidebarOpen(true)}
-        className="fixed right-4 top-4 md:hidden"
-      >
-        <IconMenu2 size={24} className="text-white" />
-      </button>
 
       <Sidebar
         onImportClick={onImportClick}
@@ -29,10 +25,9 @@ export function Layout({ children, onImportClick }) {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 p-4 md:py-8 md:px-0  pt-12 ">
-        <div className="container mx-auto">{children}</div>
+      <main className="flex-1 p-6  md:pl-0 md:pr-6 ">
+        <div className="container mx-auto py-12 md:py-0">{children}</div>
       </main>
     </div>
   );
 }
-

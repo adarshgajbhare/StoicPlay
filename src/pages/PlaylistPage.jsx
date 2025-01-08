@@ -30,42 +30,41 @@ function PlaylistPage() {
 
   return (
     <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
-       <div>
-        <h1 className="text-white text-4xl mb-1 font-medium  tracking-tight">
+      <div>
+        <h1 className="text-white text-2xl md:text-4xl font-medium  tracking-tight">
           Your Playlists
         </h1>
-        <p className="text-gray-600 text-base font-medium mb-6">
+        <p className="text-gray-600 text-xs md:text-base font-medium mb-6">
           Import playlists from YouTube
         </p>
       </div>
-   
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          <div>
-            <div
-              onClick={() => setShowAddModal(true)}
-              className="aspect-video bg-[#151515]
-                      rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]"
-            >
-              <IconSquareRoundedPlusFilled
-                size={40}
-                strokeWidth={1}
-                className="text-gray-500 "
-              />
-            </div>
-            <p className="text-lg/4 mt-3 font-medium text-gray-500 text-center">
-              Add new playlist
-            </p>
-          </div>
 
-          {playlists.map((playlist) => (
-            <PlaylistCard
-              key={playlist?.id}
-              playlist={playlist}
-              onVideoSelect={(videoId) => setCurrentVideo(videoId)}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+        <div>
+          <div
+            onClick={() => setShowAddModal(true)}
+            className="aspect-video bg-[#151515]
+                      rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]"
+          >
+            <IconSquareRoundedPlusFilled
+              size={40}
+              strokeWidth={1}
+              className="text-gray-500 "
             />
-          ))}
+          </div>
+          <p className="text-lg/4 mt-3 font-medium text-gray-500 text-center">
+            Add new playlist
+          </p>
         </div>
 
+        {playlists.map((playlist) => (
+          <PlaylistCard
+            key={playlist?.id}
+            playlist={playlist}
+            onVideoSelect={(videoId) => setCurrentVideo(videoId)}
+          />
+        ))}
+      </div>
 
       {showAddModal && (
         <AddPlaylistModal

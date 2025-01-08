@@ -56,10 +56,10 @@ const WatchLaterPage = () => {
   return (
     <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div>
-        <h1 className="text-white text-4xl mb-1 font-medium  tracking-tight">
+        <h1 className="text-white text-2xl md:text-4xl  font-medium  tracking-tight">
           Watch Later
         </h1>
-        <p className="text-gray-600 text-base font-medium mb-6">
+        <p className="text-gray-600 text-xs md:text-base font-medium mb-6">
           Vidoes saved to watch later
         </p>
       </div>
@@ -75,10 +75,7 @@ const WatchLaterPage = () => {
             width="300"
             height="300"
             viewBox="0 0 797.5 834.5"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
             role="img"
-            artist="Katerina Limpitsouni"
-            source="https://undraw.co/"
           >
             <title>void</title>
             <ellipse cx="308.5" cy="780" rx="308.5" ry="54.5" fill="#3f3d56" />

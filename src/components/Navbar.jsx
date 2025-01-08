@@ -52,7 +52,7 @@ function Navbar({ onImportClick }) {
   return (
     <nav className="relative max-w-7xl  mx-auto flex items-center justify-between  text-white p-3">
       <div className="inline-flex  items-center gap-3">
-        <span className=" text-xl/4 uppercase font-semibold text-lime-500">
+        <span className=" text-xl/4 uppercase font-medium  text-lime-500">
           zenfeeds
         </span>
         <div className="hidden md:flex items-center space-x-2">

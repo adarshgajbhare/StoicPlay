@@ -1,8 +1,7 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  IconMenu2,
   IconX,
   IconLogout,
   IconDownload,
@@ -13,25 +12,29 @@ import {
   IconHeart,
   IconClock,
   IconTrash,
+  IconThumbUp,
+  IconStack,
+  IconStack2,
+  IconDeviceTv,
 } from "@tabler/icons-react";
-import { 
-  signOut, 
-  deleteUser, 
-  reauthenticateWithPopup, 
-  GoogleAuthProvider 
+import {
+  signOut,
+  deleteUser,
+  reauthenticateWithPopup,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import DropdownMenu from "./DropdownMenu";
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
+import {
+  collection,
+  query,
+  where,
+  getDocs,
   deleteDoc,
   doc,
-  writeBatch
-} from 'firebase/firestore';
+  writeBatch,
+} from "firebase/firestore";
 
 export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -42,10 +45,34 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const navigate = useNavigate();
 
   const navItems = [
-    { name: "Feeds", path: "/feeds", icon: <IconRss size={24} /> },
-    { name: "Playlists", path: "/playlists", icon: <IconPlaylist size={24} /> },
-    { name: "Liked", path: "/liked", icon: <IconHeart size={24} /> },
-    { name: "Watch Later", path: "/watch-later", icon: <IconClock size={24} /> },
+    {
+      name: "Feeds",
+      path: "/feeds",
+      icon: (
+        <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Playlists",
+      path: "/playlists",
+      icon: (
+        <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Liked",
+      path: "/liked",
+      icon: (
+        <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
+    {
+      name: "Watch Later",
+      path: "/watch-later",
+      icon: (
+        <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
+    },
   ];
 
   const handleLogout = async () => {
@@ -65,12 +92,12 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       try {
         if (user) {
           const provider = new GoogleAuthProvider();
-  
+
           // Re-authenticate the user
           await reauthenticateWithPopup(user, provider);
-  
+
           const batch = writeBatch(db);
-  
+
           // Delete user-specific data
           const collections = ["feeds", "playlists", "liked", "watchLater"];
           for (const collectionName of collections) {
@@ -81,14 +108,14 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
             const snapshot = await getDocs(q);
             snapshot.forEach((doc) => batch.delete(doc.ref));
           }
-  
+
           // Delete user document
           const userDoc = doc(db, "users", user.uid);
           batch.delete(userDoc);
-  
+
           // Commit the batch
           await batch.commit();
-  
+
           // Delete the user from Firebase Auth
           await deleteUser(user);
           navigate("/");
@@ -105,7 +132,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       }
     }
   };
-  
+
   const dropdownItems = [
     [
       {
@@ -146,54 +173,46 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       )}
 
       <aside
-        className={`fixed md:sticky left-0 top-0 z-40 h-dvh bg-[#0A0A0A] transition-all duration-300 ${
+        className={`fixed md:sticky left-0 top-0 z-40 h-dvh bg-[#0F0F0F] transition-all duration-300 ${
           isCollapsed ? "w-24" : "w-full md:w-64"
-        } ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
+        <div className="flex h-full  flex-col">
+          <div className="flex h-16 items-center justify-between  px-4">
             <span
-              className={`text-xl/4 uppercase font-semibold text-lime-500 transition-opacity ${
+              className={`text-xl/4 uppercase font-bold  text-lime-500 transition-opacity ${
                 isCollapsed ? "hidden" : "block"
               }`}
             >
               zenfeeds
             </span>
-           
-              {/* Mobile close button */}
-              <button
-                onClick={onClose}
-                className="md:hidden rounded-lg p-1.5 ml-auto hover:bg-white/10"
-              >
-                <IconX size={24} className="text-white" />
-              </button>
-              {/* Desktop collapse button */}
-             
-                <div className="flex">
-                  {isCollapsed ? (
-                     <button
-                     onClick={() => setIsCollapsed(!isCollapsed)}
-                     className="hidden md:block rounded-lg p-1.5 ring-[1px] ring-white/30 text-white"
-                   >
-                    <IconChevronRight size={24}
-                    className="mx-auto"
-                    />
-                    </button>
-                  ) : (
-                    <button
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="hidden md:block rounded-lg p-1.5 ring-[1px] ring-white/30 text-white"
-                  >
-                    <IconChevronLeft size={24}
-                    className="ml-auto"
-                    />
-                    </button>
-                  )}
-                </div>
-            
-            
+
+            {/* Mobile close button */}
+            <button
+              onClick={onClose}
+              className="md:hidden rounded-lg p-1.5 ml-auto hover:bg-white/10"
+            >
+              <IconX size={24} className="text-white" />
+            </button>
+            {/* Desktop collapse button */}
+
+            <div className="flex">
+              {isCollapsed ? (
+                <button
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  className="hidden md:block text-white"
+                >
+                  <IconChevronRight size={28} className="ml-5 " />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  className="hidden md:block  text-white"
+                >
+                  <IconChevronLeft size={28} className="ml-auto " />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-1 flex-col gap-2 p-4">
@@ -234,7 +253,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
               {!isCollapsed && (
                 <div className="flex flex-1 items-center justify-between">
                   <span className="text-lg/4 font-medium text-white">
-                    {user?.displayName}
+                    {user?.displayName?.split(" ")?.[0] || "John Doe"}
                   </span>
                   <IconChevronRight size={24} className="text-white/50" />
                 </div>

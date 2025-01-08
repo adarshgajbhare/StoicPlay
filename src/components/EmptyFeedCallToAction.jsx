@@ -101,7 +101,7 @@ const EmptyFeedCallToAction = () => {
         </div>
       )}
 
-      <h2 className="text-3xl font-semibold tracking-tight text-white mb-4">
+      <h2 className="text-3xl font-medium  tracking-tight text-white mb-4">
         Your feed is empty, add Channels
       </h2>
       

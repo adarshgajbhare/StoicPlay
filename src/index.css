@@ -101,7 +101,15 @@ figcaption {
 }
 
 @font-face {
-  font-family: "Geist";
-  src: url("/geist-var-web.woff2") format("woff2");
+  /* font-family: "Geist";
+  src: url("/geist-var-web.woff2") format("woff2"); */
   /* font-display: swap; */
+}
+
+:root {
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+}
+@supports (font-variation-settings: normal) {
+  :root { font-family: InterVariable, sans-serif; }
 }

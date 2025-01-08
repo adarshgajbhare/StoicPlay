@@ -12,7 +12,7 @@ export function Layout({ children, onImportClick }) {
         onClick={() => setIsSidebarOpen(true)}
         className="fixed left-4 top-4 md:hidden"
       >
-        <span className=" text-lg/4 uppercase font-semibold text-lime-500">
+        <span className=" text-lg/4 uppercase font-medium  text-lime-500">
           zenfeeds
         </span>
       </div>
@@ -29,7 +29,7 @@ export function Layout({ children, onImportClick }) {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 p-4 md:p-6 pt-12 ">
+      <main className="flex-1 p-4 md:py-8 md:px-0  pt-12 ">
         <div className="container mx-auto">{children}</div>
       </main>
     </div>

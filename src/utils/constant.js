@@ -237,23 +237,6 @@ export const handleUpdateFeed = async (user, oldName, newName, newImage, updated
   }
 };
 
-export const handleDeleteFeed = async (user, feedName, navigate) => {
-  if (!window.confirm("Are you sure you want to delete this feed?")) return;
-
-  try {
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      const updatedFeeds = userData.feeds.filter((feed) => feed.name !== feedName);
-      await updateDoc(userDocRef, { feeds: updatedFeeds });
-      navigate("/");
-    }
-  } catch (error) {
-    console.error("Error deleting feed:", error);
-  }
-};
 
 export const handleShareFeed = async (user, currentFeed) => {
   try {
@@ -445,3 +428,24 @@ export const removeWatchLaterVideo = async (userId, videoId) => {
     throw error;
   }
 };
+
+
+
+// Delete Feed new io-style
+export const handleDeleteFeed = async (user, feedName, onSuccess, onError) => {
+  try {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      const updatedFeeds = userData.feeds.filter((feed) => feed.name !== feedName);
+      await updateDoc(userDocRef, { feeds: updatedFeeds });
+      if (onSuccess) onSuccess();
+    }
+  } catch (error) {
+    console.error("Error deleting feed:", error);
+    if (onError) onError(error);
+  }
+};
+

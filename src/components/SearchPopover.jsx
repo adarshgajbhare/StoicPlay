@@ -116,7 +116,7 @@ function SearchPopover({
           </div>
           {searchResults.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4 text-white">Search Results</h2>
+              <h2 className="text-lg font-medium  mb-4 text-white">Search Results</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {searchResults.map((channel) => (
                   <ChannelCard

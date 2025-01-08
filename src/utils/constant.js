@@ -298,27 +298,29 @@ export const loadUserPlaylists = async (user, setPlaylists) => {
 };
 
 
+
 export const handleAddPlaylist = async (user, playlistUrl) => {
   try {
     // Extract playlist ID from URL
     const playlistId = playlistUrl.match(/[?&]list=([^&]+)/)?.[1];
     if (!playlistId) {
-      throw new Error('Invalid playlist URL');
+      throw new Error("Invalid playlist URL");
     }
 
     // Fetch playlist details
     const playlistData = await fetchPlaylistDetails(playlistId);
-    
+
+    // Provide default values if anything is undefined
     const newPlaylist = {
-      id: playlistId,
-      title: playlistData.snippet.title,
-      thumbnail: playlistData.snippet.thumbnails.high.url,
-      videoCount: playlistData.contentDetails.itemCount,
+      id: playlistId || "",
+      title: playlistData?.snippet?.title || "Untitled",
+      thumbnail: playlistData?.snippet?.thumbnails?.high?.url || "/placeholder.png",
+      videoCount: playlistData?.contentDetails?.itemCount || 0,
     };
 
     const userDocRef = doc(db, "users", user.uid);
     await updateDoc(userDocRef, {
-      playlists: arrayUnion(newPlaylist)
+      playlists: arrayUnion(newPlaylist),
     });
 
     return newPlaylist;
@@ -362,7 +364,7 @@ export const removeLikedVideo = async (userId, videoId) => {
     if (userDoc.exists() && userDoc.data().likedVideos) {
       const updatedLikedVideos = userDoc
         .data()
-        .likedVideos.filter((video) => (video.id?.videoId || video.id) !== videoId);
+        .likedVideos.filter((video) => (video.id?.videoId || video?.id) !== videoId);
       await updateDoc(userDocRef, { likedVideos: updatedLikedVideos });
     }
   } catch (error) {
@@ -376,7 +378,7 @@ export const getLikedVideos = async (userId) => {
     const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {
-      return userDoc.data().likedVideos || [];
+      return userDoc?.data().likedVideos || [];
     } else {
       return [];
     }

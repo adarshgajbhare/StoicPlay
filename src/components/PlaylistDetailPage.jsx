@@ -89,7 +89,7 @@ function PlaylistDetailPage() {
             <div className="bg-[#0F0F0F]  ring-[1px] ring-white/20 rounded-xl p-4">
               <div className="flex items-start  justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-lg/4 text-gray-200 mb-1.5">
+                  <h2 className="font-medium  text-lg/4 text-gray-200 mb-1.5">
                     {passedData?.title}
                   </h2>
                   <h2 className="font-medium text-sm text-gray-300 z-50">

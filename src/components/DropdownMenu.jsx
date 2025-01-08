@@ -27,7 +27,7 @@ const DropdownMenu = ({
   return (
     <div 
       ref={dropdownRef}
-       className="absolute right-2 top-12 z-50  flex  w-60 flex-col overflow-hidden rounded-md 
+       className="absolute right-2 top-12 z-50  flex  w-52 flex-col overflow-hidden rounded-md 
        bg-black/50 filter backdrop-blur-3xl text-sm/none text-white ring-[1px] ring-white/20"
     >
       {items.map((section, sectionIndex) => (

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import AddPlaylistModal from "../components/AddPlaylistModal";
@@ -27,38 +29,43 @@ function PlaylistPage() {
   };
 
   return (
-    <div className="w-full min-h-dvh  rounded-2xl p-0 md:p-6 md:ring-[1px] md:ring-white/20">
-      <h1 className=" text-xl md:text-2xl text-white font-medium md:ml-6 ">Your Playlists</h1>
-      <main className="max-w-[1800px] mx-auto  lg:px-8 py-6">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+       <div>
+        <h1 className="text-white text-4xl mb-1 font-medium  tracking-tight">
+          Your Playlists
+        </h1>
+        <p className="text-gray-600 text-base font-medium mb-6">
+          Import playlists from YouTube
+        </p>
+      </div>
+   
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          <div
-            onClick={() => setShowAddModal(true)}
-            className="aspect-video bg-[#070707] 
-            
-
-            rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 
-            hover:bg-[#3f3f3f] transition-colors duration-200"
-          >
-            <IconSquareRoundedPlusFilled
-              size={40}
-              strokeWidth={1}
-              color="white"
-              className="text-gray-300 "
-            />
-            <span className="text-white text-sm font-medium">
-              Create new playlist
-            </span>
+          <div>
+            <div
+              onClick={() => setShowAddModal(true)}
+              className="aspect-video bg-[#151515]
+                      rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]"
+            >
+              <IconSquareRoundedPlusFilled
+                size={40}
+                strokeWidth={1}
+                className="text-gray-500 "
+              />
+            </div>
+            <p className="text-lg/4 mt-3 font-medium text-gray-500 text-center">
+              Add new playlist
+            </p>
           </div>
 
           {playlists.map((playlist) => (
             <PlaylistCard
-              key={playlist.id}
+              key={playlist?.id}
               playlist={playlist}
               onVideoSelect={(videoId) => setCurrentVideo(videoId)}
             />
           ))}
         </div>
-      </main>
+
 
       {showAddModal && (
         <AddPlaylistModal
@@ -82,10 +89,10 @@ function PlaylistCard({ playlist, onVideoSelect }) {
   const getFirstVideoId = () => {
     if (playlist?.videos && playlist?.videos?.length > 0) {
       const video = playlist?.videos[0];
-      if (video.id?.videoId) return video.id.videoId;
-      if (video.snippet?.resourceId?.videoId)
+      if (video?.id?.videoId) return video?.id?.videoId;
+      if (video?.snippet?.resourceId?.videoId)
         return video?.snippet?.resourceId?.videoId;
-      if (typeof video.id === "string") return video.id;
+      if (typeof video?.id === "string") return video?.id;
       if (video?.contentDetails?.videoId) return video?.contentDetails?.videoId;
     }
     return null;
@@ -93,7 +100,7 @@ function PlaylistCard({ playlist, onVideoSelect }) {
 
   return (
     <Link
-      to={`/playlist/${playlist.id}`}
+      to={`/playlist/${playlist?.id}`}
       state={{ playlistDetails: { title: playlist?.title } }}
       className="block"
     >

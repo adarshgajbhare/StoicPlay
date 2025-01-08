@@ -5,7 +5,7 @@ import {
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconClock, IconDotsVertical, IconHeart, IconTrash } from "@tabler/icons-react";
+import { IconClock, IconDotsVertical, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
 import DropdownMenu from "./DropdownMenu";
 import {
   saveLikedVideo,
@@ -208,7 +208,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       },
       {
         label: isLiked ? "Remove from Liked Videos" : "Like Video",
-        icon: isLiked ? <IconTrash size={20} /> : <IconHeart size={20} />,
+        icon: isLiked ? <IconTrash size={20} /> : <IconThumbUp size={20} />,
         onClick: isLiked ? handleRemoveLikedVideo : handleLikeVideo,
       },
     ],
@@ -307,7 +307,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
             />
           )}
           <div className="flex flex-col break-words gap-1">
-            <h3 className="font-semibold text-pretty text-base/5 line-clamp-2 text-white">
+            <h3 className="font-medium  text-pretty text-base/5 line-clamp-2 text-white">
               {video?.snippet?.title}
             </h3>
             <div className="flex flex-col gap-1 mt-1">

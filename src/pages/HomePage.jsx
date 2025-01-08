@@ -48,10 +48,10 @@ function HomePage() {
   return (
     <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] ">
       <div>
-        <h1 className="text-white text-4xl mb-1 font-medium tracking-tight">
+        <h1 className="text-white  text-2xl md:text-4xl font-medium tracking-tight">
           Hey, {user?.displayName?.split(" ")?.[0] || "there"}
         </h1>
-        <p className="text-gray-600 text-base font-medium mb-6">
+        <p className="text-gray-600 text-xs md:text-base font-medium mb-6">
           {new Date().toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",

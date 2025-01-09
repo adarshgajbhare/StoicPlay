@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from "react";
 import { compressImage } from "../utils/imageUtils";
 
@@ -55,9 +56,14 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   };
 
   const handleFeedNameChange = (event) => {
-    setFeedName(event.target.value);
-    if (event.target.value.trim()) {
+    const value = event.target.value;
+    const regex = /^[A-Za-z0-9_\-\s]*$/;
+
+    if (regex.test(value)) {
+      setFeedName(value);
       setFeedNameError("");
+    } else {
+      setFeedNameError("Feed name can only contain A-Z, 0-9, _, -, and  .");
     }
   };
 
@@ -81,7 +87,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
             <h2 className="text-2xl text-white font-medium tracking-tight mb-6">
-              Create a new feed
+              Create new feed
             </h2>
             <div className="mb-6">
               <label

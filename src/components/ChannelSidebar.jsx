@@ -26,8 +26,8 @@ const ChannelSidebar = ({
   return (
     <div
     id="channel-sidebar"
-      className={`bg-[#202020]   hidden md:block 
-         border-white/10 min-h-dvh fixed right-0 top-0 z-50 overflow-y-auto transition-all duration-300 ${
+      className={` bg-[#0f0f0f]  hidden md:block 
+         border-white/10 min-h-dvh fixed right-10 top-10 z-50 overflow-y-auto transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-full md:w-64 "
       }`}
     >
@@ -63,25 +63,25 @@ const ChannelSidebar = ({
             isCollapsed ? "p-1" : "p-1.5"
           } rounded cursor-pointer transition-colors ${
             selectedChannel === null
-              ? "bg-white"
+              ? "bg-black"
               : "bg-gray-800 hover:bg-gray-700"
           }`}
           onClick={() => onChannelSelect(null)}
         >
           <div className="flex  w-full space-x-2">
             <div
-              className={`rounded bg-white  flex items-center justify-center ${
+              className={`rounded bg-black  flex items-center justify-center ${
                 isCollapsed ? "size-10" : "size-10"
               }`}
             >
-              <Layout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-black  " />
+              <Layout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-white  " />
             </div>
             {!isCollapsed && (
               <div>
-                <span className="text-sm/3 font-medium tracking-tight text-black  ">
+                <span className="text-sm/3 font-medium tracking-tight text-white/60  ">
                   All Channels
                 </span>
-                <span className="text-xs/3 text-gray-600 block">
+                <span className="text-xs/3  text-white/60  block">
                   {totalVideosCount} videos
                 </span>
               </div>

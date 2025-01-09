@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from "react";
 import { compressImage } from "../utils/imageUtils";
 
-function AddFeedModal({ isOpen, onClose, onAddFeed }) {
+function AddFeedModal({ isOpen, onClose, onAddFeed, existingFeeds }) {
   const [feedName, setFeedName] = useState("");
   const [feedImage, setFeedImage] = useState(null);
   const [previewImageUrl, setPreviewImageUrl] = useState("/default-thumb.webp");
@@ -42,9 +41,20 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
     }
   };
 
+  const checkDuplicateFeedName = (name) => {
+    return existingFeeds.some(
+      feed => feed.name.toLowerCase() === name.trim().toLowerCase()
+    );
+  };
+
   const handleSubmit = async () => {
     if (!feedName.trim()) {
       setFeedNameError("The feed name cannot be empty");
+      return;
+    }
+
+    if (checkDuplicateFeedName(feedName)) {
+      setFeedNameError("This feed name already exists. Please choose a different name.");
       return;
     }
 
@@ -59,11 +69,17 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
     const value = event.target.value;
     const regex = /^[A-Za-z0-9_\-\s]*$/;
 
-    if (regex.test(value)) {
-      setFeedName(value);
-      setFeedNameError("");
+    if (!regex.test(value)) {
+      setFeedNameError("Feed name can only contain A-Z, 0-9, _, -, and spaces.");
+      return;
+    }
+
+    setFeedName(value);
+    
+    if (checkDuplicateFeedName(value)) {
+      setFeedNameError("This feed name already exists. Please choose a different name.");
     } else {
-      setFeedNameError("Feed name can only contain A-Z, 0-9, _, -, and  .");
+      setFeedNameError("");
     }
   };
 
@@ -76,10 +92,6 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
   };
 
   if (!isOpen) return null;
-
-  const imageUrl = feedImage
-    ? URL.createObjectURL(feedImage)
-    : "/default-thumb.webp";
 
   return (
     <>
@@ -99,7 +111,11 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
               <input
                 type="text"
                 id="feedName"
-                className="w-full p-3 text-white placeholder:text-white/35 ring-[1px] ring-white/20 bg-white/5 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 text-white placeholder:text-white/35 ring-[1px] ${
+                  feedNameError ? 'ring-red-500' : 'ring-white/20'
+                } bg-white/5 rounded-md focus:outline-none focus:ring-2 ${
+                  feedNameError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
+                }`}
                 placeholder="Space, Chess, Superheroes, etc."
                 value={feedName}
                 onChange={handleFeedNameChange}
@@ -147,8 +163,13 @@ function AddFeedModal({ isOpen, onClose, onAddFeed }) {
                 Cancel
               </button>
               <button
-                className="bg-white hover:bg-white/50 flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+                className={`${
+                  feedNameError 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-white hover:bg-white/50 cursor-pointer'
+                } flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md`}
                 onClick={handleSubmit}
+                disabled={!!feedNameError}
               >
                 Add
               </button>

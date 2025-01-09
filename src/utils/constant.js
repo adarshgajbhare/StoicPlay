@@ -431,23 +431,29 @@ export const removeWatchLaterVideo = async (userId, videoId) => {
 
 
 
-// Delete Feed new io-style
-export const handleDeleteFeed = async (user, feedName, onSuccess, onError) => {
+// Delete Feed 
+export const handleDeleteFeed = async (user, feedNames, onSuccess, onError) => {
   try {
     const userDocRef = doc(db, "users", user.uid);
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
-      const updatedFeeds = userData.feeds.filter((feed) => feed.name !== feedName);
+      // Handle both single feed name (string) and multiple feed names (array)
+      const feedNamesToDelete = Array.isArray(feedNames) ? feedNames : [feedNames];
+      const updatedFeeds = userData.feeds.filter(
+        (feed) => !feedNamesToDelete.includes(feed.name)
+      );
+      
       await updateDoc(userDocRef, { feeds: updatedFeeds });
       if (onSuccess) onSuccess();
     }
   } catch (error) {
-    console.error("Error deleting feed:", error);
+    console.error("Error deleting feeds:", error);
     if (onError) onError(error);
   }
 };
+
 
 // Delete Playlist 
 export const handleDeletePlaylist = async (user, playlistId) => {

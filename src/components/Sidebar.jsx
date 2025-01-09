@@ -1,22 +1,16 @@
-/* eslint-disable react/prop-types */
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconX,
   IconLogout,
   IconDownload,
-  IconChevronLeft,
-  IconChevronRight,
-  IconRss,
   IconPlaylist,
-  IconHeart,
-  IconClock,
   IconTrash,
   IconThumbUp,
-  IconStack,
   IconStack2,
   IconDeviceTv,
   IconLayoutSidebar,
+  IconAlertTriangle,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -31,7 +25,6 @@ import {
   query,
   where,
   getDocs,
-  deleteDoc,
   doc,
   writeBatch,
 } from "firebase/firestore";
@@ -39,6 +32,7 @@ import {
 export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [photoError, setPhotoError] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,58 +40,59 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
-      )
-    ) {
-      try {
-        if (user) {
-          const provider = new GoogleAuthProvider();
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(true);
+  };
 
-          // Re-authenticate the user
-          await reauthenticateWithPopup(user, provider);
+  const confirmDeleteAccount = async () => {
+    try {
+      if (user) {
+        const provider = new GoogleAuthProvider();
 
-          const batch = writeBatch(db);
+        // Re-authenticate the user
+        await reauthenticateWithPopup(user, provider);
 
-          // Delete user-specific data
-          const collections = ["feeds", "playlists", "liked", "watchLater"];
-          for (const collectionName of collections) {
-            const q = query(
-              collection(db, collectionName),
-              where("userId", "==", user.uid)
-            );
-            const snapshot = await getDocs(q);
-            snapshot.forEach((doc) => batch.delete(doc.ref));
-          }
+        const batch = writeBatch(db);
 
-          // Delete user document
-          const userDoc = doc(db, "users", user.uid);
-          batch.delete(userDoc);
-
-          // Commit the batch
-          await batch.commit();
-
-          // Delete the user from Firebase Auth
-          await deleteUser(user);
-          navigate("/");
-        }
-      } catch (error) {
-        console.error("Error deleting account:", error);
-        if (error.code === "auth/requires-recent-login") {
-          alert(
-            "For security reasons, please log out and log back in before deleting your account."
+        // Delete user-specific data
+        const collections = ["feeds", "playlists", "liked", "watchLater"];
+        for (const collectionName of collections) {
+          const q = query(
+            collection(db, collectionName),
+            where("userId", "==", user.uid)
           );
-        } else {
-          alert("Failed to delete account. Please try again.");
+          const snapshot = await getDocs(q);
+          snapshot.forEach((doc) => batch.delete(doc.ref));
         }
+
+        // Delete user document
+        const userDoc = doc(db, "users", user.uid);
+        batch.delete(userDoc);
+
+        // Commit the batch
+        await batch.commit();
+
+        // Delete the user from Firebase Auth
+        await deleteUser(user);
+        navigate("/");
       }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      if (error.code === "auth/requires-recent-login") {
+        alert(
+          "For security reasons, please log out and log back in before deleting your account."
+        );
+      } else {
+        alert("Failed to delete account. Please try again.");
+      }
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -136,13 +131,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       icon: <IconDownload size={22} strokeWidth={1.5} className="text-gray-500"  />,
       isLink: false,
     },
-    // {
-    //   name: "Logout",
-    //   onClick: handleLogout,
-    //   icon: <IconLogout size={22}  strokeWidth={1.5} className="text-gray-500" />,
-    //   destructive: true,
-    //   isLink: false,
-    // },
     {
       name: "Delete Account",
       onClick: handleDeleteAccount,
@@ -208,7 +196,8 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
           <div className="flex flex-1 flex-col gap-2 p-4">
             {navItems.map((item) => (
-              <Link to={item.path}
+              <Link
+                to={item.path}
                 key={item.name}
                 onClick={item.onClick || (item.isLink && (() => navigate(item.path)))}
                 className={`flex items-center justify-start gap-3 rounded-lg p-4 text-lg/4 font-medium transition-colors ${
@@ -225,7 +214,8 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
           <div className="border-t border-white/10 p-4">
             <div
-              className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5">
+              className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5"
+            >
               <img
                 src={photoError ? "/default-profile.jpeg" : user?.photoURL}
                 alt={"Profile"}
@@ -244,6 +234,42 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
           </div>
         </div>
       </aside>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1F1F1F] p-6 rounded-lg max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <IconAlertTriangle size={24} className="text-red-500 mr-2" />
+              <h2 className="text-xl font-bold text-white">Delete Account</h2>
+            </div>
+            <p className="text-gray-300 mb-4">
+              Are you absolutely sure you want to delete your account? This action cannot be undone and will result in the permanent loss of:
+            </p>
+            <ul className="list-disc list-inside text-gray-300 mb-4">
+              <li>All your saved feeds</li>
+              <li>Your playlists</li>
+              <li>Your watch history</li>
+              <li>Your liked videos</li>
+              <li>All personalized settings and preferences</li>
+            </ul>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteAccount}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
+

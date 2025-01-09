@@ -10,8 +10,8 @@
 <!-- 9. Remove liked and remove watcch later form their respective pages -->
 <!-- 10. Sidebar shoudl autoclose once selected a menu item -- done -->
 <!-- 11. feed names fix http://localhost:5173/feed/%3Cdiv%20className=%22hidden%22%3Ehidden%3C/div%3E -->
-12. move delete option outside and give mass delete option with phone like minus dot thing
+<!-- 12. move delete option outside and give mass delete option with phone like minus dot thing -->
 13. FeedCard size should not change no matter what image i use
-14. h-screen overflow-hidden  move all empty state valeus to layout add condition this or there code.
+<!-- 14. h-screen overflow-hidden  move all empty state valeus to layout add condition this or there code. -->
 
 ### zenfeeds-v3 created

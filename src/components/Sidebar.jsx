@@ -33,19 +33,26 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [photoError, setPhotoError] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
     try {
       await signOut(auth);
       navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
+    } finally {
+      setShowLogoutModal(false);
     }
   };
-
   const handleDeleteAccount = () => {
     setShowDeleteModal(true);
   };
@@ -101,40 +108,50 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       name: "Feeds",
       onClick: onClose,
       path: "/feeds",
-      icon: <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />,
+      icon: (
+        <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
       isLink: true,
     },
     {
       name: "Playlists",
       onClick: onClose,
       path: "/playlists",
-      icon: <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />,
+      icon: (
+        <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
       isLink: true,
     },
     {
       name: "Liked",
       onClick: onClose,
       path: "/liked",
-      icon: <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />,
+      icon: (
+        <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
       isLink: true,
     },
     {
       name: "Watch Later",
       onClick: onClose,
       path: "/watch-later",
-      icon: <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />,
+      icon: (
+        <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />
+      ),
       isLink: true,
     },
     {
       name: "Import Feed",
       onClick: onImportClick,
-      icon: <IconDownload size={22} strokeWidth={1.5} className="text-gray-500"  />,
+      icon: (
+        <IconDownload size={22} strokeWidth={1.5} className="text-gray-500" />
+      ),
       isLink: false,
     },
     {
       name: "Delete Account",
       onClick: handleDeleteAccount,
-      icon: <IconTrash size={22}  strokeWidth={1.5} className="text-gray-500" />,
+      icon: <IconTrash size={22} strokeWidth={1.5} className="text-gray-500" />,
       destructive: true,
       isLink: false,
     },
@@ -181,14 +198,22 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden md:block text-white"
                 >
-                  <IconLayoutSidebar size={28} className="ml-5" strokeWidth={1}/>
+                  <IconLayoutSidebar
+                    size={28}
+                    className="ml-5"
+                    strokeWidth={1}
+                  />
                 </button>
               ) : (
                 <button
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden md:block text-white"
                 >
-                  <IconLayoutSidebar size={28} className="ml-auto" strokeWidth={1} />
+                  <IconLayoutSidebar
+                    size={28}
+                    className="ml-auto"
+                    strokeWidth={1}
+                  />
                 </button>
               )}
             </div>
@@ -199,7 +224,9 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
               <Link
                 to={item.path}
                 key={item.name}
-                onClick={item.onClick || (item.isLink && (() => navigate(item.path)))}
+                onClick={
+                  item.onClick || (item.isLink && (() => navigate(item.path)))
+                }
                 className={`flex items-center justify-start gap-3 rounded-lg p-4 text-lg/4 font-medium transition-colors ${
                   location.pathname === item.path
                     ? "bg-white/10 text-white"
@@ -213,9 +240,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
           </div>
 
           <div className="border-t border-white/10 p-4">
-            <div
-              className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5"
-            >
+            <div className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5">
               <img
                 src={photoError ? "/default-profile.jpeg" : user?.photoURL}
                 alt={"Profile"}
@@ -227,13 +252,44 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                   <span className="text-lg/4 font-medium text-white">
                     {user?.displayName?.split(" ")?.[0] || "John Doe"}
                   </span>
-                  <IconLogout onClick={handleLogout} size={24} className="text-white/50" />
+                  <IconLogout
+                    onClick={handleLogout}
+                    size={24}
+                    className="text-white/50"
+                  />
                 </div>
               )}
             </div>
           </div>
         </div>
       </aside>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1F1F1F] p-6 rounded-lg max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-white mb-4">
+              Confirm Logout
+            </h2>
+            <p className="text-gray-300 mb-4">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -243,7 +299,8 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
               <h2 className="text-xl font-bold text-white">Delete Account</h2>
             </div>
             <p className="text-gray-300 mb-4">
-              Are you absolutely sure you want to delete your account? This action cannot be undone and will result in the permanent loss of:
+              Are you absolutely sure you want to delete your account? This
+              action cannot be undone and will result in the permanent loss of:
             </p>
             <ul className="list-disc list-inside text-gray-300 mb-4">
               <li>All your saved feeds</li>
@@ -272,4 +329,3 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     </>
   );
 }
-

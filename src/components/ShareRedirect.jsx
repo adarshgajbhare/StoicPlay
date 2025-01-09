@@ -1,4 +1,3 @@
-// src/components/ShareRedirect.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,6 +8,7 @@ const ShareRedirect = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [error, setError] = useState(null);
+  const [isImportComplete, setIsImportComplete] = useState(false);
 
   useEffect(() => {
     const handleShare = async () => {
@@ -20,7 +20,7 @@ const ShareRedirect = () => {
         }
 
         await importSharedFeed(user.uid, shareId);
-        navigate('/');
+        setIsImportComplete(true); // Mark the import as complete
       } catch (error) {
         console.error("Error importing shared feed:", error);
         setError("Failed to import feed. The link may be invalid or expired.");
@@ -35,6 +35,16 @@ const ShareRedirect = () => {
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
         <div className="bg-red-500 text-white p-4 rounded-md">
           {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (isImportComplete) {
+    return (
+      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+        <div className="text-white text-lg">
+          Feed successfully imported! You can now access it in your dashboard.
         </div>
       </div>
     );

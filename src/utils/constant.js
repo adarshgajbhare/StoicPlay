@@ -339,22 +339,24 @@ export const saveLikedVideo = async (userId, videoData) => {
 };
 
 
-export const removeLikedVideo = async (userId, videoId) => {
+export const removeLikedVideo = async (userId, videoIds) => {
   try {
     const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists() && userDoc.data().likedVideos) {
+      const idsToDelete = Array.isArray(videoIds) ? videoIds : [videoIds];
       const updatedLikedVideos = userDoc
         .data()
-        .likedVideos.filter((video) => (video.id?.videoId || video?.id) !== videoId);
+        .likedVideos.filter((video) => !idsToDelete.includes(video.id?.videoId || video?.id));
       await updateDoc(userDocRef, { likedVideos: updatedLikedVideos });
     }
   } catch (error) {
-    console.error("Error removing liked video:", error);
+    console.error("Error removing liked videos:", error);
     throw error;
   }
 };
+
 export const getLikedVideos = async (userId) => {
   try {
     const userDocRef = doc(db, "users", userId);
@@ -411,16 +413,19 @@ export const getWatchLaterVideos = async (userId) => {
   }
 };
 
-
-export const removeWatchLaterVideo = async (userId, videoId) => {
+// remove watch later video
+export const removeWatchLaterVideo = async (userId, videoIds) => {
   try {
     const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists() && userDoc.data().watchLater) {
+      const idsToDelete = Array.isArray(videoIds) ? videoIds : [videoIds];
       const updatedWatchLater = userDoc
         .data()
-        .watchLater.filter((video) => (video.id?.videoId || video.id) !== videoId);
+        .watchLater.filter(
+          (video) => !idsToDelete.includes(video.id?.videoId || video.id)
+        );
       await updateDoc(userDocRef, { watchLater: updatedWatchLater });
     }
   } catch (error) {
@@ -456,18 +461,22 @@ export const handleDeleteFeed = async (user, feedNames, onSuccess, onError) => {
 
 
 // Delete Playlist 
-export const handleDeletePlaylist = async (user, playlistId) => {
+export const handleDeletePlaylist = async (user, playlistIds) => {
   try {
     const userDocRef = doc(db, "users", user.uid);
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
-      const updatedPlaylists = userData.playlists.filter(playlist => playlist.id !== playlistId);
+      // Handle both single ID and array of IDs
+      const idsToDelete = Array.isArray(playlistIds) ? playlistIds : [playlistIds];
+      const updatedPlaylists = userData.playlists.filter(
+        playlist => !idsToDelete.includes(playlist.id)
+      );
       await updateDoc(userDocRef, { playlists: updatedPlaylists });
     }
   } catch (error) {
-    console.error("Error deleting playlist:", error);
+    console.error("Error deleting playlists:", error);
     throw error;
   }
 };

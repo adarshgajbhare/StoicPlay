@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconX,
@@ -28,6 +29,7 @@ import {
   doc,
   writeBatch,
 } from "firebase/firestore";
+import { APP_NAME } from "../utils/constant";
 
 export function Sidebar({ onImportClick, isOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -108,50 +110,41 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       name: "Feeds",
       onClick: onClose,
       path: "/feeds",
-      icon: (
-        <IconStack2 size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
+      icon: <IconStack2 size={20} strokeWidth={1} className="" />,
       isLink: true,
     },
     {
       name: "Playlists",
       onClick: onClose,
       path: "/playlists",
-      icon: (
-        <IconPlaylist size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
+      icon: <IconPlaylist size={20} strokeWidth={1} className="" />,
       isLink: true,
     },
     {
       name: "Liked",
       onClick: onClose,
       path: "/liked",
-      icon: (
-        <IconThumbUp size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
+      icon: <IconThumbUp size={20} strokeWidth={1} className="" />,
       isLink: true,
     },
     {
       name: "Watch Later",
       onClick: onClose,
       path: "/watch-later",
-      icon: (
-        <IconDeviceTv size={24} strokeWidth={1.5} className="text-gray-500" />
-      ),
+      icon: <IconDeviceTv size={20} strokeWidth={1} className="" />,
       isLink: true,
     },
+
     {
       name: "Import Feed",
       onClick: onImportClick,
-      icon: (
-        <IconDownload size={22} strokeWidth={1.5} className="text-gray-500" />
-      ),
+      icon: <IconDownload size={20} strokeWidth={1} className="" />,
       isLink: false,
     },
     {
       name: "Delete Account",
       onClick: handleDeleteAccount,
-      icon: <IconTrash size={22} strokeWidth={1.5} className="text-gray-500" />,
+      icon: <IconTrash size={20} strokeWidth={1} className="" />,
       destructive: true,
       isLink: false,
     },
@@ -173,93 +166,131 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       )}
 
       <aside
-        className={`fixed md:sticky left-0 top-0 z-40 h-dvh bg-[#0F0F0F] transition-all duration-300 ${
-          isCollapsed ? "w-24" : "w-full md:w-64"
+        className={`fixed md:sticky left-0 top-0 z-40 flex h-svh p-5  items-center  text-xl/4  justify-between  flex-col  bg-black transition-all duration-300 ${
+          isCollapsed ? "w-16" : "w-full md:w-72"
         } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-between px-4">
-            <span
-              className={`text-xl/4 uppercase font-bold text-lime-500 transition-opacity ${
-                isCollapsed ? "hidden" : "block"
-              }`}
-            >
-              zenfeeds
-            </span>
-            <button
-              onClick={onClose}
-              className="md:hidden rounded-lg p-1.5 ml-auto hover:bg-white/10"
-            >
-              <IconX size={24} className="text-white" />
-            </button>
-            <div className="flex">
-              {isCollapsed ? (
-                <button
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="hidden md:block text-white"
-                >
-                  <IconLayoutSidebar
-                    size={28}
-                    className="ml-5"
-                    strokeWidth={1}
-                  />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="hidden md:block text-white"
-                >
-                  <IconLayoutSidebar
-                    size={28}
-                    className="ml-auto"
-                    strokeWidth={1}
-                  />
-                </button>
-              )}
-            </div>
-          </div>
+        <div
+          className={`flex text-xl/4  mt-2  flex-shrink-0  py-2  rounded-full w-full items-center ${
+            isCollapsed ? "md:justify-center" : "md:justify-between"
+          }`}
+        >
+          <span
+            className={`text-xl/4    uppercase  font-bold  text-lime-500 transition-opacity ${
+              isCollapsed ? "hidden" : "block"
+            }`}
+          >
+            {APP_NAME}
+          </span>
+          <button
+            onClick={onClose}
+            className="md:hidden bg-white/10   size-8  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] flex items-center justify-center rounded-full ml-auto hover:bg-white/10"
+          >
+            <IconX size={20} className="text-white  " strokeWidth={1} />
+          </button>
 
-          <div className="flex flex-1 flex-col gap-2 p-4">
-            {navItems.map((item) => (
-              <Link
-                to={item.path}
-                key={item.name}
-                onClick={
-                  item.onClick || (item.isLink && (() => navigate(item.path)))
+          {isCollapsed ? (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="hidden md:flex  bg-white/10  size-8 flex-shrink-0  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)]  items-center text-white justify-center rounded-full  hover:bg-white/10"
+            >
+              <IconLayoutSidebar
+                size={20}
+                className=" "
+                strokeWidth={1}
+              />
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="hidden md:flex  bg-white/10  size-8  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)]  items-center text-white justify-center rounded-full  hover:bg-white/10"
+            >
+              <IconX size={20} className=" " strokeWidth={1} />
+            </button>
+          )}
+        </div>
+
+        <div className="flex text-xl/4  mb-auto rounded-[2.5rem]  py-4 flex-col w-full">
+          {navItems.map((item) => (
+            <Link
+              to={item.path}
+              key={item.name}
+              onClick={
+                item.onClick || (item.isLink && (() => navigate(item.path)))
+              }
+              className={`flex items-center  w-full justify-between text-lg/4  py-1.5 rounded-full  text-nowrap  font-bold uppercase tracking-tight transition-colors ${
+                location.pathname === item.path
+                  ? " text-slate-50"
+                  : "text-[#555555]  "
+              }  
+                ${
+                  item.name === "Delete Account"
+                    ? " text-red-400"
+                    : "text-[#555555]  "
                 }
-                className={`flex items-center justify-start gap-3 rounded-lg p-4 text-lg/4 font-medium transition-colors ${
+                `}
+            >
+              {!isCollapsed && <span>{item.name}</span>}
+
+              <div
+                className={`flex items-center flex-shrink-0 shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] justify-center bg-white/10 rounded-full   size-8   ${
                   location.pathname === item.path
-                    ? "bg-white/10 text-white"
-                    : "text-white/75 hover:bg-white/5 hover:text-white"
-                }`}
+                    ? " text-slate-50"
+                    : "text-[#555555]  "
+                }
+                 ${
+                   item.name === "Delete Account"
+                     ? " text-red-400"
+                     : "text-[#555555]  "
+                 }
+                `}
               >
                 {item.icon}
-                {!isCollapsed && <span>{item.name}</span>}
-              </Link>
-            ))}
-          </div>
-
-          <div className="border-t border-white/10 p-4">
-            <div className="flex cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-2 hover:bg-white/5">
-              <img
-                src={photoError ? "/default-profile.jpeg" : user?.photoURL}
-                alt={"Profile"}
-                className="h-8 w-8 rounded-full ring-1 ring-white/20"
-                onError={() => setPhotoError(true)}
-              />
-              {!isCollapsed && (
-                <div className="flex flex-1 items-center justify-between">
-                  <span className="text-lg/4 font-medium text-white">
-                    {user?.displayName?.split(" ")?.[0] || "John Doe"}
-                  </span>
-                  <IconLogout
-                    onClick={handleLogout}
+                {/* <IconArrowRight
                     size={24}
-                    className="text-white/50"
+                    className={`  relative  ${
+                      location.pathname === item.path
+                        ? " text-slate-50"
+                        : "text-[#555555]  "
+                    }`}
+                    strokeWidth={1}
+                  /> */}
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="w-full">
+          <div className="flex text-xl/4  cursor-pointer items-center justify-center gap-3  py-2 rounded-full hover:bg-white/5">
+            <img
+              src={photoError ? "/default-profile.jpeg" : user?.photoURL}
+              alt={"Profile"}
+              className="size-8 rounded-full ring-1 ring-white/20"
+              onError={() => setPhotoError(true)}
+            />
+            {!isCollapsed && (
+              <div className="flex flex-1 items-center justify-between">
+                <span className="text-xl/4   uppercase font-bold  text-slate-50">
+                  {user?.displayName?.split(" ")?.[0] || "John Doe"}
+                </span>
+                <div className="bg-white/10  size-8   shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] flex items-center justify-center rounded-full ml-auto hover:bg-white/10">
+                  <IconLogout
+                    size={20}
+                    className="text-white relative left-[1px]"
+                    strokeWidth={1}
+                    onClick={handleLogout}
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
+          <div className="inline-flex py-4  items-center justify-between w-full">
+            <span className="text-[#555555] font-bold  tracking-tight text-xl/4">
+              ABOUT US
+            </span>
+            <span className="text-[#555555] font-bold  tracking-tight text-xl/4">
+              CONTACT US
+            </span>
           </div>
         </div>
       </aside>

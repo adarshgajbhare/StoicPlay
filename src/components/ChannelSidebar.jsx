@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
-import { Trash2, ChevronRight, ChevronLeft, Layout } from "lucide-react";
-import { IconMenu, IconMenu2, IconX } from "@tabler/icons-react";
+import { IconLayout, IconMenu, IconTrash, IconX } from "@tabler/icons-react";
 
 const ChannelSidebar = ({
   channels,
@@ -26,8 +25,8 @@ const ChannelSidebar = ({
   return (
     <div
     id="channel-sidebar"
-      className={` bg-[#0f0f0f]  hidden md:block 
-         border-white/10 min-h-dvh fixed right-10 top-10 z-50 overflow-y-auto transition-all duration-300 ${
+      className={` bg-[#323232] rounded-lg  hidden md:block 
+         border-white/10 min-h-dvh py-2.5 fixed right-10 top-10 bottom-96 max-h-96 z-50 overflow-y-auto transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-full md:w-64 "
       }`}
     >
@@ -74,7 +73,7 @@ const ChannelSidebar = ({
                 isCollapsed ? "size-10" : "size-10"
               }`}
             >
-              <Layout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-white  " />
+              <IconLayout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-white  " />
             </div>
             {!isCollapsed && (
               <div>
@@ -135,7 +134,7 @@ const ChannelSidebar = ({
                 aria-label={`Remove ${channelTitle}`}
                 title="Remove channel"
               >
-                <Trash2
+                <IconTrash
                   size={16}
                   className="text-white opacity-60 group-hover:opacity-100"
                 />

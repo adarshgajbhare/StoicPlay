@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import VideoCard from "../components/VideoCard";
-import { getLikedVideos, removeLikedVideo } from "../utils/constant";
+import { APP_NAME, getLikedVideos, removeLikedVideo } from "../utils/constant";
 import { useAuth } from "../contexts/AuthContext";
 import Toast from "../components/Toast";
 import { IconSquareCheckFilled, IconMinus, IconCheck } from "@tabler/icons-react";
@@ -92,7 +92,7 @@ const LikedVideosPage = () => {
             Liked Videos
           </h1>
           <p className="text-gray-600 text-xs md:text-base font-medium">
-            Videos you liked on Zenfeeds
+            Videos you liked on {APP_NAME}
           </p>
         </div>
         {likedVideos.length > 0 && (

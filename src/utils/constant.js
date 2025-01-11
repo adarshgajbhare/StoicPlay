@@ -480,3 +480,7 @@ export const handleDeletePlaylist = async (user, playlistIds) => {
     throw error;
   }
 };
+
+
+
+export const APP_NAME = "StoicPlay";

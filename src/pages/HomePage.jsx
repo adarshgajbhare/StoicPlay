@@ -10,6 +10,11 @@ import {
   IconSquareRoundedPlusFilled,
   IconMinus,
   IconX,
+  IconFilterEdit,
+  IconEditCircle,
+  IconEdit,
+  IconShare2,
+  IconCopy,
 } from "@tabler/icons-react";
 import {
   loadHomeFeeds,
@@ -80,10 +85,14 @@ function HomePage() {
         user,
         feedsArray,
         () => {
-          setFeeds(currentFeeds => 
-            currentFeeds.filter(feed => !feedsToDelete.has(feed.name))
+          setFeeds((currentFeeds) =>
+            currentFeeds.filter((feed) => !feedsToDelete.has(feed.name))
           );
-          setToastMessage(`Successfully deleted ${feedsArray.length} feed${feedsArray.length > 1 ? 's' : ''}`);
+          setToastMessage(
+            `Successfully deleted ${feedsArray.length} feed${
+              feedsArray.length > 1 ? "s" : ""
+            }`
+          );
           setShowToast(true);
         },
         (error) => {
@@ -92,7 +101,7 @@ function HomePage() {
           setShowToast(true);
         }
       );
-      
+
       setTimeout(() => setShowToast(false), 3000);
       setFeedsToDelete(new Set());
       setIsDeleteMode(false);
@@ -102,16 +111,15 @@ function HomePage() {
       console.error("Error in deletion process:", error);
     }
   };
-  
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
-      <div className="flex justify-between items-center mb-6">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+      <div className="flex justify-between items-start mb-4 ">
         <div>
-          <h1 className="text-white text-2xl md:text-4xl font-medium tracking-tight">
+          <h1 className="text-gray-50 text-xl  uppercase font-bold ">
             Hey, {user?.displayName?.split(" ")?.[0] || "there"}
           </h1>
-          <p className="text-gray-600 text-xs md:text-base font-medium">
+          <p className="text-[#555555] text-xs uppercase font-bold">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -120,7 +128,7 @@ function HomePage() {
             })}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1">
           {isDeleteMode && feedsToDelete.size > 0 && (
             <button
               onClick={() => setShowDeleteConfirmation(true)}
@@ -131,9 +139,24 @@ function HomePage() {
           )}
           <button
             onClick={handleDeleteMode}
-            className="text-white hover:text-gray-300 transition-colors"
+            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
           >
-            {isDeleteMode ? "Done" : "Edit"}
+            
+            {isDeleteMode ? <IconCheck size={20} strokeWidth={1.5} className="mr-2" /> : <IconEdit size={20} strokeWidth={1.5} className="mr-2" />}
+          </button>
+          <button
+            onClick={handleDeleteMode}
+            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
+          >
+            <IconShare2 size={20} strokeWidth={1.5} className="mr-2" />
+          
+          </button>
+          <button
+            onClick={handleDeleteMode}
+            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
+          >
+            <IconCopy size={20} strokeWidth={1.5} className="mr-2" />
+           
           </button>
         </div>
       </div>
@@ -144,7 +167,7 @@ function HomePage() {
             onClick={() => !isDeleteMode && setShowAddModal(true)}
             className={`aspect-video bg-[#151515]
             rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]
-            ${isDeleteMode ? 'opacity-50 cursor-not-allowed' : ''}`}
+            ${isDeleteMode ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <IconSquareRoundedPlusFilled
               size={40}
@@ -191,7 +214,8 @@ function HomePage() {
               Delete Feeds?
             </h3>
             <p className="text-gray-400 mb-6">
-              Are you sure you want to delete {feedsToDelete.size} selected feed{feedsToDelete.size > 1 ? 's' : ''}? This action cannot be undone.
+              Are you sure you want to delete {feedsToDelete.size} selected feed
+              {feedsToDelete.size > 1 ? "s" : ""}? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-4">
               <button
@@ -242,7 +266,7 @@ function FeedItem({ feed, isDeleteMode, isSelected, onToggleDelete }) {
             onToggleDelete();
           }}
           className={`absolute -left-1 -top-1 z-20 size-5 ${
-            isSelected ? 'bg-red-600' : 'bg-gray-600'
+            isSelected ? "bg-red-600" : "bg-gray-600"
           } rounded-full flex items-center justify-center shadow-lg isolate hover:bg-red-500 transition-colors`}
           aria-label={`Toggle delete ${feed.name}`}
         >
@@ -262,7 +286,7 @@ function FeedItem({ feed, isDeleteMode, isSelected, onToggleDelete }) {
             src={feed?.image || "/placeholder.png"}
             alt={feed?.name}
             className={`aspect-video bg-[#272727] rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f] transition-colors duration-200 ${
-              isSelected ? 'opacity-50' : ''
+              isSelected ? "opacity-50" : ""
             }`}
           />
         </div>

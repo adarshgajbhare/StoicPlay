@@ -482,5 +482,4 @@ export const handleDeletePlaylist = async (user, playlistIds) => {
 };
 
 
-
 export const APP_NAME = "StoicPlay";

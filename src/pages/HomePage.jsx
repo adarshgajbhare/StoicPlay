@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import AddFeedModal from "../components/AddFeedModal";
 import EditFeedModal from "../components/EditFeedModal";
+import ImportFeedModal from "../components/ImportFeedModal";
 import {
   IconCheck,
   IconCircleCheckFilled,
@@ -15,12 +16,14 @@ import {
   IconEdit,
   IconShare2,
   IconCopy,
+  IconTrash,
 } from "@tabler/icons-react";
 import {
   loadHomeFeeds,
   handleAddHomeFeed,
   handleUpdateHomeFeed,
   handleDeleteFeed,
+  handleShareMultipleFeeds,
 } from "../utils/constant";
 import Toast from "../components/Toast";
 
@@ -29,9 +32,12 @@ function HomePage() {
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [feeds, setFeeds] = useState([]);
   const [editingFeed, setEditingFeed] = useState(null);
+  const [isShareMode, setIsShareMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [feedsToShare, setFeedsToShare] = useState(new Set());
   const [feedsToDelete, setFeedsToDelete] = useState(new Set());
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -59,6 +65,33 @@ function HomePage() {
     );
   };
 
+  const handleShareMode = () => {
+    if (isShareMode && feedsToShare.size > 0) {
+      handleShareMultipleFeeds(user, Array.from(feedsToShare), feeds, setToastMessage, setShowToast);
+    }
+    setIsShareMode(!isShareMode);
+    setFeedsToShare(new Set());
+  };
+
+  const handleDeleteMode = () => {
+    if (isDeleteMode && feedsToDelete.size > 0) {
+      setShowDeleteConfirmation(true);
+    } else {
+      setIsDeleteMode(!isDeleteMode);
+      setFeedsToDelete(new Set());
+    }
+  };
+
+  const toggleFeedToShare = (feedName) => {
+    const newFeedsToShare = new Set(feedsToShare);
+    if (newFeedsToShare.has(feedName)) {
+      newFeedsToShare.delete(feedName);
+    } else {
+      newFeedsToShare.add(feedName);
+    }
+    setFeedsToShare(newFeedsToShare);
+  };
+
   const toggleFeedToDelete = (feedName) => {
     const newFeedsToDelete = new Set(feedsToDelete);
     if (newFeedsToDelete.has(feedName)) {
@@ -69,13 +102,11 @@ function HomePage() {
     setFeedsToDelete(newFeedsToDelete);
   };
 
-  const handleDeleteMode = () => {
-    if (isDeleteMode && feedsToDelete.size > 0) {
-      setShowDeleteConfirmation(true);
-    } else {
-      setIsDeleteMode(!isDeleteMode);
-      setFeedsToDelete(new Set());
-    }
+  const handleImportFeed = async (importedFeed) => {
+    setFeeds([...feeds, importedFeed]);
+    setToastMessage("Feed imported successfully");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   const confirmDelete = async () => {
@@ -106,7 +137,6 @@ function HomePage() {
       setFeedsToDelete(new Set());
       setIsDeleteMode(false);
       setShowDeleteConfirmation(false);
-      await loadHomeFeeds(user, setFeeds);
     } catch (error) {
       console.error("Error in deletion process:", error);
     }
@@ -116,7 +146,7 @@ function HomePage() {
     <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div className="flex justify-between items-start mb-4 ">
         <div>
-          <h1 className="text-gray-50 text-xl  uppercase font-bold ">
+          <h1 className="text-gray-50 text-xl uppercase font-bold ">
             Hey, {user?.displayName?.split(" ")?.[0] || "there"}
           </h1>
           <p className="text-[#555555] text-xs uppercase font-bold">
@@ -129,6 +159,14 @@ function HomePage() {
           </p>
         </div>
         <div className="flex items-center gap-1">
+          {isShareMode && feedsToShare.size > 0 && (
+            <button
+              onClick={handleShareMode}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Share ({feedsToShare.size})
+            </button>
+          )}
           {isDeleteMode && feedsToDelete.size > 0 && (
             <button
               onClick={() => setShowDeleteConfirmation(true)}
@@ -138,25 +176,30 @@ function HomePage() {
             </button>
           )}
           <button
-            onClick={handleDeleteMode}
-            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
+            onClick={handleShareMode}
+            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
           >
-            
-            {isDeleteMode ? <IconCheck size={20} strokeWidth={1.5} className="mr-2" /> : <IconEdit size={20} strokeWidth={1.5} className="mr-2" />}
+            {isShareMode ? (
+              <IconCheck size={20} strokeWidth={1.5} className="mr-2" />
+            ) : (
+              <IconShare2 size={20} strokeWidth={1.5} className="mr-2" />
+            )}
           </button>
           <button
             onClick={handleDeleteMode}
-            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
+            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
           >
-            <IconShare2 size={20} strokeWidth={1.5} className="mr-2" />
-          
+            {isDeleteMode ? (
+              <IconCheck size={20} strokeWidth={1.5} className="mr-2" />
+            ) : (
+              <IconTrash size={20} strokeWidth={1.5} className="mr-2" />
+            )}
           </button>
           <button
-            onClick={handleDeleteMode}
-            className="text-gray-50 font-bold   rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
+            onClick={() => setShowImportModal(true)}
+            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
           >
             <IconCopy size={20} strokeWidth={1.5} className="mr-2" />
-           
           </button>
         </div>
       </div>
@@ -164,10 +207,10 @@ function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div>
           <div
-            onClick={() => !isDeleteMode && setShowAddModal(true)}
+            onClick={() => !isShareMode && !isDeleteMode && setShowAddModal(true)}
             className={`aspect-video bg-[#151515]
             rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]
-            ${isDeleteMode ? "opacity-50 cursor-not-allowed" : ""}`}
+            ${(isShareMode || isDeleteMode) ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <IconSquareRoundedPlusFilled
               size={40}
@@ -183,8 +226,11 @@ function HomePage() {
           <FeedItem
             key={feed?.name}
             feed={feed}
+            isShareMode={isShareMode}
             isDeleteMode={isDeleteMode}
-            isSelected={feedsToDelete.has(feed.name)}
+            isSelectedForShare={feedsToShare.has(feed.name)}
+            isSelectedForDelete={feedsToDelete.has(feed.name)}
+            onToggleShare={() => toggleFeedToShare(feed.name)}
             onToggleDelete={() => toggleFeedToDelete(feed.name)}
           />
         ))}
@@ -204,6 +250,13 @@ function HomePage() {
           onClose={() => setShowEditModal(false)}
           onUpdateFeed={handleUpdateFeed}
           feed={editingFeed}
+        />
+      )}
+      {showImportModal && (
+        <ImportFeedModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImportFeed={handleImportFeed}
         />
       )}
 
@@ -256,37 +309,47 @@ function HomePage() {
   );
 }
 
-function FeedItem({ feed, isDeleteMode, isSelected, onToggleDelete }) {
+function FeedItem({ feed, isShareMode, isDeleteMode, isSelectedForShare, isSelectedForDelete, onToggleShare, onToggleDelete }) {
   return (
-    <div className="rounded transition-all duration-500 relative group">
-      {isDeleteMode && (
+    <div className={`rounded transition-all duration-500 relative group ${(isShareMode || isDeleteMode) ? 'animate-wiggle' : ''}`}>
+      {(isShareMode || isDeleteMode) && (
         <button
           onClick={(e) => {
             e.preventDefault();
-            onToggleDelete();
+            isShareMode ? onToggleShare() : onToggleDelete();
           }}
           className={`absolute -left-1 -top-1 z-20 size-5 ${
-            isSelected ? "bg-red-600" : "bg-gray-600"
-          } rounded-full flex items-center justify-center shadow-lg isolate hover:bg-red-500 transition-colors`}
-          aria-label={`Toggle delete ${feed.name}`}
+            isShareMode
+              ? isSelectedForShare ? "bg-blue-600" : "bg-gray-600"
+              : isSelectedForDelete ? "bg-red-600" : "bg-gray-600"
+          } rounded-full flex items-center justify-center shadow-lg isolate hover:bg-blue-500 transition-colors`}
+          aria-label={`Toggle ${isShareMode ? 'share' : 'delete'} ${feed.name}`}
         >
-          {isSelected ? (
-            <IconCheck size={12} className="text-white" strokeWidth={2} />
+          {isShareMode ? (
+            isSelectedForShare ? (
+              <IconCheck size={12} className="text-white" strokeWidth={2} />
+            ) : (
+              <IconShare2 size={12} className="text-white" strokeWidth={2} />
+            )
           ) : (
-            <IconMinus size={12} className="text-white" strokeWidth={2} />
+            isSelectedForDelete ? (
+              <IconCheck size={12} className="text-white" strokeWidth={2} />
+            ) : (
+              <IconMinus size={12} className="text-white" strokeWidth={2} />
+            )
           )}
         </button>
       )}
       <Link
-        to={isDeleteMode ? "#" : `/feed/${feed?.name}`}
-        className={`block ${isDeleteMode ? "cursor-default" : ""}`}
+        to={(isShareMode || isDeleteMode) ? "#" : `/feed/${feed?.name}`}
+        className={`block ${(isShareMode || isDeleteMode) ? "cursor-default" : ""}`}
       >
-        <div className={`relative ${isDeleteMode ? "animate-wiggle" : ""}`}>
+        <div className="relative">
           <img
             src={feed?.image || "/placeholder.png"}
             alt={feed?.name}
             className={`aspect-video bg-[#272727] rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f] transition-colors duration-200 ${
-              isSelected ? "opacity-50" : ""
+              (isSelectedForShare || isSelectedForDelete) ? "opacity-50" : ""
             }`}
           />
         </div>
@@ -301,3 +364,4 @@ function FeedItem({ feed, isDeleteMode, isSelected, onToggleDelete }) {
 }
 
 export default HomePage;
+

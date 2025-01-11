@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Trash, Trash2 } from "lucide-react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
+import { IconTrash } from "@tabler/icons-react";
 
 function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
   const { user } = useAuth();
@@ -178,7 +178,7 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
                     onClick={() => handleRemoveChannel(channel.channelId)}
                     className="text-red-600 hover:text-red-400"
                   >
-                    <Trash className="size-5" />
+                    <IconTrash className="size-5" />
                   </button>
                 </li>
               ))}

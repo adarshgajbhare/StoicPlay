@@ -3,7 +3,8 @@ import { signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { auth, provider } from "../lib/firebase";
 import { Navigate, useNavigate } from "react-router-dom";
-import { IoChevronBack } from "react-icons/io5";
+import { APP_NAME } from "../utils/constant";
+import { IconChevronLeft } from "@tabler/icons-react";
 
 const LearnMorePage = () => {
   const [error, setError] = useState(null);
@@ -22,7 +23,7 @@ const LearnMorePage = () => {
       <div className="min-h-dvh text-white overflow-hidden bg-[#050505] p-6 md:p-10 ">
         <div className="fixed top-2 left-2 md:top-4 md:left-4 z-50 flex items-center gap-1 cursor-pointer">
           <a href="/login" className="flex items-center gap-1">
-            <IoChevronBack className="text-2xl ml-2 md:text-3xl lg:text-4xl text-white" />
+            <IconChevronLeft className="text-2xl ml-2 md:text-3xl lg:text-4xl text-white" />
             <span className="text-xl/4 font-medium tracking-tight">
               Back to Homepage
             </span>
@@ -30,17 +31,17 @@ const LearnMorePage = () => {
         </div>
         <div className="max-w-xl mt-6 ">
           <h1 className="text-2xl  md:text-4xl  font-medium max-w-3xl text-base text-balance tracking-tight text-left my-2 md:my-2">
-            ZenFeeds, Take Back the control from the Algorithm
+            {APP_NAME}, Take Back the control from the Algorithm
           </h1>
           <p className="text-base/6 md:text-xl/7 text-left text-pretty   mb-4 ">
             Imagine a world where you're in charge of your video feed, not some
             faceless algorithm bent on keeping you glued to your screen. That's
-            ZenFeeds.
+            {APP_NAME}.
           </p>
           <div className="text-left space-y-4 lg:space-y-8">
             <div>
               <h2 className="text-xl/4 my-3 lg:text-2xl font-medium text-pretty">
-                Why ZenFeeds?
+                Why {APP_NAME}?
               </h2>
               <ul className="text-left text-nowrap list-none w-4/5 lg:w-3/5 space-y-2  mt-2">
                 <li>
@@ -76,7 +77,7 @@ const LearnMorePage = () => {
               </ul>
             </div>
             <p className="text-base/6 md:text-xl/7  max-w-2xl ">
-              You don't need to quit YouTube to escape its traps. With ZenFeeds,
+              You don't need to quit YouTube to escape its traps. With {APP_NAME},
               reconnect with your favorite creators, rediscover purposeful
               browsing, and log off <em>on your schedule</em>.
             </p>

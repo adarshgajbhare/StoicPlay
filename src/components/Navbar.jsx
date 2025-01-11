@@ -10,6 +10,7 @@ import { auth } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import DropdownMenu from "./DropdownMenu";
+import { APP_NAME } from "../utils/constant";
 
 function Navbar({ onImportClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,7 +54,7 @@ function Navbar({ onImportClick }) {
     <nav className="relative max-w-7xl  mx-auto flex items-center justify-between  text-white p-3">
       <div className="inline-flex  items-center gap-3">
         <span className=" text-xl/4 uppercase font-medium  text-lime-500">
-          zenfeeds
+          {APP_NAME}
         </span>
         <div className="hidden md:flex items-center space-x-2">
           <span className="items-center md:hidden rounded-full bg-[#555555] px-3 py-0.5 text-sm/6 font-medium tracking-tight text-white inline-flex">

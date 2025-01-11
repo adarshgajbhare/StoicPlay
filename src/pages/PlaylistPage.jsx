@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -264,10 +265,10 @@ function PlaylistCard({ playlist, onVideoSelect, isDeleteMode, isSelected, onTog
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-white text-lg/5 mt-1 font-medium line-clamp-2">
+            <h3 className="text-white text-sm mt-1 font-medium line-clamp-1">
               {playlist?.title}
             </h3>
-            <p className="text-[#AAAAAA] text-sm mt-1 mb-3">View full playlist</p>
+            <p className="text-[#AAAAAA] text-xs mb-3">View full playlist</p>
           </div>
         </div>
       </Link>

@@ -189,7 +189,7 @@ function FeedPage() {
   };
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] ">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-4 bg-[#151515]  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] ">
       <div
         id="feed-side"
         className={`
@@ -199,7 +199,7 @@ function FeedPage() {
               : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
-        <div className="flex justify-between  gap-4 mb-8  ">
+        <div className="flex border rounded-lg p-2 bg-[#303030] justify-between  gap-4 mb-8  ">
           <Link to="/" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
               <IconChevronLeft

@@ -63,7 +63,7 @@ function App() {
                 <Layout onImportClick={() => setShowImportModal(true)}>
                   <HomePage />
                 </Layout>
-              </PrivateRoute>
+               </PrivateRoute>
             }
           />
           <Route

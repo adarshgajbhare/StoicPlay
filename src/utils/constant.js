@@ -480,6 +480,19 @@ export const handleDeletePlaylist = async (user, playlistIds) => {
     throw error;
   }
 };
-
+export const handleShareMultipleFeeds = async (user, feedNames, allFeeds, setToastMessage, setShowToast) => {
+  try {
+    const feedsToShare = allFeeds.filter(feed => feedNames.includes(feed.name));
+    const shareId = await createSharedFeed(user.uid, { feeds: feedsToShare });
+    const shareableLink = `${window.location.origin}/share/${shareId}`;
+    await navigator.clipboard.writeText(shareableLink);
+    setToastMessage("Feed link copied to clipboard!");
+    setShowToast(true);
+  } catch (error) {
+    console.error("Error sharing feeds:", error);
+    setToastMessage("Failed to share feeds. Please try again.");
+    setShowToast(true);
+  }
+};
 
 export const APP_NAME = "StoicPlay";

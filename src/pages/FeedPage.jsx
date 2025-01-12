@@ -175,7 +175,7 @@ function FeedPage() {
 
   return (
     <div 
-      className={`w-full ${!hasChannels ? 'h-[700px] overflow-auto' : 'min-h-dvh'} rounded-2xl p-0 md:p-4  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
+      className={`w-full ${!hasChannels ? 'h-[700px] overflow-auto' : 'min-h-dvh'} rounded-2xl p-0 md:p-4 bg-[#151515] md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
     >
       <div
         id="feed-side"

@@ -164,7 +164,7 @@ const resetFeedStates = (setFeedChannels, setHasChannels, setInitialLoad) => {
 
 
 export const handleChannelDelete = async (user, feedName, channelIdToDelete, selectedChannel, setSelectedChannel, loadFeedData) => {
-  if (!window.confirm("Are you sure you want to remove this channel?")) return;
+  // if (!window.confirm("Are you sure you want to remove this channel?")) return;
 
   try {
     const userDocRef = doc(db, "users", user.uid);

@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import {
   formatRelativeTime,
@@ -214,12 +213,36 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
     ],
   ];
 
+  // const handleClick = () => {
+  //   setIsVideoOpen(true);
+  // };
+
+  const channelTitle =
+    channelDetails?.snippet?.title || video?.snippet?.channelTitle;
+
+  if (variant === "playlist") {
+    return (
+      <PlaylistVideoCard
+        video={video}
+        channelDetails={channelDetails}
+        onMenuOpen={setIsMenuOpen}
+        isMenuOpen={isMenuOpen}
+        menuItems={menuItems}
+        onVideoClick={handleClick}
+        videoImageError={videoImageError}
+        onVideoImageError={handleVideoImageError}
+        channelImageError={channelImageError}
+        onChannelImageError={handleChannelImageError}
+        getVideoId={getVideoId}
+      />
+    );
+  }
   const handleClick = () => {
     setIsVideoOpen(true);
   };
 
-  const channelTitle =
-    channelDetails?.snippet?.title || video?.snippet?.channelTitle;
+  // const channelTitle =
+  //   channelDetails?.snippet?.title || video?.snippet?.channelTitle;
 
   if (variant === "playlist") {
     return (
@@ -271,7 +294,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
               className="w-full h-40 object-cover rounded-md"
             />
           )}
-
+{/* 
           <div
             className="absolute top-2 right-2 z-20"
             onClick={(e) => e.stopPropagation()}
@@ -284,9 +307,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
               }}
               className="p-2 rounded-full bg-black/50"
             >
-              <IconDotsVertical size={18}
-              className="text-white"
-              />
+              <IconDotsVertical size={18} className="text-white" />
             </button>
 
             <DropdownMenu
@@ -294,7 +315,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
               onClose={() => setIsMenuOpen(false)}
               items={menuItems}
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-start mt-2 gap-1">
@@ -306,17 +327,43 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
               onError={handleChannelImageError}
             />
           )}
-          <div className="flex flex-col break-words gap-1">
-            <h3 className="font-medium  text-pretty text-base/5 line-clamp-2 text-white">
-              {video?.snippet?.title}
-            </h3>
-            <div className="flex flex-col gap-1 mt-1">
-              <span className="text-sm/3 text-gray-400 font-medium flex">
-                {channelTitle}
-              </span>
-              <p className="text-gray-400 font-medium text-xs/3 ">
-                {formatRelativeTime(video?.snippet?.publishedAt)}
-              </p>
+          <div className="flex flex-col break-words gap-1 flex-grow">
+            <div className="flex  items-center gap-2">
+             
+              <h3 className="font-medium text-pretty text-base/5 line-clamp-2 text-white flex-grow">
+                {video?.snippet?.title}
+              </h3>
+            
+            </div>
+            <div className="flex items-center gap-2 w-full justify-between" >
+              <div className="flex flex-col gap-1 mt-1">
+                <span className="text-sm/3 text-gray-400 font-medium flex">
+                  {channelTitle}
+                </span>
+                <p className="text-gray-400 font-medium text-xs/3 ">
+                  {formatRelativeTime(video?.snippet?.publishedAt)}
+                </p>
+              </div>
+              <div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    isWatchLater ? handleRemoveWatchLater(e) : handleWatchLater(e);
+                  }}
+                  className="p-1 rounded-full bg-black/50"
+                >
+                  <IconClock size={16} className={`${isWatchLater ? 'text-blue-500' : 'text-white'}`} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e);
+                  }}
+                  className="p-1 rounded-full bg-black/50"
+                >
+                  <IconThumbUp size={16} className={`${isLiked ? 'text-red-500' : 'text-white'}`} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

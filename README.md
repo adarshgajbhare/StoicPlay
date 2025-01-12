@@ -12,7 +12,7 @@
 <!-- 11. feed names fix http://localhost:5173/feed/%3Cdiv%20className=%22hidden%22%3Ehidden%3C/div%3E -->
 <!-- 12. move delete option outside and give mass delete option with phone like minus dot thing -->
 13. FeedCard size should not change no matter what image i use
-14. h-screen overflow-hidden  move all empty state valeus to layout add condition this or there code.
+14. h-screen overflow-hidden  move all empty state valeus to layout add condition this or there code. ---> empty feed no movement or scrolling
 
 ## {APP_NAME}-v3 Tasklist
 1. Finalize color code app wide
@@ -20,5 +20,5 @@
 3. UI consistency app wide
 4. Sidebar alignment
 5. Consistent CTAs and Popovers thorughout the app
-6. Like and watch later shifting to some other way
-7. 
+<!-- 6. Like and watch later shifting to some other way -->
+7. two thigns you need to fix (pull out the button out of feed, fix the edit add copy cancel shit select all)

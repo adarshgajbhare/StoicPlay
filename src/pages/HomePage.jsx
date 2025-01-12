@@ -158,7 +158,7 @@ function HomePage() {
             })}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex border items-center gap-1 fixed bottom-5 right-5 z-50 pl-2 py-2 bg-black/50 scale-100 md:scale-150 filter backdrop-blur-2xl rounded-full ring-[1px] ring-white/20">  
           {isShareMode && feedsToShare.size > 0 && (
             <button
               onClick={handleShareMode}
@@ -204,7 +204,7 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 px-1 md:px-0">
         <div>
           <div
             onClick={() => !isShareMode && !isDeleteMode && setShowAddModal(true)}

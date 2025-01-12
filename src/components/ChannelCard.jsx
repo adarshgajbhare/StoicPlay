@@ -1,84 +1,90 @@
-/* eslint-disable react/prop-types */
 import { IconCircleCheck } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 import { useState } from "react";
 
 function ChannelCard({ channel, onAddChannel }) {
   const [isAdded, setIsAdded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  if (!channel || !channel.snippet) {
-    return null;
-  }
+  if (!channel || !channel?.snippet) return null;
 
   const handleAddChannel = () => {
-    onAddChannel(
-      channel.id.channelId,
-      channel.snippet.title,
-      channel.statistics
-    );
+    onAddChannel(channel?.id.channelId, channel?.snippet.title, channel?.statistics);
     setIsAdded(true);
   };
 
-  function formatSubscriberCount(count) {
+  const formatSubscriberCount = (count) => {
     if (!count) return "0";
-    if (count >= 1000000) {
-      return (count / 1000000).toFixed(1) + "M";
-    } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + "K";
-    }
+    if (count >= 1000000) return (count / 1000000).toFixed(1) + "M";
+    if (count >= 1000) return (count / 1000).toFixed(1) + "K";
     return count.toString();
-  }
-
-  // New function to check if channel should show verification badge
-  const isVerified = () => {
-    return channel.statistics?.subscriberCount >= 100000;
   };
 
+  const isVerified = () => channel?.statistics?.subscriberCount >= 100000;
+
   return (
-    <div className="bg-black ring-[1px] ring-white/20 rounded-md overflow-hidden shadow-lg">
-      <div className="p-6 flex items-start gap-6">
-        <div className="flex-shrink-0">
-          <img
-            src={channel.snippet.thumbnails?.default?.url || "/placeholder.svg"}
-            alt={channel.snippet.title || "Channel thumbnail"}
-            className="size-10 md:size-16 rounded-md object-cover"
-          />
-        </div>
-        <div className="flex-grow min-w-0 space-y-2">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="flex items-center">
-                <h3 className="font-medium  text-base/4 md:text-xl/4 truncate text-white">
-                  {channel.snippet.title}
-                </h3>
-                {isVerified() && (
-                  <IconCircleCheck className="text-lime-500 relative ml-2 size-4" />
-                )}
-              </div>
-              {channel.statistics && (
-                <p className="md:text-sm/3 text-xs mt-2 bg-red-600  rounded-sm w-fit p-1 mb-2 font-medium text-white">
-                  {formatSubscriberCount(channel.statistics.subscriberCount)}{" "}
-                  subscribers
-                </p>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      // whileHover={{ scale: 1.02 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="bg-[#101010]  rounded-xl overflow-hidden "
+    >
+      <div className="p-4 flex items-start gap-4">
+        <motion.img
+          src={channel?.snippet.thumbnails?.default?.url || "/placeholder.svg"}
+          alt={channel?.snippet.title}
+          className="w-12 h-12 rounded-full object-cover"
+          // whileHover={{ scale: 1.1 }}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className="font-medium text-white truncate">
+                {channel?.snippet.title}
+              </h3>
+              {isVerified() && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200 }}
+                >
+                  <IconCircleCheck className="text-purple-500 w-4 h-4 flex-shrink-0" />
+                </motion.div>
               )}
             </div>
-            <button
+            <motion.button
               onClick={handleAddChannel}
-              className={`w-fit flex-shrink-0 py-3 px-4 rounded-md font-medium tracking-tight text-base/3 ${
-                isAdded
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-white text-black hover:bg-green-500 hover:text-white"
-              }`}
               disabled={isAdded}
+              // whileHover={!isAdded ? { scale: 1.05 } : {}}
+              whileTap={!isAdded ? { scale: 0.95 } : {}}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
+                ${isAdded 
+                  ? "bg-gray-500 text-white/50 cursor-not-allowed" 
+                  : "bg-white text-black hover:bg-gray-100"}`}
             >
               {isAdded ? "Added" : "Add"}
-            </button>
+            </motion.button>
           </div>
-          <p className="md:text-base/5 text-sm text-white/60 mb-4 text-pretty line-clamp-3">
-            {channel.snippet.description || "No description available"}
-          </p>
+          {/* <p className="text-white/40 text-sm mt-1">
+            {channel?.snippet.customUrl || channel?.snippet.title.toLowerCase().replace(/\s+/g, '')}
+          </p> */}
+          {channel?.statistics && (
+            <p className="text-sm text-left text-white/60">
+              {formatSubscriberCount(channel?.statistics.subscriberCount)} subscribers
+            </p>
+          )}
+          <motion.p 
+            className="text-sm text-left text-white/60  line-clamp-2"
+            animate={{ opacity: isHovered ? 1 : 0.6 }}
+          >
+            {channel?.snippet.description || "No description available"}
+          </motion.p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

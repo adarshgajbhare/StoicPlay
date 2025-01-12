@@ -199,7 +199,7 @@ function FeedPage() {
               : " max-w-8xl md:pr-64 transition-all duration-300"
           }`}
       >
-        <div className="flex border rounded-lg p-2 bg-[#303030] justify-between  gap-4 mb-8  ">
+        <div className="flex  rounded-lg p-2  justify-between  gap-4 mb-8  ">
           <Link to="/" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
               <IconChevronLeft

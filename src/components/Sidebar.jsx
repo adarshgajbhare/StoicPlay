@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconX,
@@ -156,6 +156,16 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     }
   };
 
+
+  useEffect(() => {
+    // Dispatch event when sidebar state changes
+    const event = new CustomEvent('leftSidebarStateChange', {
+      detail: { isCollapsed }
+    });
+    window.dispatchEvent(event);
+  }, [isCollapsed]);
+  
+
   return (
     <>
       {isOpen && (
@@ -246,15 +256,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
                 `}
               >
                 {item.icon}
-                {/* <IconArrowRight
-                    size={24}
-                    className={`  relative  ${
-                      location.pathname === item.path
-                        ? " text-slate-50"
-                        : "text-[#555555]  "
-                    }`}
-                    strokeWidth={1}
-                  /> */}
               </div>
             </Link>
           ))}

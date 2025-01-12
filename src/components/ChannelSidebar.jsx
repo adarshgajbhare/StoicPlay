@@ -25,7 +25,7 @@ const ChannelSidebar = ({
   return (
     <div
     id="channel-sidebar"
-      className={` bg-[#323232] rounded-lg  hidden md:block 
+      className={` rounded-lg  hidden md:block 
          border-white/10 min-h-dvh py-2.5 fixed right-10 top-10 bottom-96 max-h-96 z-50 overflow-y-auto transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-full md:w-64 "
       }`}

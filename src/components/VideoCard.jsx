@@ -4,8 +4,7 @@ import {
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconClock, IconDotsVertical, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
-import DropdownMenu from "./DropdownMenu";
+import { IconClock, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
 import {
   saveLikedVideo,
   saveWatchLater,
@@ -16,12 +15,10 @@ import {
 } from "../utils/constant";
 import { useAuth } from "../contexts/AuthContext";
 import VideoPlayer from "./VideoPlayer";
-import PlaylistVideoCard from "./PlaylistVideoCard";
 
 function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved }) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
@@ -264,23 +261,23 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
 
   return (
     <>
-      <div className="bg-transparent overflow-hidden shadow-md md:transition-transform duration-500 cursor-pointer relative">
-        <div className="relative group" onClick={handleClick}>
+      <div className="group bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
+        <div className="relative aspect-video" onClick={() => setIsVideoOpen(true)}>
           {!videoImageError ? (
-            <div className="relative">
+            <div className="relative w-full h-full">
               <img
                 src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
-                alt={"Video thumbnail"}
-                className="w-full h-40 object-cover rounded-md"
-                onError={handleVideoImageError}
+                alt={video?.snippet?.title}
+                className="w-full h-full object-cover"
+                onError={() => setVideoImageError(true)}
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="w-14 h-14 flex items-center justify-center rounded-full bg-black/60 transform scale-90 group-hover:scale-100 transition-transform duration-300">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="white"
                     viewBox="0 0 24 24"
-                    className="w-6 h-6"
+                    className="w-7 h-7"
                   >
                     <path d="M8 5v14l11-7z" />
                   </svg>
@@ -288,81 +285,63 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
               </div>
             </div>
           ) : (
-            <img
-              src="/placeholder.png"
-              alt="Placeholder"
-              className="w-full h-40 object-cover rounded-md"
-            />
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+              <span className="text-gray-500">No thumbnail available</span>
+            </div>
           )}
-{/* 
-          <div
-            className="absolute top-2 right-2 z-20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsMenuOpen(!isMenuOpen);
-              }}
-              className="p-2 rounded-full bg-black/50"
-            >
-              <IconDotsVertical size={18} className="text-white" />
-            </button>
-
-            <DropdownMenu
-              isOpen={isMenuOpen}
-              onClose={() => setIsMenuOpen(false)}
-              items={menuItems}
-            />
-          </div> */}
         </div>
 
-        <div className="flex items-start mt-2 gap-1">
-          {!channelImageError && channelDetails?.snippet?.thumbnails && (
-            <img
-              src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
-              alt={channelTitle}
-              className="size-8 rounded-full ring-[1px] flex-shrink-0 ring-white/20 mr-1 overflow-hidden border-white"
-              onError={handleChannelImageError}
-            />
-          )}
-          <div className="flex flex-col break-words gap-1 flex-grow">
-            <div className="flex  items-center gap-2">
-             
-              <h3 className="font-medium text-pretty text-base/5 line-clamp-2 text-white flex-grow">
+        <div className="p-4">
+          <div className="flex gap-3">
+            {!channelImageError && channelDetails?.snippet?.thumbnails && (
+              <img
+                src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
+                alt={channelDetails?.snippet?.title || video?.snippet?.channelTitle}
+                className="w-10 h-10 rounded-full ring-1 ring-white/10 object-cover flex-shrink-0"
+                onError={() => setChannelImageError(true)}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-white font-medium text-base line-clamp-2 mb-1">
                 {video?.snippet?.title}
               </h3>
-            
-            </div>
-            <div className="flex items-center gap-2 w-full justify-between" >
-              <div className="flex flex-col gap-1 mt-1">
-                <span className="text-sm/3 text-gray-400 font-medium flex">
-                  {channelTitle}
-                </span>
-                <p className="text-gray-400 font-medium text-xs/3 ">
-                  {formatRelativeTime(video?.snippet?.publishedAt)}
-                </p>
-              </div>
-              <div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    isWatchLater ? handleRemoveWatchLater(e) : handleWatchLater(e);
-                  }}
-                  className="p-1 rounded-full bg-black/50"
-                >
-                  <IconClock size={16} className={`${isWatchLater ? 'text-blue-500' : 'text-white'}`} />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e);
-                  }}
-                  className="p-1 rounded-full bg-black/50"
-                >
-                  <IconThumbUp size={16} className={`${isLiked ? 'text-red-500' : 'text-white'}`} />
-                </button>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-gray-400 text-sm font-medium">
+                    {channelDetails?.snippet?.title || video?.snippet?.channelTitle}
+                  </span>
+                  <span className="text-gray-500 text-xs">
+                    {formatRelativeTime(video?.snippet?.publishedAt)}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      isWatchLater ? handleRemoveWatchLater(e) : handleWatchLater(e);
+                    }}
+                    className="p-2 rounded-full hover:bg-white/5 transition-colors"
+                    title={isWatchLater ? "Remove from Watch Later" : "Add to Watch Later"}
+                  >
+                    <IconClock
+                      size={18}
+                      className={`${isWatchLater ? 'text-blue-500' : 'text-gray-400'} transition-colors`}
+                    />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e);
+                    }}
+                    className="p-2 rounded-full hover:bg-white/5 transition-colors"
+                    title={isLiked ? "Unlike" : "Like"}
+                  >
+                    <IconThumbUp
+                      size={18}
+                      className={`${isLiked ? 'text-red-500' : 'text-gray-400'} transition-colors`}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -380,3 +359,4 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
 }
 
 export default VideoCard;
+

@@ -111,11 +111,15 @@ export const handleUpdateHomeFeed = async (user, feeds, setFeeds, oldName, newNa
 };
 
 
-
-
-
 // FeedPage Methods
-export const loadFeedData = async (user, feedName, setCurrentFeed, setFeedChannels, setHasChannels, setInitialLoad) => {
+export const loadFeedData = async (
+  user,
+  feedName,
+  setCurrentFeed,
+  setFeedChannels,
+  setHasChannels,
+  setInitialLoad
+) => {
   if (user) {
     try {
       const userDocRef = doc(db, "users", user.uid);
@@ -124,34 +128,40 @@ export const loadFeedData = async (user, feedName, setCurrentFeed, setFeedChanne
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
         const thisFeed = userData.feeds.find((feed) => feed.name === feedName);
+
         if (thisFeed) {
           setCurrentFeed(thisFeed);
-          setFeedChannels(
-            thisFeed.channels.reduce((acc, channel) => {
-              acc[channel.channelId] = channel.channelTitle;
-              return acc;
-            }, {})
-          );
+
+          // Create a channels object in one go
+          const channels = thisFeed.channels.reduce((acc, channel) => {
+            acc[channel?.channelId] = channel?.channelTitle;
+            return acc;
+          }, {});
+
+          setFeedChannels(channels);
           setHasChannels(thisFeed.channels.length > 0);
         } else {
-          setFeedChannels({});
-          setHasChannels(false);
-          setInitialLoad(false);
+          // If feed does not exist, reset states
+          resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
         }
       } else {
         console.log("No such document!");
-        setFeedChannels({});
-        setHasChannels(false);
-        setInitialLoad(false);
+        resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
       }
     } catch (error) {
       console.error("Error loading feed data:", error);
-      setFeedChannels({});
-      setHasChannels(false);
-      setInitialLoad(false);
+      resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
     }
   }
 };
+
+// Helper function to reset feed states
+const resetFeedStates = (setFeedChannels, setHasChannels, setInitialLoad) => {
+  setFeedChannels({});
+  setHasChannels(false);
+  setInitialLoad(false);
+};
+
 
 export const handleChannelDelete = async (user, feedName, channelIdToDelete, selectedChannel, setSelectedChannel, loadFeedData) => {
   if (!window.confirm("Are you sure you want to remove this channel?")) return;

@@ -9,23 +9,13 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronLeft, IconChevronsLeft, IconShare2 } from "@tabler/icons-react";
+import { IconChevronLeft, IconPlus, IconEdit } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
   handleChannelDelete,
   handleUpdateFeed,
-  handleDeleteFeed,
-  handleShareFeed,
 } from "../utils/constant";
-import {
-  IconDotsVertical,
-  IconShare,
-  IconPlus,
-  IconEdit,
-  IconTrash,
-} from "@tabler/icons-react";
-import DropdownMenu from "../components/DropdownMenu";
 import FilterTags from "../components/FilterTags";
 
 function FeedPage() {
@@ -43,40 +33,14 @@ function FeedPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
   const [currentFeed, setCurrentFeed] = useState(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentDateRange, setCurrentDateRange] = useState({
     start: new Date(new Date().setDate(new Date().getDate() - 15)),
     end: new Date(),
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
-  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
 
-  const actionMenuItems = [
-    [
-      {
-        label: "Share Feed",
-        icon: <IconShare2 size={20} />,
-        onClick: () => handleShareFeed(user, currentFeed),
-      },
-      {
-        label: "Add Channel",
-        icon: <IconPlus size={20} />,
-        onClick: () => setIsSearchPopoverOpen(true),
-      },
-      {
-        label: "Edit Feed",
-        icon: <IconEdit size={20} />,
-        onClick: () => setIsEditModalOpen(true),
-      },
-      // {
-      //   label: "Delete Feed",
-      //   icon: <IconTrash size={20} />,
-      //   onClick: () => handleDeleteFeed(user, feedName, navigate),
-      //   destructive: true,
-      // },
-    ],
-  ];
   useEffect(() => {
     if (selectedChannel) {
       const channelVideos = videos.filter(
@@ -188,18 +152,43 @@ function FeedPage() {
     }, 100);
   };
 
+  const getGridColumns = () => {
+    if (isCollapsed && isLeftSidebarCollapsed) {
+      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'; // Both sidebars collapsed
+    } else if (!isCollapsed && !isLeftSidebarCollapsed) {
+      return 'grid-cols-1 sm:grid-cols-2'; // Both sidebars open
+    } else {
+      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'; // One sidebar open
+    }
+  };
+
+  useEffect(() => {
+    const handleLeftSidebar = (e) => {
+      if (e.detail) {
+        setIsLeftSidebarCollapsed(e.detail.isCollapsed);
+      }
+    };
+
+    window.addEventListener('leftSidebarStateChange', handleLeftSidebar);
+    return () => window.removeEventListener('leftSidebarStateChange', handleLeftSidebar);
+  }, []);
+
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-4 bg-[#151515]  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] ">
+    <div 
+      className={`w-full ${!hasChannels ? 'h-[700px] overflow-auto' : 'min-h-dvh'} rounded-2xl p-0 md:p-4  md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
+    >
       <div
         id="feed-side"
         className={`
+          ${hasChannels ? 'overflow-auto' : 'overflow-hidden'}
           ${
             isCollapsed
-              ? " max-w-8xl md:pr-16  transition-all duration-300"
-              : " max-w-8xl md:pr-64 transition-all duration-300"
-          }`}
+              ? "max-w-8xl md:pr-16 transition-all duration-300"
+              : "max-w-8xl md:pr-64 transition-all duration-300"
+          }
+        `}
       >
-        <div className="flex  rounded-lg p-2  justify-between  gap-4 mb-8  ">
+        <div className="flex rounded-lg p-2 justify-between gap-4 mb-8">
           <Link to="/" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
               <IconChevronLeft
@@ -208,30 +197,30 @@ function FeedPage() {
                 className="scale-[2] text-white"
               />
             </div>
-            <h1 className="text-xl  lg:text-2xl relative right-1.5 md:right-0 font-medium text-center text-white tracking-tight">
+            <h1 className="text-xl lg:text-2xl relative right-1.5 md:right-0 font-medium text-center text-white tracking-tight">
               {feedName}
             </h1>
           </Link>
-          <div className="relative">
+          <div className="flex space-x-2">
             <button
-              onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
-              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white"
-              aria-label="Feed actions"
+              onClick={() => setIsSearchPopoverOpen(true)}
+              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white flex items-center"
+              aria-label="Add Channel"
             >
-              <IconDotsVertical size={24} />
+              <IconPlus size={20} />
+              <span className="ml-1 hidden md:inline">Add Channel</span>
             </button>
-            <div className="">
-              <DropdownMenu
-                isOpen={isActionMenuOpen}
-                onClose={() => setIsActionMenuOpen(false)}
-                items={actionMenuItems}
-                position="left"
-                width="w-48"
-              />
-            </div>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white flex items-center"
+              aria-label="Edit Feed"
+            >
+              <IconEdit size={20} />
+              <span className="ml-1 hidden md:inline">Edit Feed</span>
+            </button>
           </div>
         </div>
-        <h2 className="text-2xl text-white font-medium  mb-4 hidden md:block">
+        <h2 className="text-2xl text-white font-medium mb-4 hidden md:block">
           {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
             : "All Videos"}
@@ -274,8 +263,7 @@ function FeedPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
           </div>
         ) : (
-          //grid vieos conditional rendering based on sidebar open
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid ${getGridColumns()} gap-6 p-4 transition-all duration-300`}>
             {filteredVideos.map((video) => (
               <VideoCard
                 key={video.id?.videoId || video.id}
@@ -362,3 +350,4 @@ function FeedPage() {
 }
 
 export default FeedPage;
+

@@ -17,6 +17,7 @@ import {
   IconShare2,
   IconCopy,
   IconTrash,
+  IconShare3,
 } from "@tabler/icons-react";
 import {
   loadHomeFeeds,
@@ -67,7 +68,13 @@ function HomePage() {
 
   const handleShareMode = () => {
     if (isShareMode && feedsToShare.size > 0) {
-      handleShareMultipleFeeds(user, Array.from(feedsToShare), feeds, setToastMessage, setShowToast);
+      handleShareMultipleFeeds(
+        user,
+        Array.from(feedsToShare),
+        feeds,
+        setToastMessage,
+        setShowToast
+      );
     }
     setIsShareMode(!isShareMode);
     setFeedsToShare(new Set());
@@ -158,59 +165,92 @@ function HomePage() {
             })}
           </p>
         </div>
-        <div className="flex border items-center gap-1 fixed bottom-5 right-5 z-50 pl-2 py-2 bg-black/50 scale-100 md:scale-150 filter backdrop-blur-2xl rounded-full ring-[1px] ring-white/20">  
-          {isShareMode && feedsToShare.size > 0 && (
-            <button
-              onClick={handleShareMode}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Share ({feedsToShare.size})
-            </button>
-          )}
-          {isDeleteMode && feedsToDelete.size > 0 && (
-            <button
-              onClick={() => setShowDeleteConfirmation(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Delete ({feedsToDelete.size})
-            </button>
-          )}
-          <button
-            onClick={handleShareMode}
-            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
-          >
-            {isShareMode ? (
-              <IconCheck size={20} strokeWidth={1.5} className="mr-2" />
-            ) : (
-              <IconShare2 size={20} strokeWidth={1.5} className="mr-2" />
+
+        <div className="fixed md:top-10 bottom-6 right-6 z-50">
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-lg p-2">
+            {isShareMode && feedsToShare.size > 0 && (
+              <button
+                onClick={handleShareMode}
+                className="bg-blue-100 text-blue-500 p-2 rounded-full relative"
+              >
+                <IconShare3 />
+                <span className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs text-white bg-red-500 rounded-full border-2 border-white">
+                  {feedsToShare.size}
+                </span>
+              </button>
             )}
-          </button>
-          <button
-            onClick={handleDeleteMode}
-            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
-          >
-            {isDeleteMode ? (
-              <IconCheck size={20} strokeWidth={1.5} className="mr-2" />
-            ) : (
-              <IconTrash size={20} strokeWidth={1.5} className="mr-2" />
+
+            {isDeleteMode && feedsToDelete.size > 0 && (
+              <button
+                onClick={() => setShowDeleteConfirmation(true)}
+                className="bg-red-100 text-red-500 p-2 rounded-full relative"
+              >
+                <IconTrash />
+                <span className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs text-white bg-red-500 rounded-full border-2 border-white">
+                  {feedsToDelete.size}
+                </span>
+              </button>
             )}
-          </button>
-          <button
-            onClick={() => setShowImportModal(true)}
-            className="text-gray-50 font-bold rounded-lg text-sm uppercase hover:text-gray-100 transition-colors"
-          >
-            <IconCopy size={20} strokeWidth={1.5} className="mr-2" />
-          </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShareMode}
+                className={`p-2 rounded-full ${
+                  isShareMode
+                    ? "bg-blue-100 text-blue-500"
+                    : "text-gray-500 hover:bg-gray-100"
+                } transition-colors`}
+              >
+                {isShareMode ? <IconCheck /> : <IconShare3/>}
+              </button>
+              <button
+                onClick={handleDeleteMode}
+                className={`p-2 rounded-full ${
+                  isDeleteMode
+                    ? "bg-red-100 text-red-500"
+                    : "text-gray-500 hover:bg-gray-100"
+                } transition-colors`}
+              >
+                {isDeleteMode ? <IconCheck /> : <IconTrash />}
+              </button>
+
+              {/*               
+               IMPORT BUTTON
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button> */}
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 px-1 md:px-0">
         <div>
           <div
-            onClick={() => !isShareMode && !isDeleteMode && setShowAddModal(true)}
+            onClick={() =>
+              !isShareMode && !isDeleteMode && setShowAddModal(true)
+            }
             className={`aspect-video bg-[#151515]
             rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f]/30 transition-colors duration-200 shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]
-            ${(isShareMode || isDeleteMode) ? "opacity-50 cursor-not-allowed" : ""}`}
+            ${
+              isShareMode || isDeleteMode ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <IconSquareRoundedPlusFilled
               size={40}
@@ -309,9 +349,21 @@ function HomePage() {
   );
 }
 
-function FeedItem({ feed, isShareMode, isDeleteMode, isSelectedForShare, isSelectedForDelete, onToggleShare, onToggleDelete }) {
+function FeedItem({
+  feed,
+  isShareMode,
+  isDeleteMode,
+  isSelectedForShare,
+  isSelectedForDelete,
+  onToggleShare,
+  onToggleDelete,
+}) {
   return (
-    <div className={`rounded transition-all duration-500 relative group ${(isShareMode || isDeleteMode) ? 'animate-wiggle' : ''}`}>
+    <div
+      className={`rounded transition-all duration-500 relative group ${
+        isShareMode || isDeleteMode ? "animate-wiggle" : ""
+      }`}
+    >
       {(isShareMode || isDeleteMode) && (
         <button
           onClick={(e) => {
@@ -320,10 +372,16 @@ function FeedItem({ feed, isShareMode, isDeleteMode, isSelectedForShare, isSelec
           }}
           className={`absolute -left-1 -top-1 z-20 size-5 ${
             isShareMode
-              ? isSelectedForShare ? "bg-blue-600" : "bg-gray-600"
-              : isSelectedForDelete ? "bg-red-600" : "bg-gray-600"
+              ? isSelectedForShare
+                ? "bg-blue-600"
+                : "bg-gray-600"
+              : isSelectedForDelete
+              ? "bg-red-600"
+              : "bg-gray-600"
           } rounded-full flex items-center justify-center shadow-lg isolate hover:bg-blue-500 transition-colors`}
-          aria-label={`Toggle ${isShareMode ? 'share' : 'delete'} ${feed.name}`}
+          aria-label={`Toggle ${isShareMode ? "share" : "delete"} ${
+            feed?.name
+          }`}
         >
           {isShareMode ? (
             isSelectedForShare ? (
@@ -331,25 +389,25 @@ function FeedItem({ feed, isShareMode, isDeleteMode, isSelectedForShare, isSelec
             ) : (
               <IconShare2 size={12} className="text-white" strokeWidth={2} />
             )
+          ) : isSelectedForDelete ? (
+            <IconCheck size={12} className="text-white" strokeWidth={2} />
           ) : (
-            isSelectedForDelete ? (
-              <IconCheck size={12} className="text-white" strokeWidth={2} />
-            ) : (
-              <IconMinus size={12} className="text-white" strokeWidth={2} />
-            )
+            <IconMinus size={12} className="text-white" strokeWidth={2} />
           )}
         </button>
       )}
       <Link
-        to={(isShareMode || isDeleteMode) ? "#" : `/feed/${feed?.name}`}
-        className={`block ${(isShareMode || isDeleteMode) ? "cursor-default" : ""}`}
+        to={isShareMode || isDeleteMode ? "#" : `/feed/${feed?.name}`}
+        className={`block ${
+          isShareMode || isDeleteMode ? "cursor-default" : ""
+        }`}
       >
         <div className="relative">
           <img
             src={feed?.image || "/placeholder.png"}
             alt={feed?.name}
             className={`aspect-video bg-[#272727] rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f] transition-colors duration-200 ${
-              (isSelectedForShare || isSelectedForDelete) ? "opacity-50" : ""
+              isSelectedForShare || isSelectedForDelete ? "opacity-50" : ""
             }`}
           />
         </div>
@@ -364,4 +422,3 @@ function FeedItem({ feed, isShareMode, isDeleteMode, isSelectedForShare, isSelec
 }
 
 export default HomePage;
-

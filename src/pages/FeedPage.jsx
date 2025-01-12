@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronLeft, IconPlus, IconEdit } from "@tabler/icons-react";
+import { IconChevronLeft, IconPlus, IconEdit, IconEditCircle } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -189,7 +189,7 @@ function FeedPage() {
         `}
       >
         <div className="flex rounded-lg p-2 justify-between gap-4 mb-8">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/feeds" className="flex items-center gap-2">
             <div className="text-white transition-colors duration-500">
               <IconChevronLeft
                 size={16}
@@ -204,19 +204,19 @@ function FeedPage() {
           <div className="flex space-x-2">
             <button
               onClick={() => setIsSearchPopoverOpen(true)}
-              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white flex items-center"
-              aria-label="Add Channel"
-            >
+              className=" hover:bg-white  flex items-center
+               bg-white/10 text-blue-500 p-3 rounded-full ml-1 md:inline"
+              aria-label="Add Channel">
               <IconPlus size={20} />
-              <span className="ml-1 hidden md:inline">Add Channel</span>
             </button>
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="rounded-full p-2 hover:bg-white/10 transition-colors text-white flex items-center"
+             className=" hover:bg-white  flex items-center
+               bg-white/10 text-blue-500 p-3 rounded-full ml-1 md:inline"
               aria-label="Edit Feed"
             >
               <IconEdit size={20} />
-              <span className="ml-1 hidden md:inline">Edit Feed</span>
+        
             </button>
           </div>
         </div>

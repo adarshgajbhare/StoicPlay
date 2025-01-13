@@ -221,7 +221,7 @@ function FeedPage() {
             </button>
           </div>
         </div>
-        <h2 className="text-2xl text-white font-medium mb-4 hidden md:block">
+        <h2 className={`text-2xl text-white font-medium mb-4 ${!hasChannels ? "hidden" :" md:block"} `}>
           {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
             : "All Videos"}

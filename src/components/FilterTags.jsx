@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 const FilterTags = ({
   channels,
   channelDetails,
@@ -5,6 +6,7 @@ const FilterTags = ({
   onChannelSelect,
   onChannelDelete,
   videos,
+  hasChannels
 }) => {
   // Helper function to count videos for each channel
   const getChannelVideoCount = (channelId) => {
@@ -22,12 +24,11 @@ const FilterTags = ({
       {/* All Channels Tag */}
       <span
         onClick={() => onChannelSelect(null)}
-        className={`cursor-pointer flex-shrink-0 p-2 rounded flex items-center gap-2 ${
+        className={`cursor-pointer flex-shrink-0 p-2 rounded flex items-center gap-2  ${!hasChannels ? 'hidden' : 'md:block'} ${
           selectedChannel === null
             ? "ring-[1px] ring-white/30 text-white"
             : "bg-gray-600 text-white hover:bg-gray-500"
-        }`}
-      >
+        }`}>
         All Videos ({videos.length})
       </span>
 

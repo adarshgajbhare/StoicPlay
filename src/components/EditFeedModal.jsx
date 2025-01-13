@@ -10,6 +10,7 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
   const [imageUrl, setImageUrl] = useState("");
   const [channels, setChannels] = useState([]);
   const fileInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (feed) {
@@ -21,15 +22,13 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateFeedInFirebase();
-    onUpdateFeed(feed.name, feedName, imageUrl, channels);
-    onClose();
-  };
-
-  const updateFeedInFirebase = async () => {
+    
     if (!user) return;
-
+    
+    setIsLoading(true);
+    
     try {
+      // First update Firebase
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
@@ -49,19 +48,26 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
 
         await updateDoc(userDocRef, { feeds: updatedFeeds });
       }
+
+      // Then update parent component state
+      await onUpdateFeed(feed.name, feedName, imageUrl, channels);
+      
+      // Close modal immediately after both updates
+      onClose();
     } catch (error) {
-      console.error("Error updating feed in Firebase:", error);
+      console.error("Error updating feed:", error);
+      alert("An error occurred while updating the feed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRemoveChannel = async (channelId) => {
-    // Update local state
     const updatedChannels = channels.filter(
       (channel) => channel.channelId !== channelId
     );
     setChannels(updatedChannels);
 
-    // Update Firebase
     if (user) {
       try {
         const userDocRef = doc(db, "users", user.uid);
@@ -126,7 +132,10 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
           </div>
 
           <div>
-           <label htmlFor="imageUrl" className="block mb-3 tracking-tight text-lg/4 text-white">
+            <label
+              htmlFor="imageUrl"
+              className="block mb-3 tracking-tight text-lg/4 text-white"
+            >
               Change your feed image
             </label>
             <div className="flex items-center space-x-4">
@@ -140,7 +149,7 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="grid  place-items-center text-pretty rounded-md text-lg/4 p-3 bg-[#303030] font-medium tracking-tight text-white/90 shadow-[inset_0px_2px_2px_0px_hsla(0,0%,0%,0.4)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)]"
+                className="grid place-items-center text-pretty rounded-md text-lg/4 p-3 bg-[#303030] font-medium tracking-tight text-white/90 shadow-[inset_0px_2px_2px_0px_hsla(0,0%,0%,0.4)] drop-shadow-[0px_2px_0px_hsla(0,0%,100%,0.15)]"
               >
                 Change image
               </button>
@@ -154,25 +163,19 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
             </div>
           </div>
 
-
-
-
-
-
-
-
-
-
-
           <div>
-            <h3 className="text-lg font-medium text-gray-200 mb-2">Channels added to feed</h3>
+            <h3 className="text-lg font-medium text-gray-200 mb-2">
+              Channels added to feed
+            </h3>
             <ul className="space-y-2 max-h-60 overflow-y-auto">
               {channels.map((channel) => (
                 <li
                   key={channel.channelId}
-                  className="flex justify-between items-center bg-[#202020] p-3  rounded-md"
+                  className="flex justify-between items-center bg-[#202020] p-3 rounded-md"
                 >
-                  <span className="text-white text-lg/4">{channel.channelTitle}</span>
+                  <span className="text-white text-lg/4">
+                    {channel.channelTitle}
+                  </span>
                   <button
                     type="button"
                     onClick={() => handleRemoveChannel(channel.channelId)}
@@ -189,15 +192,18 @@ function EditFeedModal({ isOpen, onClose, onUpdateFeed, feed }) {
             <button
               type="button"
               onClick={onClose}
-              className="g-black ring-[1px] ring-white/20 flex-1 hover:bg-red-500 text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md "
+              className="g-black ring-[1px] ring-white/20 flex-1 hover:bg-red-500 text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-white  hover:bg-blue-500 hover:text-white   flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
+              disabled={isLoading}
+              className={`bg-white hover:bg-blue-500 hover:text-white flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Done
+              {isLoading ? "Updating..." : "Done"}
             </button>
           </div>
         </form>

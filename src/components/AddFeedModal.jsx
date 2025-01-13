@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { compressImage } from "../utils/imageUtils";
+import { IconX } from "@tabler/icons-react";
 
 function AddFeedModal({ isOpen, onClose, onAddFeed, existingFeeds }) {
   const [feedName, setFeedName] = useState("");
@@ -97,10 +98,18 @@ function AddFeedModal({ isOpen, onClose, onAddFeed, existingFeeds }) {
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-black ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
-            <h2 className="text-2xl text-white font-medium tracking-tight mb-6">
-              Create new feed
-            </h2>
+          <div className="bg-[#151515] ring-[1px] ring-white/10 p-6 rounded-md w-full max-w-md">
+            <div className="flex justify-between items-center  mb-6">
+              <h2 className="text-2xl text-white font-medium tracking-tight">
+                Create new feed
+              </h2>
+              <button
+                className="text-white/50 hover:text-white/75"
+                onClick={onClose}
+              >
+                <IconX/>
+              </button>
+            </div>
             <div className="mb-6">
               <label
                 htmlFor="feedName"
@@ -113,7 +122,7 @@ function AddFeedModal({ isOpen, onClose, onAddFeed, existingFeeds }) {
                 id="feedName"
                 className={`w-full p-3 text-white placeholder:text-white/35 ring-[1px] ${
                   feedNameError ? 'ring-red-500' : 'ring-white/20'
-                } bg-white/5 rounded-md focus:outline-none focus:ring-2 ${
+                } bg-[#2B2B2B] rounded-md focus:outline-none focus:ring-2 ${
                   feedNameError ? 'focus:ring-red-500' : 'focus:ring-blue-500'
                 }`}
                 placeholder="Space, Chess, Superheroes, etc."
@@ -155,19 +164,14 @@ function AddFeedModal({ isOpen, onClose, onAddFeed, existingFeeds }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 mt-6">
-              <button
-                className="bg-black ring-[1px] ring-white/20 flex-1 hover:bg-black/50 text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
+            <div className="flex items-center  w-full">
+            
               <button
                 className={`${
                   feedNameError 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-white hover:bg-white/50 cursor-pointer'
-                } flex-1 text-black font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md`}
+                    : 'bg-[#3B82F6] hover:bg-white/50 cursor-pointer'
+                }  text-white font-medium tracking-tight text-lg/4 py-3 px-4 rounded-md ml-auto w-fit`}
                 onClick={handleSubmit}
                 disabled={!!feedNameError}
               >

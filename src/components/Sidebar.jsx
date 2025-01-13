@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -12,6 +11,7 @@ import {
   IconDeviceTv,
   IconLayoutSidebar,
   IconAlertTriangle,
+  IconChevronLeft,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -41,8 +41,15 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setShowLogoutModal(true);
+  const handleLogout = () => setShowLogoutModal(true);
+  const handleDeleteAccount = () => setShowDeleteModal(true);
+  
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
   };
 
   const confirmLogout = async () => {
@@ -55,21 +62,14 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       setShowLogoutModal(false);
     }
   };
-  const handleDeleteAccount = () => {
-    setShowDeleteModal(true);
-  };
 
   const confirmDeleteAccount = async () => {
     try {
       if (user) {
         const provider = new GoogleAuthProvider();
-
-        // Re-authenticate the user
         await reauthenticateWithPopup(user, provider);
-
         const batch = writeBatch(db);
-
-        // Delete user-specific data
+        
         const collections = ["feeds", "playlists", "liked", "watchLater"];
         for (const collectionName of collections) {
           const q = query(
@@ -80,23 +80,15 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
           snapshot.forEach((doc) => batch.delete(doc.ref));
         }
 
-        // Delete user document
-        const userDoc = doc(db, "users", user.uid);
-        batch.delete(userDoc);
-
-        // Commit the batch
+        await batch.delete(doc(db, "users", user.uid));
         await batch.commit();
-
-        // Delete the user from Firebase Auth
         await deleteUser(user);
         navigate("/");
       }
     } catch (error) {
       console.error("Error deleting account:", error);
       if (error.code === "auth/requires-recent-login") {
-        alert(
-          "For security reasons, please log out and log back in before deleting your account."
-        );
+        alert("For security reasons, please log out and log back in before deleting your account.");
       } else {
         alert("Failed to delete account. Please try again.");
       }
@@ -108,213 +100,153 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
   const navItems = [
     {
       name: "Feeds",
-      onClick: onClose,
       path: "/feeds",
-      icon: <IconStack2 size={20} strokeWidth={1} className="" />,
+      icon: <IconStack2 size={20} strokeWidth={1.5} />,
       isLink: true,
     },
     {
       name: "Playlists",
-      onClick: onClose,
       path: "/playlists",
-      icon: <IconPlaylist size={20} strokeWidth={1} className="" />,
+      icon: <IconPlaylist size={20} strokeWidth={1.5} />,
       isLink: true,
     },
     {
       name: "Liked",
-      onClick: onClose,
       path: "/liked",
-      icon: <IconThumbUp size={20} strokeWidth={1} className="" />,
+      icon: <IconThumbUp size={20} strokeWidth={1.5} />,
       isLink: true,
     },
     {
       name: "Watch Later",
-      onClick: onClose,
       path: "/watch-later",
-      icon: <IconDeviceTv size={20} strokeWidth={1} className="" />,
+      icon: <IconDeviceTv size={20} strokeWidth={1.5} />,
       isLink: true,
     },
-
     {
       name: "Import Feed",
       onClick: onImportClick,
-      icon: <IconDownload size={20} strokeWidth={1} className="" />,
+      icon: <IconDownload size={20} strokeWidth={1.5} />,
       isLink: false,
     },
     {
       name: "Delete Account",
       onClick: handleDeleteAccount,
-      icon: <IconTrash size={20} strokeWidth={1} className="" />,
+      icon: <IconTrash size={20} strokeWidth={1.5} />,
       destructive: true,
       isLink: false,
     },
   ];
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-
   useEffect(() => {
-    // Dispatch event when sidebar state changes
     const event = new CustomEvent('leftSidebarStateChange', {
       detail: { isCollapsed }
     });
     window.dispatchEvent(event);
   }, [isCollapsed]);
-  
 
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={handleBackdropClick}
-        />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] md:hidden" 
+             onClick={handleBackdropClick} />
       )}
 
-      <aside
-        className={`fixed md:sticky left-0 top-0 z-40 flex h-svh p-5  items-center  text-xl/4  justify-between  flex-col  bg-black transition-all duration-300 ${
-          isCollapsed ? "w-16" : "w-full md:w-72"
-        } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
-      >
-        <div
-          className={`flex text-xl/4  mt-2  flex-shrink-0  py-2  rounded-full w-full items-center ${
-            isCollapsed ? "md:justify-center" : "md:justify-between"
-          }`}
-        >
-          <span
-            className={`text-xl/4    uppercase  font-bold  text-lime-500 transition-opacity ${
-              isCollapsed ? "hidden" : "block"
-            }`}
-          >
-            {APP_NAME}
-          </span>
+      <aside className={`fixed md:sticky left-0 top-0 z-[999] flex   h-screen flex-col bg-[#121212] transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-16" : "md:w-72 w-full"
+      } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+        <div className="flex items-center justify-between p-4">
+          {!isCollapsed && (
+            <span className="text-xl font-bold text-lime-500">{APP_NAME}</span>
+          )}
           <button
-            onClick={onClose}
-            className="md:hidden bg-white/10   size-8  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] flex items-center justify-center rounded-full ml-auto hover:bg-white/10"
+            onClick={isCollapsed ? toggleCollapse : onClose} title="open"
+            className={`rounded-full p-2 hover:bg-zinc-800 ${isCollapsed ? "mx-auto" : "md:hidden"}`} 
           >
-            <IconX size={20} className="text-white  " strokeWidth={1} />
+            {isCollapsed ? (
+              <IconLayoutSidebar  className="h-5 w-5 text-zinc-400" />
+            ) : (
+              <IconX className="h-5 w-5 text-zinc-400" />
+            )}
           </button>
-
-          {isCollapsed ? (
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden md:flex  bg-white/10  size-8 flex-shrink-0  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)]  items-center text-white justify-center rounded-full  hover:bg-white/10"
+          {!isCollapsed && (
+            <button title="close"
+              onClick={toggleCollapse}
+              className="hidden md:block rounded-full p-2 hover:bg-zinc-800"
             >
-              <IconLayoutSidebar
-                size={20}
-                className=" "
-                strokeWidth={1}
-              />
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden md:flex  bg-white/10  size-8  shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)]  items-center text-white justify-center rounded-full  hover:bg-white/10"
-            >
-              <IconX size={20} className=" " strokeWidth={1} />
+              <IconChevronLeft className="h-5 w-5 text-zinc-400" />
             </button>
           )}
         </div>
 
-        <div className="flex text-xl/4  mb-auto rounded-[2.5rem]  py-4 flex-col w-full">
-          {navItems.map((item) => (
-            <Link
-              to={item.path}
-              key={item.name}
-              onClick={
-                item.onClick || (item.isLink && (() => navigate(item.path)))
-              }
-              className={`flex items-center  w-full justify-between text-lg/4  py-1.5 rounded-full  text-nowrap  font-bold uppercase tracking-tight transition-colors ${
-                location.pathname === item.path
-                  ? " text-slate-50"
-                  : "text-[#555555]  "
-              }  
-                ${
-                  item.name === "Delete Account"
-                    ? " text-red-400"
-                    : "text-[#555555]  "
-                }
-                `}
-            >
-              {!isCollapsed && <span>{item.name}</span>}
-
-              <div
-                className={`flex items-center flex-shrink-0 shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] justify-center bg-white/10 rounded-full   size-8   ${
-                  location.pathname === item.path
-                    ? " text-slate-50"
-                    : "text-[#555555]  "
-                }
-                 ${
-                   item.name === "Delete Account"
-                     ? " text-red-400"
-                     : "text-[#555555]  "
-                 }
-                `}
+        <nav className="flex-1 space-y-1 p-2">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+               
+                onClick={item.onClick || (item.isLink ? () => navigate(item.path) : undefined)}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
+                  isActive 
+                    ? "bg-zinc-800 text-white" 
+                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                } ${item.destructive ? "text-red-400 hover:text-red-400" : ""}`}
+                title={item.name}
               >
-                {item.icon}
-              </div>
-            </Link>
-          ))}
-        </div>
+                <span  className="flex-shrink-0" >{item.icon}</span>
+                {!isCollapsed && <span>{item.name}</span>}
+              </Link>
+            );
+          })}
+        </nav>
 
-        <div className="w-full">
-          <div className="flex text-xl/4  cursor-pointer items-center justify-center gap-3  py-2 rounded-full hover:bg-white/5">
+        <div className="mt-auto border-t border-zinc-800 p-4">
+          <div className="flex items-center gap-3">
             <img
               src={photoError ? "/default-profile.jpeg" : user?.photoURL}
-              alt={"Profile"}
-              className="size-8 rounded-full ring-1 ring-white/20"
+              alt="Profile"
+              className="h-8 w-8 rounded-full"
               onError={() => setPhotoError(true)}
             />
             {!isCollapsed && (
               <div className="flex flex-1 items-center justify-between">
-                <span className="text-xl/4   uppercase font-bold  text-slate-50">
-                  {user?.displayName?.split(" ")?.[0] || "John Doe"}
+                <span className="text-sm font-medium text-white">
+                  {user?.displayName?.split(" ")[0] || "User"}
                 </span>
-                <div className="bg-white/10  size-8   shadow-[inset_0.1px_0.2px_0.5px_0.5px_rgba(255,255,255,0.2)] flex items-center justify-center rounded-full ml-auto hover:bg-white/10">
-                  <IconLogout
-                    size={20}
-                    className="text-white relative left-[1px]"
-                    strokeWidth={1}
-                    onClick={handleLogout}
-                  />
-                </div>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-full p-1.5 hover:bg-zinc-800"
+                >
+                  <IconLogout title="logout" className="h-5 w-5 text-zinc-400" />
+                </button>
               </div>
             )}
           </div>
-          <div className="inline-flex py-4  items-center justify-between w-full">
-            <span className="text-[#555555] font-bold  tracking-tight text-xl/4">
-              ABOUT US
-            </span>
-            <span className="text-[#555555] font-bold  tracking-tight text-xl/4">
-              CONTACT US
-            </span>
-          </div>
+          {!isCollapsed && (
+            <div className="mt-4 flex justify-between">
+              <a href="https://github.com/adarshgajbhare" target="_blank" className="text-xs text-zinc-400 hover:text-white">ABOUT US</a>
+              <a href="https://adarshh.vercel.app/" target="_blank"  className="text-xs text-zinc-400 hover:text-white">CONTACT US</a>
+            </div>
+          )}
         </div>
       </aside>
 
       {showLogoutModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#1F1F1F] p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-white mb-4">
-              Confirm Logout
-            </h2>
-            <p className="text-gray-300 mb-4">
-              Are you sure you want to log out?
-            </p>
-            <div className="flex justify-end space-x-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999]">
+          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
+            <h2 className="text-xl font-semibold text-white mb-4">Confirm Logout</h2>
+            <p className="text-zinc-400 mb-4">Are you sure you want to log out?</p>
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
               >
                 Logout
               </button>
@@ -324,33 +256,32 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#1F1F1F] p-6 rounded-lg max-w-md w-full mx-4">
-            <div className="flex items-center mb-4">
-              <IconAlertTriangle size={24} className="text-red-500 mr-2" />
-              <h2 className="text-xl font-bold text-white">Delete Account</h2>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999] ">
+          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <IconAlertTriangle className="h-5 w-5 text-red-500" />
+              <h2 className="text-xl font-semibold text-white">Delete Account</h2>
             </div>
-            <p className="text-gray-300 mb-4">
-              Are you absolutely sure you want to delete your account? This
-              action cannot be undone and will result in the permanent loss of:
+            <p className="text-zinc-400 mb-4">
+              Are you absolutely sure you want to delete your account? This action cannot be undone.
             </p>
-            <ul className="list-disc list-inside text-gray-300 mb-4">
+            <ul className="list-disc list-inside text-zinc-400 mb-4 space-y-1">
               <li>All your saved feeds</li>
               <li>Your playlists</li>
               <li>Your watch history</li>
               <li>Your liked videos</li>
-              <li>All personalized settings and preferences</li>
+              <li>All personalized settings</li>
             </ul>
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteAccount}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
               >
                 Delete Account
               </button>
@@ -361,3 +292,4 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     </>
   );
 }
+

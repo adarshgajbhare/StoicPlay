@@ -8,7 +8,7 @@ export function Layout({ children, onImportClick }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-dvh flex bg-black relative">
+    <div className="min-h-dvh flex bg-[#121212] relative ">
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-4 left-1/2 -translate-x-1/2  w-[94%]  z-10 flex items-center shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)] justify-between px-3 py-2 rounded-lg   bg-[#0F0F0F]/60 filter backdrop-blur-sm">
         <div onClick={() => setIsSidebarOpen(true)} className="">

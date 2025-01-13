@@ -1,10 +1,11 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import {
   formatRelativeTime,
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconClock, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
+import { IconBookmark, IconClock, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
 import {
   saveLikedVideo,
   saveWatchLater,
@@ -261,7 +262,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
 
   return (
     <>
-      <div className="group bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
+      <div className="group bg-[#1a1a1a]  rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
         <div className="relative aspect-video" onClick={() => setIsVideoOpen(true)}>
           {!videoImageError ? (
             <div className="relative w-full h-full">
@@ -314,7 +315,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
                     {formatRelativeTime(video?.snippet?.publishedAt)}
                   </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -323,8 +324,8 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
                     className="p-2 rounded-full hover:bg-white/5 transition-colors"
                     title={isWatchLater ? "Remove from Watch Later" : "Add to Watch Later"}
                   >
-                    <IconClock
-                      size={18}
+                    <IconBookmark
+                      size={24}
                       className={`${isWatchLater ? 'text-blue-500' : 'text-gray-400'} transition-colors`}
                     />
                   </button>
@@ -337,7 +338,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
                     title={isLiked ? "Unlike" : "Like"}
                   >
                     <IconThumbUp
-                      size={18}
+                      size={24}
                       className={`${isLiked ? 'text-red-500' : 'text-gray-400'} transition-colors`}
                     />
                   </button>

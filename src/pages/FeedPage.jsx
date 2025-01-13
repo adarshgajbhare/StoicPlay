@@ -39,7 +39,7 @@ function FeedPage() {
   });
   const [hasMoreVideos, setHasMoreVideos] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     if (selectedChannel) {
@@ -154,13 +154,14 @@ function FeedPage() {
 
   const getGridColumns = () => {
     if (isCollapsed && isLeftSidebarCollapsed) {
-      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'; // Both sidebars collapsed
+      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'; // Both sidebars closed
     } else if (!isCollapsed && !isLeftSidebarCollapsed) {
-      return 'grid-cols-1 sm:grid-cols-2'; // Both sidebars open
+      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'; // Both sidebars open
     } else {
-      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'; // One sidebar open
+      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'; // One sidebar open
     }
   };
+  
 
   useEffect(() => {
     const handleLeftSidebar = (e) => {
@@ -175,12 +176,12 @@ function FeedPage() {
 
   return (
     <div 
-      className={`w-full ${!hasChannels ? 'h-[700px] overflow-auto' : 'min-h-dvh'} rounded-2xl p-0 md:p-4 bg-[#151515] md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
+      className={`w-full ${!hasChannels ? 'h-[700px] overflow-hidden' : 'min-h-dvh'} rounded-2xl p-0 md:p-4 bg-[#101010] popover md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
     >
       <div
         id="feed-side"
         className={`
-          ${hasChannels ? 'overflow-auto' : 'overflow-hidden'}
+          ${hasChannels ? 'overflow-hidden' : 'overflow-auto'}
           ${
             isCollapsed
               ? "max-w-8xl md:pr-16 transition-all duration-300"
@@ -201,18 +202,18 @@ function FeedPage() {
               {feedName}
             </h1>
           </Link>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 ">
             <button
               onClick={() => setIsSearchPopoverOpen(true)}
-              className=" hover:bg-white  flex items-center
-               bg-white/10 text-blue-500 p-3 rounded-full ml-1 md:inline"
+              className=" hover:bg-white hover:text-black  flex items-center
+               bg-white/10 text-white p-3 rounded-full ml-1 md:inline"
               aria-label="Add Channel">
               <IconPlus size={20} />
             </button>
             <button
               onClick={() => setIsEditModalOpen(true)}
-             className=" hover:bg-white  flex items-center
-               bg-white/10 text-blue-500 p-3 rounded-full ml-1 md:inline"
+             className=" hover:bg-white  hover:text-black flex items-center
+               bg-white/10 text-white p-3 rounded-full ml-1 md:inline"
               aria-label="Edit Feed"
             >
               <IconEdit size={20} />

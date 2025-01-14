@@ -7,16 +7,11 @@ import EditFeedModal from "../components/EditFeedModal";
 import ImportFeedModal from "../components/ImportFeedModal";
 import {
   IconCheck,
-  IconCircleCheckFilled,
   IconSquareCheckFilled,
   IconSquareRoundedPlusFilled,
   IconMinus,
-  IconX,
-  IconFilterEdit,
-  IconEditCircle,
   IconEdit,
   IconShare2,
-  IconCopy,
   IconTrash,
   IconShare3,
   IconArrowBack,
@@ -29,11 +24,10 @@ import {
   handleShareMultipleFeeds,
 } from "../utils/constant";
 import Toast from "../components/Toast";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 
 function HomePage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -58,7 +52,12 @@ function HomePage() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleUpdateFeed = async (oldName, newName, newImageUrl, updatedChannels) => {
+  const handleUpdateFeed = async (
+    oldName,
+    newName,
+    newImageUrl,
+    updatedChannels
+  ) => {
     await handleUpdateHomeFeed(
       user,
       feeds,
@@ -199,7 +198,8 @@ function HomePage() {
         <div className="fixed md:top-7 bottom-6 right-6 md:right-10 z-50">
           <div className="flex items-center gap-2  bg-[#121212] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-2">
             <AnimatePresence>
-              {(isShareMode && feedsToShare.size > 0) || (isDeleteMode && feedsToDelete.size > 0) ? (
+              {(isShareMode && feedsToShare.size > 0) ||
+              (isDeleteMode && feedsToDelete.size > 0) ? (
                 <motion.button
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -233,7 +233,7 @@ function HomePage() {
                     : "text-gray-500 hover:bg-gray-100"
                 } transition-colors`}
               >
-                <IconShare3 size={20}/>
+                <IconShare3 size={20} />
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -246,8 +246,8 @@ function HomePage() {
                     ? "text-gray-300 cursor-not-allowed"
                     : "text-gray-500 hover:bg-gray-100"
                 } transition-colors`}
-              > 
-                <IconTrash  size={20}/>
+              >
+                <IconTrash size={20} />
               </motion.button>
             </div>
           </div>
@@ -375,7 +375,7 @@ function FeedItem({
   isSelectedForDelete,
   onToggleShare,
   onToggleDelete,
-  onEdit
+  onEdit,
 }) {
   return (
     <motion.div
@@ -435,7 +435,6 @@ function FeedItem({
             className={`aspect-video bg-[#272727] rounded-xl cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-[#3f3f3f] transition-colors duration-200 ${
               isSelectedForShare || isSelectedForDelete ? "opacity-50" : ""
             }`}
-        
           />
         </div>
         <div className="my-3">
@@ -445,8 +444,7 @@ function FeedItem({
         </div>
       </Link>
       {!isShareMode && !isDeleteMode && (
-        <div
-          className="absolute right-2 top-2 z-20" >
+        <div className="absolute right-2 top-2 z-20">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -454,9 +452,9 @@ function FeedItem({
               onEdit();
             }}
             className="group relative p-2  rounded-full flex items-center justify-center shadow-lg hover:shadow-xl "
-            aria-label={`Edit ${feed?.name}`}>
+            aria-label={`Edit ${feed?.name}`}
+          >
             <IconEdit size={16} className="text-white" />
-        
           </button>
         </div>
       )}
@@ -465,4 +463,3 @@ function FeedItem({
 }
 
 export default HomePage;
-

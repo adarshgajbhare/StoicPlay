@@ -103,6 +103,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       path: "/feeds",
       icon: <IconStack2 size={20} strokeWidth={1.5} />,
       isLink: true,
+    
     },
     {
       name: "Playlists",
@@ -125,12 +126,13 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     {
       name: "Import Feed",
       onClick: onImportClick,
+      
       icon: <IconDownload size={20} strokeWidth={1.5} />,
       isLink: false,
     },
     {
       name: "Delete Account",
-      onClick: handleDeleteAccount,
+      onClick: handleDeleteAccount, 
       icon: <IconTrash size={20} strokeWidth={1.5} />,
       destructive: true,
       isLink: false,
@@ -177,29 +179,32 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
             </button>
           )}
         </div>
-
         <nav className="flex-1 space-y-1 p-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-               
-                onClick={item.onClick || (item.isLink ? () => navigate(item.path) : undefined)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                  isActive 
-                    ? "bg-zinc-800 text-white" 
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-                } ${item.destructive ? "text-red-400 hover:text-red-400" : ""}`}
-                title={item.name}
-              >
-                <span  className="flex-shrink-0" >{item.icon}</span>
-                {!isCollapsed && <span>{item.name}</span>}
-              </Link>
-            );
-          })}
-        </nav>
+  {navItems.map((item) => {
+    const isActive = location.pathname === item.path;
+    return (
+      <Link
+        key={item.name}
+        to={item.path}
+        onClick={() => {
+          if (item.isLink) navigate(item.path);
+          if (onClose) onClose(); // Close the sidebar
+          if (item.onClick) item.onClick();
+        }}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
+          isActive
+            ? "bg-zinc-800 text-white"
+            : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+        } ${item.destructive ? "text-red-400 hover:text-red-400" : ""}`}
+        title={item.name}
+      >
+        <span className="flex-shrink-0">{item.icon}</span>
+        {!isCollapsed && <span>{item.name}</span>}
+      </Link>
+    );
+  })}
+</nav>
+
 
         <div className="mt-auto border-t border-zinc-800 p-4">
           <div className="flex items-center gap-3">

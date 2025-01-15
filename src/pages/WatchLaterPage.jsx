@@ -85,13 +85,13 @@ const WatchLaterPage = () => {
   }
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-4 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-white text-2xl md:text-4xl font-medium tracking-tight">
+          <h1 className="text-white text-base md:text-2xl font-medium tracking-tight">
             Watch Later
           </h1>
-          <p className="text-gray-600 text-xs md:text-base font-medium">
+          <p className="text-gray-600 text-xs md:text-xs font-medium">
             Videos saved to watch later
           </p>
         </div>
@@ -121,7 +121,7 @@ const WatchLaterPage = () => {
         </div>
       ) : watchLaterVideos.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-6 py-12 px-4 max-w-xl mx-auto text-center">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-base font-semibold text-white">
             No videos to watch later
           </h2>
           <p className="text-gray-400 text-base leading-relaxed">
@@ -129,7 +129,7 @@ const WatchLaterPage = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
           {watchLaterVideos.map((video) => (
             <div
               key={video.id?.videoId || video.id}

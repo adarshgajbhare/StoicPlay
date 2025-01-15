@@ -83,10 +83,11 @@ function PlaylistPage() {
   };
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-4 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]
+    ">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-white text-2xl md:text-4xl font-medium tracking-tight">
+          <h1 className="text-white text-sm md:text-xl font-medium tracking-tight">
             Your Playlists
           </h1>
           <p className="text-gray-600 text-xs md:text-base font-medium">
@@ -111,7 +112,7 @@ function PlaylistPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 md:gap-4 gap-x-4 gap-y-0 ">
         <div>
           <div
             onClick={() => !isDeleteMode && setShowAddModal(true)}

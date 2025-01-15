@@ -179,7 +179,7 @@ function HomePage() {
   };
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-4 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+    <div className="w-full min-h-dvh  overflow-hidden rounded-2xl p-4 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div className="flex justify-between items-start mb-4 ">
         <div>
           <h1 className="text-gray-50 text-xl uppercase font-bold ">
@@ -254,7 +254,7 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 px-1 md:px-0">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 px-1 md:px-0 gap-x-4 gap-y-0">
         <div>
           <div
             onClick={() =>
@@ -403,7 +403,7 @@ function FeedItem({
                 : isSelectedForDelete
                 ? "bg-red-600"
                 : "bg-gray-600"
-            } rounded-full flex border   items-center justify-center shadow-lg isolate hover:bg-blue-500 transition-colors`}
+            } rounded-full flex border items-center justify-center shadow-lg isolate hover:bg-blue-500 transition-colors`}
             aria-label={`Toggle ${isShareMode ? "share" : "delete"} ${
               feed?.name
             }`}
@@ -428,7 +428,7 @@ function FeedItem({
           isShareMode || isDeleteMode ? "cursor-default" : ""
         }`}
       >
-        <div className="relative">
+        <div className="relative  group">
           <img
             src={feed?.image || "/placeholder.png"}
             alt={feed?.name}
@@ -444,17 +444,29 @@ function FeedItem({
         </div>
       </Link>
       {!isShareMode && !isDeleteMode && (
-        <div className="absolute right-2 top-2 z-20">
+        <div className="absolute right-2 top-2 z-20 ">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onEdit();
             }}
-            className="group relative p-2  rounded-full flex items-center justify-center shadow-lg hover:shadow-xl "
-            aria-label={`Edit ${feed?.name}`}
-          >
-            <IconEdit size={16} className="text-white" />
+            className="group relative p-1.5 rounded-full  items-center justify-center shadow-lg hover:shadow-xl 
+             bg-black/50 backdrop-blur filter  md:group-hover:flex md:hidden  transition-all duration-300  ease-in-out delay-100">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1}
+              stroke="currentColor"
+              className="size-4 text-white "
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+              />
+            </svg>
           </button>
         </div>
       )}

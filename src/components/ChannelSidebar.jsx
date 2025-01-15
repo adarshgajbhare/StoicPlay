@@ -87,8 +87,9 @@ const ChannelSidebar = ({
     <>
       <div
         id="channel-sidebar"
-        className={`bg-[#323232] rounded-lg hidden md:block  popover 
-          border-white/10  py-2.5 fixed right-10 top-10 bottom-96 h-[658px] z-50 overflow-y-auto transition-all duration-300 ${
+        className={`bg-[#202020] rounded-lg hidden md:block  popover 
+          border-white/10  py-2.5 fixed right-10 top-10 bottom-96 h-[658px] 
+          z-50 overflow-y-auto transition-all duration-300 ${
             isCollapsed ? "w-16" : "w-full md:w-64"
           }`}
       >
@@ -123,18 +124,18 @@ const ChannelSidebar = ({
               isCollapsed ? "p-1" : "p-1.5"
             } rounded cursor-pointer transition-colors ${
               selectedChannel === null
-                ? "bg-black"
-                : "bg-gray-800 hover:bg-gray-700"
+                ? "bg-black/20"
+                : "bg-black hover:bg-gray-700"
             }`}
             onClick={() => onChannelSelect(null)}
           >
             <div className="flex w-full space-x-2">
               <div
-                className={`rounded bg-black flex items-center justify-center ${
+                className={`rounded flex items-center justify-center ${
                   isCollapsed ? "size-10" : "size-10"
                 }`}
               >
-                <IconLayout size={isCollapsed ? 36 : 36} strokeWidth={1} className="text-white" />
+                <IconLayout size={isCollapsed ? 36 : 36}  strokeWidth={1} className="text-white" />
               </div>
               {!isCollapsed && (
                 <div>
@@ -157,8 +158,8 @@ const ChannelSidebar = ({
                 isCollapsed ? "p-1" : "p-1.5"
               } rounded cursor-pointer transition-colors ${
                 selectedChannel === channelId
-                  ? "bg-black"
-                  : "bg-gray-800 hover:bg-gray-700"
+                  ? "bg-black/20"
+                  : "bg-black hover:bg-gray-700"
               }`}
               onClick={() => onChannelSelect(channelId)}
             >

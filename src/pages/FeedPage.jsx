@@ -178,7 +178,7 @@ function FeedPage() {
   return (
     <div 
       className={`w-full ${!hasChannels ? 'h-[700px] overflow-hidden' : 'min-h-dvh'}
-       rounded-2xl p-0 md:p-4 bg-[#101010] popover md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
+       rounded-2xl p-4 bg-[#101010] popover md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
     >
       <div
         id="feed-side"
@@ -223,7 +223,7 @@ function FeedPage() {
             </button>
           </div>
         </div>
-        <p className={`text-lg text-white font-2xl mb-4 ${!hasChannels ? "hidden" :" md:block"} `}>
+        <p className={`text-base  text-white text md:font-2xl mb-4 ${!hasChannels ? "hidden" :" md:block"} `}>
           {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
             : "All Videos"}

@@ -85,13 +85,13 @@ const LikedVideosPage = () => {
   }
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-4 md:p-8 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-white text-2xl md:text-4xl font-medium tracking-tight">
+          <h1 className="text-white text-sm md:text-xl font-medium tracking-tight">
             Liked Videos
           </h1>
-          <p className="text-gray-600 text-xs md:text-base font-medium">
+          <p className="text-gray-600 text-sm md:text-base font-medium">
             Videos you liked on {APP_NAME}
           </p>
         </div>

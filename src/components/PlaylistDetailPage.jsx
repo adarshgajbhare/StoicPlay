@@ -60,8 +60,8 @@ function PlaylistDetailPage() {
                 <div className="aspect-video bg-black rounded-xl overflow-hidden">
                   <iframe
                     className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${videos[currentVideoIndex].contentDetails.videoId}?rel=0`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    src={`https://www.youtube.com/embed/${videos[currentVideoIndex].contentDetails.videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                   ></iframe>
                 </div>

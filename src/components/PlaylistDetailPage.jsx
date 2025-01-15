@@ -51,7 +51,6 @@ function PlaylistDetailPage() {
 
   return (
     <div className="min-h-dvh bg-[#0f0f0f]  text-white">
-     
       <main className="max-w-[1800px]  mx-auto">
         <div className="flex flex-col  w-full lg:flex-row gap-6 md:p-4">
           {/* Video Player Section */}
@@ -60,8 +59,8 @@ function PlaylistDetailPage() {
               <div className=" ">
                 <div className="aspect-video bg-black rounded-xl overflow-hidden">
                   <iframe
-                    className="w-full  h-full"
-                    src={`https://www.youtube.com/embed/${videos[currentVideoIndex].contentDetails.videoId}`}
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${videos[currentVideoIndex].contentDetails.videoId}?rel=0`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   ></iframe>
@@ -81,7 +80,7 @@ function PlaylistDetailPage() {
           </div>
 
           {/* Playlist Section */}
-          <div className="lg:w-[400px]   flex-shrink-0">
+          <div className="lg:w-[400px]   flex-shrink-0 ">
             <div className="bg-[#0F0F0F]  ring-[1px] ring-white/20 rounded-xl p-4">
               <div className="flex items-start  justify-between mb-4">
                 <div>
@@ -93,11 +92,11 @@ function PlaylistDetailPage() {
                   </h2>
                 </div>
                 {/* <img src={playlistDetails?.thumbnail} alt="" /> */}
-                <button className="p-2 hover:bg-white/10 rounded-full">
+                {/* <button className="p-2 hover:bg-white/10 rounded-full">
                   <IconDotsVertical size={24} />
-                </button>
+                </button> */}
               </div>
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              <div className="space-y-2 max-h-[600px] overflow-y-auto popover">
                 {videos.map((video, index) => (
                   <div
                     key={video.contentDetails.videoId}

@@ -8,7 +8,6 @@ import {
 import {
   IconBookmark,
   IconClock,
-  IconHeart,
   IconThumbUp,
   IconTrash,
 } from "@tabler/icons-react";
@@ -22,11 +21,9 @@ import {
 } from "../utils/constant";
 import { useAuth } from "../contexts/AuthContext";
 import VideoPlayer from "./VideoPlayer";
-
 function VideoCard({
   video,
   channelDetails,
-  variant = "default",
   onVideoRemoved,
 }) {
   const [channelImageError, setChannelImageError] = useState(false);
@@ -36,13 +33,7 @@ function VideoCard({
   const [isLiked, setIsLiked] = useState(false);
   const [isWatchLater, setIsWatchLater] = useState(false);
 
-  const handleVideoImageError = () => {
-    setVideoImageError(true);
-  };
 
-  const handleChannelImageError = () => {
-    setChannelImageError(true);
-  };
 
   const getVideoId = () => {
     if (video.id?.videoId) {
@@ -140,7 +131,7 @@ function VideoCard({
       console.error("Failed to save liked video:", error);
     }
 
-    setIsMenuOpen(false);
+   
   };
 
   const handleRemoveLikedVideo = async (e) => {
@@ -159,7 +150,7 @@ function VideoCard({
     } catch (error) {
       console.error("Failed to remove from liked videos", error);
     }
-    setIsMenuOpen(false);
+
   };
 
   const handleRemoveWatchLater = async (e) => {
@@ -178,7 +169,7 @@ function VideoCard({
     } catch (error) {
       console.log("Failed to remove from watch later", error);
     }
-    setIsMenuOpen(false);
+
   };
 
   const handleWatchLater = async (e) => {
@@ -221,72 +212,11 @@ function VideoCard({
       console.error("Failed to save to watch later:", error);
     }
 
-    setIsMenuOpen(false);
   };
 
-  let menuItems = [
-    [
-      {
-        label: isWatchLater ? "Remove from Watch Later" : "Watch Later",
-        icon: isWatchLater ? <IconTrash size={20} /> : <IconClock size={20} />,
-        onClick: isWatchLater ? handleRemoveWatchLater : handleWatchLater,
-      },
-      {
-        label: isLiked ? "Remove from Liked Videos" : "Like Video",
-        icon: isLiked ? <IconTrash size={20} /> : <IconThumbUp size={20} />,
-        onClick: isLiked ? handleRemoveLikedVideo : handleLikeVideo,
-      },
-    ],
-  ];
-
-  // const handleClick = () => {
-  //   setIsVideoOpen(true);
-  // };
 
   const channelTitle =
     channelDetails?.snippet?.title || video?.snippet?.channelTitle;
-
-  if (variant === "playlist") {
-    return (
-      <PlaylistVideoCard
-        video={video}
-        channelDetails={channelDetails}
-        onMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-        menuItems={menuItems}
-        onVideoClick={handleClick}
-        videoImageError={videoImageError}
-        onVideoImageError={handleVideoImageError}
-        channelImageError={channelImageError}
-        onChannelImageError={handleChannelImageError}
-        getVideoId={getVideoId}
-      />
-    );
-  }
-  const handleClick = () => {
-    setIsVideoOpen(true);
-  };
-
-  // const channelTitle =
-  //   channelDetails?.snippet?.title || video?.snippet?.channelTitle;
-
-  if (variant === "playlist") {
-    return (
-      <PlaylistVideoCard
-        video={video}
-        channelDetails={channelDetails}
-        onMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-        menuItems={menuItems}
-        onVideoClick={handleClick}
-        videoImageError={videoImageError}
-        onVideoImageError={handleVideoImageError}
-        channelImageError={channelImageError}
-        onChannelImageError={handleChannelImageError}
-        getVideoId={getVideoId}
-      />
-    );
-  }
 
   return (
     <>

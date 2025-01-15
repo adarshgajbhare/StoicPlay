@@ -22,3 +22,19 @@
 5. Consistent CTAs and Popovers thorughout the app
 <!-- 6. Like and watch later shifting to some other way -->
 7. two thigns you need to fix (pull out the button out of feed, fix the edit add copy cancel shit select all)
+
+
+
+
+ <div
+            id="no-image-placeholder"
+            className={`relative h-[150px] shadow-[inset_0.1px_0.2px_0.25px_0.25px_rgba(255,255,255,0.2)] aspect-video bg-gradient-to-br from-[#272727] to-[#1e1d1d] rounded-xl overflow-hidden grid place-items-center ${
+              isSelectedForShare || isSelectedForDelete ? "opacity-50" : ""
+            }`}
+          >
+            <IconBrandYoutube
+              size={40}
+              className="text-gray-100"
+              strokeWidth={0.5}
+            />
+          </div>

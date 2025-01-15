@@ -5,7 +5,13 @@ import {
   getChannelThumbnailUrl,
   getVideoThumbnailUrl,
 } from "../services/youtubeApi";
-import { IconBookmark, IconClock, IconHeart, IconThumbUp, IconTrash } from "@tabler/icons-react";
+import {
+  IconBookmark,
+  IconClock,
+  IconHeart,
+  IconThumbUp,
+  IconTrash,
+} from "@tabler/icons-react";
 import {
   saveLikedVideo,
   saveWatchLater,
@@ -17,7 +23,12 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import VideoPlayer from "./VideoPlayer";
 
-function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved }) {
+function VideoCard({
+  video,
+  channelDetails,
+  variant = "default",
+  onVideoRemoved,
+}) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -54,7 +65,12 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       if (user?.uid && video?.id) {
         const likedVideos = await getLikedVideos(user.uid);
         const videoIdToCheck = getVideoId();
-        setIsLiked(likedVideos.some((likedVideo) => (likedVideo.id?.videoId || likedVideo.id) === videoIdToCheck));
+        setIsLiked(
+          likedVideos.some(
+            (likedVideo) =>
+              (likedVideo.id?.videoId || likedVideo.id) === videoIdToCheck
+          )
+        );
       } else {
         setIsLiked(false);
       }
@@ -64,7 +80,13 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       if (user?.uid && video?.id) {
         const watchLaterVideos = await getWatchLaterVideos(user.uid);
         const videoIdToCheck = getVideoId();
-        setIsWatchLater(watchLaterVideos.some((watchLaterVideo) => (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToCheck));
+        setIsWatchLater(
+          watchLaterVideos.some(
+            (watchLaterVideo) =>
+              (watchLaterVideo.id?.videoId || watchLaterVideo.id) ===
+              videoIdToCheck
+          )
+        );
       } else {
         setIsWatchLater(false);
       }
@@ -89,7 +111,10 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
     try {
       const videoIdToSave = getVideoId();
       const likedVideos = await getLikedVideos(user.uid);
-      const alreadyLiked = likedVideos.some((likedVideo) => (likedVideo.id?.videoId || likedVideo.id) === videoIdToSave);
+      const alreadyLiked = likedVideos.some(
+        (likedVideo) =>
+          (likedVideo.id?.videoId || likedVideo.id) === videoIdToSave
+      );
 
       if (alreadyLiked) {
         console.log("Video already liked.");
@@ -127,12 +152,12 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       const videoIdToRemove = getVideoId();
       await removeLikedVideo(user.uid, videoIdToRemove);
       setIsLiked(false);
-      console.log('Removed from liked videos:', videoIdToRemove);
+      console.log("Removed from liked videos:", videoIdToRemove);
       if (onVideoRemoved) {
         onVideoRemoved(videoIdToRemove);
       }
     } catch (error) {
-      console.error('Failed to remove from liked videos', error);
+      console.error("Failed to remove from liked videos", error);
     }
     setIsMenuOpen(false);
   };
@@ -146,12 +171,12 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       const videoId = getVideoId();
       await removeWatchLaterVideo(user.uid, videoId);
       setIsWatchLater(false);
-      console.log('removed from watch later:', videoId);
+      console.log("removed from watch later:", videoId);
       if (onVideoRemoved) {
         onVideoRemoved(videoId);
       }
     } catch (error) {
-      console.log('Failed to remove from watch later', error);
+      console.log("Failed to remove from watch later", error);
     }
     setIsMenuOpen(false);
   };
@@ -167,7 +192,10 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
     try {
       const videoIdToSave = getVideoId();
       const watchLaterVideos = await getWatchLaterVideos(user.uid);
-      const alreadyInWatchLater = watchLaterVideos.some((watchLaterVideo) => (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToSave);
+      const alreadyInWatchLater = watchLaterVideos.some(
+        (watchLaterVideo) =>
+          (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToSave
+      );
 
       if (alreadyInWatchLater) {
         console.log("Video already in watch later.");
@@ -262,27 +290,22 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
 
   return (
     <>
-      <div className="group bg-[#1a1a1a]  rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
-        <div className="relative aspect-video" onClick={() => setIsVideoOpen(true)}>
+      <div className="group bg-[#0f0f0f]  rounded-xl overflow-hidden cursor-pointer">
+        <div
+          className="relative aspect-video"
+          onClick={() => setIsVideoOpen(true)}
+        >
           {!videoImageError ? (
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full ">
               <img
                 src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
                 alt={video?.snippet?.title}
                 className="w-full h-full object-cover"
                 onError={() => setVideoImageError(true)}
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="w-14 h-14 flex items-center justify-center rounded-full bg-black/60 transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    className="w-7 h-7"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
+              <div className="absolute bottom-2 right-2 bg-black/80 px-1 rounded text-xs text-white">
+                69:69
+                {/* add some time */}
               </div>
             </div>
           ) : (
@@ -292,56 +315,60 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
           )}
         </div>
 
-        <div className="p-4">
+        <div className="p-3">
           <div className="flex gap-3">
             {!channelImageError && channelDetails?.snippet?.thumbnails && (
               <img
-                src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
-                alt={channelDetails?.snippet?.title || video?.snippet?.channelTitle}
-                className="w-10 h-10 rounded-full ring-1 ring-white/10 object-cover flex-shrink-0"
+                src={getChannelThumbnailUrl(
+                  channelDetails?.snippet?.thumbnails
+                )}
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                 onError={() => setChannelImageError(true)}
               />
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-medium text-base line-clamp-2 mb-1">
+              <p className="text-white text-sm font-medium line-clamp-2 mb-1 ">
                 {video?.snippet?.title}
-              </h3>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-gray-400 text-sm font-medium">
-                    {channelDetails?.snippet?.title || video?.snippet?.channelTitle}
-                  </span>
-                  <span className="text-gray-500 text-xs">
-                    {formatRelativeTime(video?.snippet?.publishedAt)}
-                  </span>
-                </div>
-                <div className="flex gap-">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      isWatchLater ? handleRemoveWatchLater(e) : handleWatchLater(e);
-                    }}
-                    className="p-2 rounded-full hover:bg-white/5 transition-colors"
-                    title={isWatchLater ? "Remove from Watch Later" : "Add to Watch Later"}
-                  >
-                    <IconBookmark
-                      size={24}
-                      className={`${isWatchLater ? 'text-blue-500' : 'text-gray-400'} transition-colors`}
-                    />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e);
-                    }}
-                    className="p-2 rounded-full hover:bg-white/5 transition-colors"
-                    title={isLiked ? "Unlike" : "Like"}
-                  >
-                    <IconThumbUp
-                      size={24}
-                      className={`${isLiked ? 'text-red-500' : 'text-gray-400'} transition-colors`}
-                    />
-                  </button>
+              </p>
+
+              <div className="flex flex-col text-[13px] text-gray-400">
+                <span>{channelTitle}</span>
+                <div className="flex items-center gap-1 justify-between">
+                  <span>{formatRelativeTime(video?.snippet?.publishedAt)}</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        isWatchLater
+                          ? handleRemoveWatchLater(e)
+                          : handleWatchLater(e);
+                      }}
+                      className="hover:text-white transition-colors"
+                    >
+                      <IconBookmark
+                        size={18}
+                        className={`${
+                          isWatchLater ? "text-blue-500" : "text-gray-400"
+                        }`}
+                      />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        isLiked
+                          ? handleRemoveLikedVideo(e)
+                          : handleLikeVideo(e);
+                      }}
+                      className="hover:text-white transition-colors"
+                    >
+                      <IconThumbUp
+                        size={18}
+                        className={`${
+                          isLiked ? "text-red-500" : "text-gray-400"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -357,7 +384,7 @@ function VideoCard({ video, channelDetails, variant = "default", onVideoRemoved 
       )}
     </>
   );
+
 }
 
 export default VideoCard;
-

@@ -97,7 +97,7 @@ p,
 li,
 figcaption {
   max-width: 70ch; /* Limit text width */
-  text-wrap: pretty; /* Better text wrapping */
+   /* Better text wrapping */
 }
 
 @font-face {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import VideoCard from "../components/VideoCard";
+
 import EditFeedModal from "../components/EditFeedModal";
 import {
   fetchChannelVideos,
@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronLeft, IconPlus, IconEdit, IconEditCircle } from "@tabler/icons-react";
+import { IconChevronLeft, IconPlus, IconEdit } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -17,6 +17,7 @@ import {
   handleUpdateFeed,
 } from "../utils/constant";
 import FilterTags from "../components/FilterTags";
+import VideoCard from "../components/VideoCard";
 
 function FeedPage() {
   const { user } = useAuth();
@@ -176,7 +177,8 @@ function FeedPage() {
 
   return (
     <div 
-      className={`w-full ${!hasChannels ? 'h-[700px] overflow-hidden' : 'min-h-dvh'} rounded-2xl p-0 md:p-4 bg-[#101010] popover md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
+      className={`w-full ${!hasChannels ? 'h-[700px] overflow-hidden' : 'min-h-dvh'}
+       rounded-2xl p-0 md:p-4 bg-[#101010] popover md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]`}
     >
       <div
         id="feed-side"
@@ -221,11 +223,11 @@ function FeedPage() {
             </button>
           </div>
         </div>
-        <h2 className={`text-2xl text-white font-medium mb-4 ${!hasChannels ? "hidden" :" md:block"} `}>
+        <p className={`text-lg text-white font-2xl mb-4 ${!hasChannels ? "hidden" :" md:block"} `}>
           {selectedChannel
             ? `Videos from ${feedChannels[selectedChannel]}`
             : "All Videos"}
-        </h2>
+        </p>
 
         <FilterTags
           channels={feedChannels}
@@ -264,7 +266,7 @@ function FeedPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
           </div>
         ) : (
-          <div className={`grid ${getGridColumns()} gap-6 p-4 transition-all duration-300`}>
+          <div className={`grid ${getGridColumns()} gap-6 md:p-4 p-0 transition-all duration-300`}>
             {filteredVideos.map((video) => (
               <VideoCard
                 key={video.id?.videoId || video.id}

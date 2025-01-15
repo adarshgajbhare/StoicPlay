@@ -179,7 +179,7 @@ function HomePage() {
   };
 
   return (
-    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-0 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
+    <div className="w-full min-h-dvh overflow-hidden rounded-2xl p-4 md:p-5 md:shadow-[inset_0.1px_0.1px_0.1px_1px_rgba(255,255,255,0.1)]">
       <div className="flex justify-between items-start mb-4 ">
         <div>
           <h1 className="text-gray-50 text-xl uppercase font-bold ">

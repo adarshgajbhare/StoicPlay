@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 import { fetchPlaylistVideos } from "../services/youtubeApi";
-import VideoCard from "../components/VideoCard";
-// import Navbar from "../components/Navbar";
-import { IconChevronsLeft, IconDotsVertical } from "@tabler/icons-react";
+import {  IconDotsVertical } from "@tabler/icons-react";
 
 function PlaylistDetailPage() {
   const { playlistId } = useParams();
-  const { user } = useAuth();
+
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -54,8 +51,7 @@ function PlaylistDetailPage() {
 
   return (
     <div className="min-h-dvh bg-[#0f0f0f]  text-white">
-      {/* <Navbar /> */}
-      {/* {console.log("passssssssssssssssssssssssssssss", playlistDetails)} */}
+     
       <main className="max-w-[1800px]  mx-auto">
         <div className="flex flex-col  w-full lg:flex-row gap-6 md:p-4">
           {/* Video Player Section */}

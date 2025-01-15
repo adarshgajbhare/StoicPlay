@@ -27,7 +27,7 @@ export function Layout({ children, onImportClick }) {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 p-4  md:pl-0 md:pr-6 ">
+      <main className="flex-1 p-0 md:pt-4  md:pl-0 md:pr-6 ">
         <div className="container mx-auto py-12 md:py-0">{children}</div>
       </main>
     </div>

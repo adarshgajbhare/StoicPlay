@@ -7,9 +7,7 @@ import {
 } from "../services/youtubeApi";
 import {
   IconBookmark,
-  IconClock,
   IconThumbUp,
-  IconTrash,
 } from "@tabler/icons-react";
 import {
   saveLikedVideo,
@@ -21,35 +19,62 @@ import {
 } from "../utils/constant";
 import { useAuth } from "../contexts/AuthContext";
 import VideoPlayer from "./VideoPlayer";
-function VideoCard({
-  video,
-  channelDetails,
-  onVideoRemoved,
-}) {
+
+function VideoCard({ video, channelDetails, onVideoRemoved }) {
   const [channelImageError, setChannelImageError] = useState(false);
   const [videoImageError, setVideoImageError] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [isWatchLater, setIsWatchLater] = useState(false);
-
-
+  const [videoDuration, setVideoDuration] = useState("");
 
   const getVideoId = () => {
-    if (video.id?.videoId) {
-      return video.id.videoId;
-    }
-    if (video.snippet?.resourceId?.videoId) {
-      return video.snippet.resourceId.videoId;
-    }
-    if (typeof video.id === "string") {
-      return video.id;
-    }
-    if (video.contentDetails?.videoId) {
-      return video.contentDetails.videoId;
-    }
+    if (video.id?.videoId) return video.id.videoId;
+    if (video.snippet?.resourceId?.videoId) return video.snippet.resourceId.videoId;
+    if (typeof video.id === "string") return video.id;
+    if (video.contentDetails?.videoId) return video.contentDetails.videoId;
     return null;
   };
+
+  // Parse ISO 8601 duration to mm:ss or hh:mm:ss
+  const parseDuration = (isoDuration) => {
+    const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return "0:00";
+    const hours = parseInt(match[1] || 0, 10);
+    const minutes = parseInt(match[2] || 0, 10);
+    const seconds = parseInt(match[3] || 0, 10);
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    const fetchDuration = async () => {
+      const videoId = getVideoId();
+      if (!videoId) return;
+
+      try {
+        const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY; // store your API key in .env
+        const res = await fetch(
+          `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${apiKey}`
+        );
+        const data = await res.json();
+        const isoDuration = data.items?.[0]?.contentDetails?.duration;
+        if (isoDuration) {
+          setVideoDuration(parseDuration(isoDuration));
+        }
+      } catch (err) {
+        console.error("Error fetching video duration:", err);
+      }
+    };
+
+    fetchDuration();
+  }, [video?.id]);
 
   useEffect(() => {
     const checkIfLiked = async () => {
@@ -92,12 +117,9 @@ function VideoCard({
   }
 
   const handleLikeVideo = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    if (!user?.uid) return; // Ensure user is logged in
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (!user?.uid) return;
 
     try {
       const videoIdToSave = getVideoId();
@@ -107,10 +129,7 @@ function VideoCard({
           (likedVideo.id?.videoId || likedVideo.id) === videoIdToSave
       );
 
-      if (alreadyLiked) {
-        console.log("Video already liked.");
-        return; // Prevent duplicate addition
-      }
+      if (alreadyLiked) return;
 
       const videoToSave = {
         ...video,
@@ -126,59 +145,41 @@ function VideoCard({
 
       await saveLikedVideo(user.uid, videoToSave);
       setIsLiked(true);
-      console.log("Video liked:", videoIdToSave);
     } catch (error) {
       console.error("Failed to save liked video:", error);
     }
-
-   
   };
 
   const handleRemoveLikedVideo = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    e?.preventDefault();
+    e?.stopPropagation();
     try {
       const videoIdToRemove = getVideoId();
       await removeLikedVideo(user.uid, videoIdToRemove);
       setIsLiked(false);
-      console.log("Removed from liked videos:", videoIdToRemove);
-      if (onVideoRemoved) {
-        onVideoRemoved(videoIdToRemove);
-      }
+      if (onVideoRemoved) onVideoRemoved(videoIdToRemove);
     } catch (error) {
       console.error("Failed to remove from liked videos", error);
     }
-
   };
 
   const handleRemoveWatchLater = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    e?.preventDefault();
+    e?.stopPropagation();
     try {
       const videoId = getVideoId();
       await removeWatchLaterVideo(user.uid, videoId);
       setIsWatchLater(false);
-      console.log("removed from watch later:", videoId);
-      if (onVideoRemoved) {
-        onVideoRemoved(videoId);
-      }
+      if (onVideoRemoved) onVideoRemoved(videoId);
     } catch (error) {
       console.log("Failed to remove from watch later", error);
     }
-
   };
 
   const handleWatchLater = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    if (!user?.uid) return; // Ensure user is logged in
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (!user?.uid) return;
 
     try {
       const videoIdToSave = getVideoId();
@@ -188,10 +189,7 @@ function VideoCard({
           (watchLaterVideo.id?.videoId || watchLaterVideo.id) === videoIdToSave
       );
 
-      if (alreadyInWatchLater) {
-        console.log("Video already in watch later.");
-        return; // Prevent duplicate addition
-      }
+      if (alreadyInWatchLater) return;
 
       const videoToSave = {
         ...video,
@@ -207,36 +205,34 @@ function VideoCard({
 
       await saveWatchLater(user.uid, videoToSave);
       setIsWatchLater(true);
-      console.log("Added to watch later:", videoIdToSave);
     } catch (error) {
       console.error("Failed to save to watch later:", error);
     }
-
   };
-
 
   const channelTitle =
     channelDetails?.snippet?.title || video?.snippet?.channelTitle;
 
   return (
     <>
-      <div className="group bg-[#0f0f0f]  rounded-xl overflow-hidden cursor-pointer">
+      <div className="group bg-[#0f0f0f] rounded-xl overflow-hidden cursor-pointer">
         <div
           className="relative aspect-video"
           onClick={() => setIsVideoOpen(true)}
         >
           {!videoImageError ? (
-            <div className="relative w-full h-full ">
+            <div className="relative w-full h-full">
               <img
                 src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
                 alt={video?.snippet?.title}
                 className="w-full h-full object-cover"
                 onError={() => setVideoImageError(true)}
               />
-              <div className="absolute bottom-2 right-2 bg-black/80 px-1 rounded text-xs text-white">
-                69:69
-                {/* add some time */}
-              </div>
+              {videoDuration && (
+                <div className="absolute bottom-2 right-2 bg-black/80 px-1 rounded text-xs text-white">
+                  {videoDuration}
+                </div>
+              )}
             </div>
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
@@ -249,15 +245,13 @@ function VideoCard({
           <div className="flex gap-3">
             {!channelImageError && channelDetails?.snippet?.thumbnails && (
               <img
-                src={getChannelThumbnailUrl(
-                  channelDetails?.snippet?.thumbnails
-                )}
+                src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                 onError={() => setChannelImageError(true)}
               />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium line-clamp-2 mb-1 ">
+              <p className="text-white text-sm font-medium line-clamp-2 mb-1">
                 {video?.snippet?.title}
               </p>
 
@@ -267,12 +261,11 @@ function VideoCard({
                   <span>{formatRelativeTime(video?.snippet?.publishedAt)}</span>
                   <div className="flex gap-2">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={(e) =>
                         isWatchLater
                           ? handleRemoveWatchLater(e)
-                          : handleWatchLater(e);
-                      }}
+                          : handleWatchLater(e)
+                      }
                       className="hover:text-white transition-colors"
                     >
                       <IconBookmark
@@ -283,12 +276,9 @@ function VideoCard({
                       />
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        isLiked
-                          ? handleRemoveLikedVideo(e)
-                          : handleLikeVideo(e);
-                      }}
+                      onClick={(e) =>
+                        isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e)
+                      }
                       className="hover:text-white transition-colors"
                     >
                       <IconThumbUp
@@ -314,7 +304,6 @@ function VideoCard({
       )}
     </>
   );
-
 }
 
 export default VideoCard;

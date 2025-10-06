@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Liquid Glass Theme System */
+@import './styles/liquid-glass.css';
+
 *,
 *::before,
 *::after {
@@ -17,20 +20,65 @@ textarea:not([rows]) {
   padding: 0;
   font: inherit;
   min-width: 0;
-  /* user-select: none; */
 }
 
 html {
-  -webkit-font-smoothing: antialiased; /* Smoother fonts for Webkit browsers */
-  -moz-osx-font-smoothing: grayscale; /* Better font rendering for macOS */
-  font-display: swap; /* Load text immediately with fallback fonts */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-display: swap;
   scroll-behavior: smooth;
   -moz-text-size-adjust: none;
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
 }
 
-body,
+/* iOS 26 Liquid Glass Base Styling */
+body {
+  margin-block-end: 0;
+  container-type: inline-size;
+  min-height: 100svh;
+  
+  /* Liquid Glass Background */
+  background: linear-gradient(135deg, 
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%);
+  background-size: 400% 400%;
+  animation: liquid-gradient 15s ease infinite;
+  
+  /* Additional texture overlay */
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes liquid-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 h1,
 h2,
 h3,
@@ -53,27 +101,35 @@ label {
   line-height: 1.1;
 }
 
-
-/* Hide scrollbar but allow scrolling */
+/* Enhanced Scrollbar Styling */
 .popover {
   overflow: auto;
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-/* For Chrome, Edge, and Safari */
 .popover::-webkit-scrollbar {
-  display: none;
-} 
+  width: 6px;
+}
+
+.popover::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.popover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
 
 ul[role="list"],
 ol[role="list"] {
   list-style: none;
-}
-
-body {
-  container-type: inline-size; /* Use max-width for container */
-  min-height: 100svh; /* Full height */
 }
 
 img,
@@ -90,30 +146,33 @@ h3,
 h4,
 h5,
 h6 {
-  text-wrap: balance; /* Prevents text from overflowing */
+  text-wrap: balance;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 p,
 li,
 figcaption {
-  max-width: 70ch; /* Limit text width */
-   /* Better text wrapping */
+  max-width: 70ch;
 }
 
-@font-face {
-  /* font-family: "Geist";
-  src: url("/geist-var-web.woff2") format("woff2"); */
-  /* font-display: swap; */
-}
-
+/* Enhanced Font System */
 :root {
-  font-family: Inter, sans-serif;
-  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
-}
-@supports (font-variation-settings: normal) {
-  :root { font-family: InterVariable, sans-serif; }
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+               Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
+@supports (font-variation-settings: normal) {
+  :root { 
+    font-family: 'SF Pro Display Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+/* Enhanced Animations */
 @keyframes wiggle {
   0% { transform: rotate(0deg); }
   25% { transform: rotate(-1deg); }
@@ -121,7 +180,199 @@ figcaption {
   100% { transform: rotate(0deg); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); 
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .animate-wiggle {
   animation: wiggle 0.3s ease-in-out infinite;
 }
 
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-bottom 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Custom Utility Classes for Liquid Glass */
+.backdrop-blur-glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.text-glass {
+  @apply glass-text;
+}
+
+.bg-glass {
+  @apply glass;
+}
+
+.bg-glass-soft {
+  @apply glass-soft;
+}
+
+.bg-glass-strong {
+  @apply glass-strong;
+}
+
+.bg-glass-elevated {
+  @apply glass-elevated;
+}
+
+/* Liquid Glass Interactive States */
+.liquid-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.liquid-interactive:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1) saturate(1.2);
+}
+
+.liquid-interactive:active {
+  transform: translateY(0) scale(0.98);
+  filter: brightness(0.9);
+}
+
+/* Focus styles for accessibility */
+.glass-focus:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+/* Dark/Light mode text adjustments */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(0, 212, 255, 0.3);
+  color: white;
+}
+
+/* Liquid Glass Loading State */
+.glass-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+  animation: glass-loading-shimmer 1.5s infinite;
+}
+
+@keyframes glass-loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  body {
+    background-size: 200% 200%;
+  }
+  
+  .liquid-interactive:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Reduce motion for mobile performance */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass,
+  .glass-soft,
+  .glass-strong {
+    border: 2px solid currentColor;
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .glass-text {
+    color: white;
+    text-shadow: none;
+  }
+}

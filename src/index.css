@@ -255,91 +255,10 @@ figcaption {
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
-.text-glass {
-  @apply glass-text;
-}
-
-.bg-glass {
-  @apply glass;
-}
-
-.bg-glass-soft {
-  @apply glass-soft;
-}
-
-.bg-glass-strong {
-  @apply glass-strong;
-}
-
-.bg-glass-elevated {
-  @apply glass-elevated;
-}
-
-/* Liquid Glass Interactive States */
-.liquid-interactive {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-}
-
-.liquid-interactive:hover {
-  transform: translateY(-2px) scale(1.02);
-  filter: brightness(1.1) saturate(1.2);
-}
-
-.liquid-interactive:active {
-  transform: translateY(0) scale(0.98);
-  filter: brightness(0.9);
-}
-
-/* Focus styles for accessibility */
-.glass-focus:focus-visible {
-  outline: 2px solid var(--neon-blue);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
-}
-
-/* Dark/Light mode text adjustments */
-[data-theme="dark"] {
-  color-scheme: dark;
-}
-
-[data-theme="light"] {
-  color-scheme: light;
-}
-
 /* Selection styling */
 ::selection {
   background: rgba(0, 212, 255, 0.3);
   color: white;
-}
-
-/* Liquid Glass Loading State */
-.glass-loading {
-  position: relative;
-  overflow: hidden;
-}
-
-.glass-loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.4) 50%, 
-    transparent 100%);
-  animation: glass-loading-shimmer 1.5s infinite;
-}
-
-@keyframes glass-loading-shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
 }
 
 /* Mobile optimizations */

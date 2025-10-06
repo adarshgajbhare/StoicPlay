@@ -1,9 +1,7 @@
+@import './styles/liquid-glass.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import Liquid Glass Theme System */
-@import './styles/liquid-glass.css';
 
 *,
 *::before,

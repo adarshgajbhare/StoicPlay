@@ -288,17 +288,17 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
     return null;
   }
 
-  // Render glass morphism placeholder while not visible
+  // Render professional glass morphism placeholder while not visible
   if (!isVisible) {
     return (
       <div ref={cardRef} className="glass-card p-1 animate-fade-in">
-        <div className="glass-shimmer aspect-video rounded-glass mb-4"></div>
-        <div className="p-4">
+        <div className="glass-shimmer aspect-video rounded-lg mb-3 sm:mb-4"></div>
+        <div className="p-3 sm:p-4">
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full glass-shimmer flex-shrink-0"></div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full glass-shimmer flex-shrink-0"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 glass-shimmer rounded w-full"></div>
-              <div className="h-3 glass-shimmer rounded w-3/4"></div>
+              <div className="h-3 sm:h-4 glass-shimmer rounded w-full"></div>
+              <div className="h-2 sm:h-3 glass-shimmer rounded w-3/4"></div>
             </div>
           </div>
         </div>
@@ -314,26 +314,26 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Liquid Glass Video Thumbnail Container */}
+        {/* Professional Video Thumbnail Container */}
         <div
-          className="relative aspect-video overflow-hidden rounded-glass cursor-pointer"
+          className="relative aspect-video overflow-hidden rounded-lg cursor-pointer"
           onClick={() => setIsVideoOpen(true)}
         >
-          {/* Background Gradient Animation */}
-          <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/10 via-transparent to-neon-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {/* Subtle background enhancement */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-white/[0.01] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           {/* Thumbnail Image */}
           {!videoImageError ? (
             <div className="relative w-full h-full">
               {!imageLoaded && (
-                <div className="absolute inset-0 glass-loading rounded-glass flex items-center justify-center">
-                  <IconEye className="w-8 h-8 text-glass/50 animate-pulse" />
+                <div className="absolute inset-0 glass-loading rounded-lg flex items-center justify-center">
+                  <IconEye className="w-6 h-6 sm:w-8 sm:h-8 text-glass-muted animate-pulse" />
                 </div>
               )}
               <img
                 src={getVideoThumbnailUrl(video?.snippet?.thumbnails)}
                 alt={video?.snippet?.title}
-                className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
+                className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
                   imageLoaded ? 'opacity-100' : 'opacity-0'
                 }`}
                 onLoad={() => setImageLoaded(true)}
@@ -341,43 +341,43 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
                 loading="lazy"
               />
               
-              {/* Play Button Overlay */}
+              {/* Professional Play Button Overlay */}
               <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
                 isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
               }`}>
-                <div className="glass-elevated rounded-full p-4 neon-glow">
-                  <IconPlayerPlay className="w-8 h-8 text-glass fill-current" />
+                <div className="glass-elevated rounded-full p-3 sm:p-4 accent-glow">
+                  <IconPlayerPlay className="w-6 h-6 sm:w-8 sm:h-8 text-glass" />
                 </div>
               </div>
               
-              {/* Duration Badge */}
+              {/* Professional Duration Badge */}
               {videoDuration && imageLoaded && (
-                <div className="absolute bottom-3 right-3 glass-strong px-3 py-1 rounded-full text-xs font-medium text-glass flex items-center gap-1">
+                <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 glass-strong px-2 sm:px-3 py-1 rounded-md text-xs font-medium text-glass flex items-center gap-1">
                   <IconClock className="w-3 h-3" />
-                  {videoDuration}
+                  <span className="text-xs">{videoDuration}</span>
                 </div>
               )}
               
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
             </div>
           ) : (
             <div className="w-full h-full glass-soft flex items-center justify-center">
               <div className="text-center">
-                <IconEye className="w-12 h-12 text-glass/50 mx-auto mb-2" />
-                <span className="text-glass/70 text-sm">No thumbnail available</span>
+                <IconEye className="w-8 h-8 sm:w-12 sm:h-12 text-glass-muted mx-auto mb-2" />
+                <span className="text-glass-muted text-xs sm:text-sm">No thumbnail available</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Content Section with Glass Morphism */}
-        <div className="p-4">
-          <div className="flex gap-4">
-            {/* Channel Avatar with Glass Frame */}
+        {/* Content Section with Professional Design */}
+        <div className="p-3 sm:p-4">
+          <div className="flex gap-3">
+            {/* Channel Avatar */}
             {!channelImageError && channelDetails?.snippet?.thumbnails && (
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-br from-neon-blue/50 to-neon-purple/50">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full p-0.5 bg-gradient-to-br from-blue-500/20 to-slate-500/10">
                   <img
                     src={getChannelThumbnailUrl(channelDetails?.snippet?.thumbnails)}
                     className="w-full h-full rounded-full object-cover"
@@ -390,39 +390,39 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
             
             {/* Video Details */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-glass font-semibold text-sm line-clamp-2 mb-2 group-hover:text-white transition-colors duration-300">
+              <h3 className="text-glass font-semibold text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2 group-hover:text-white transition-colors duration-300">
                 {video?.snippet?.title}
               </h3>
 
-              <div className="flex flex-col gap-1 text-xs text-glass/70">
-                <span className="font-medium text-glass/90">{channelTitle}</span>
+              <div className="flex flex-col gap-1 text-xs text-glass-secondary">
+                <span className="font-medium text-glass-secondary text-xs truncate">{channelTitle}</span>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-xs text-glass-muted">
                     <IconClock className="w-3 h-3" />
                     {relativeTime}
                   </span>
                   
-                  {/* Action Buttons with Glass Design */}
-                  <div className="flex gap-2">
+                  {/* Professional Action Buttons */}
+                  <div className="flex gap-1 sm:gap-2">
                     <button
                       onClick={(e) =>
                         isWatchLater
                           ? handleRemoveWatchLater(e)
                           : handleWatchLater(e)
                       }
-                      className={`glass-button p-2 rounded-lg transition-all duration-300 ${
+                      className={`glass-button p-1.5 sm:p-2 rounded-md transition-all duration-300 ${
                         isWatchLater 
-                          ? "neon-glow border-neon-blue/50" 
+                          ? "accent-glow border-blue-500/30" 
                           : "hover:glass-strong"
                       }`}
                       title={isWatchLater ? "Remove from Watch Later" : "Add to Watch Later"}
                     >
                       <IconBookmark
-                        size={14}
+                        size={12}
                         className={`transition-colors duration-300 ${
                           isWatchLater 
-                            ? "text-neon-blue" 
-                            : "text-glass/70 group-hover:text-glass"
+                            ? "text-accent-blue" 
+                            : "text-glass-muted hover:text-glass"
                         }`}
                       />
                     </button>
@@ -431,19 +431,19 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
                       onClick={(e) =>
                         isLiked ? handleRemoveLikedVideo(e) : handleLikeVideo(e)
                       }
-                      className={`glass-button p-2 rounded-lg transition-all duration-300 ${
+                      className={`glass-button p-1.5 sm:p-2 rounded-md transition-all duration-300 ${
                         isLiked 
-                          ? "neon-glow border-neon-pink/50" 
+                          ? "accent-glow border-emerald-500/30" 
                           : "hover:glass-strong"
                       }`}
                       title={isLiked ? "Remove from Liked" : "Add to Liked"}
                     >
                       <IconThumbUp
-                        size={14}
+                        size={12}
                         className={`transition-colors duration-300 ${
                           isLiked 
-                            ? "text-neon-pink" 
-                            : "text-glass/70 group-hover:text-glass"
+                            ? "text-accent-emerald" 
+                            : "text-glass-muted hover:text-glass"
                         }`}
                       />
                     </button>
@@ -453,16 +453,12 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
             </div>
           </div>
         </div>
-        
-        {/* Floating Glass Orbs for Enhanced Visual Appeal */}
-        <div className="absolute top-2 left-2 w-2 h-2 bg-neon-blue/30 rounded-full blur-sm animate-float opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-neon-purple/30 rounded-full blur-sm animate-float opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ animationDelay: '1s' }} />
       </div>
 
-      {/* Enhanced Video Player Modal */}
+      {/* Professional Video Player Modal */}
       {isVideoOpen && (
-        <div className="fixed inset-0 frosted-overlay z-50 flex items-center justify-center animate-fade-in">
-          <div className="glass-modal max-w-6xl w-full mx-4 animate-slide-in-bottom">
+        <div className="fixed inset-0 frosted-overlay z-50 flex items-center justify-center animate-fade-in p-4">
+          <div className="glass-modal max-w-6xl w-full animate-slide-in-bottom">
             <VideoPlayer
               videoId={videoId}
               onClose={() => setIsVideoOpen(false)}

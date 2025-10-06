@@ -3,68 +3,133 @@ import authReducer from './authSlice';
 import feedsReducer from './feedsSlice';
 import videoCacheReducer from './videoCacheSlice';
 
-// Persistence middleware for video cache
-const persistVideoCacheMiddleware = (store) => (next) => (action) => {
-  const result = next(action);
-  
-  // Persist video cache to localStorage on specific actions
-  if (action.type?.startsWith('videoCache/')) {
-    try {
-      const state = store.getState();
-      const { feeds, channelDetails } = state.videoCache;
-      
-      // Only persist feeds that are less than 1 hour old
+// High-performance async persistence middleware
+const createAsyncPersistenceMiddleware = () => {
+  let persistQueue = Promise.resolve();
+  let lastPersistTime = 0;
+  const PERSIST_THROTTLE = 1000; // 1 second throttle
+
+  return (store) => (next) => (action) => {
+    const result = next(action);
+    
+    // Only persist video cache actions and throttle writes
+    if (action.type?.startsWith('videoCache/')) {
       const now = Date.now();
-      const maxAge = 60 * 60 * 1000; // 1 hour
       
-      const validFeeds = {};
-      Object.entries(feeds).forEach(([feedName, feedData]) => {
-        if (feedData.lastFetched && (now - feedData.lastFetched) < maxAge) {
-          validFeeds[feedName] = feedData;
-        }
-      });
-      
-      // Persist to localStorage
-      localStorage.setItem('stoicplay_video_cache', JSON.stringify({
-        feeds: validFeeds,
-        channelDetails,
-        timestamp: now
-      }));
-    } catch (error) {
-      console.warn('Failed to persist video cache:', error);
+      // Throttle persistence to avoid blocking UI
+      if (now - lastPersistTime > PERSIST_THROTTLE) {
+        lastPersistTime = now;
+        
+        // Queue persistence to avoid blocking
+        persistQueue = persistQueue.then(async () => {
+          try {
+            await new Promise(resolve => {
+              // Use requestIdleCallback for non-blocking persistence
+              const callback = () => {
+                try {
+                  const state = store.getState();
+                  const { feeds, channelDetails } = state.videoCache;
+                  
+                  // Only persist valid, recent feeds
+                  const maxAge = 60 * 60 * 1000; // 1 hour
+                  const validFeeds = {};
+                  
+                  Object.entries(feeds).forEach(([feedName, feedData]) => {
+                    if (feedData.lastFetched && (now - feedData.lastFetched) < maxAge) {
+                      // Only store essential data to reduce payload
+                      validFeeds[feedName] = {
+                        videos: feedData.videos.slice(0, 100), // Limit to 100 videos
+                        channels: feedData.channels,
+                        lastFetched: feedData.lastFetched,
+                        lastIncrementalCheck: feedData.lastIncrementalCheck
+                      };
+                    }
+                  });
+                  
+                  // Compress channel details
+                  const compressedChannelDetails = {};
+                  Object.entries(channelDetails).forEach(([channelId, details]) => {
+                    if (details.fetchedAt && (now - details.fetchedAt) < maxAge) {
+                      compressedChannelDetails[channelId] = {
+                        data: {
+                          id: details.data?.id,
+                          snippet: {
+                            title: details.data?.snippet?.title,
+                            thumbnails: details.data?.snippet?.thumbnails,
+                            customUrl: details.data?.snippet?.customUrl
+                          },
+                          statistics: details.data?.statistics
+                        },
+                        fetchedAt: details.fetchedAt
+                      };
+                    }
+                  });
+                  
+                  const cacheData = {
+                    feeds: validFeeds,
+                    channelDetails: compressedChannelDetails,
+                    timestamp: now
+                  };
+                  
+                  localStorage.setItem('stoicplay_video_cache', JSON.stringify(cacheData));
+                  resolve();
+                } catch (error) {
+                  console.warn('Failed to persist video cache:', error);
+                  resolve();
+                }
+              };
+              
+              // Use requestIdleCallback if available, otherwise setTimeout
+              if (typeof requestIdleCallback === 'function') {
+                requestIdleCallback(callback, { timeout: 2000 });
+              } else {
+                setTimeout(callback, 0);
+              }
+            });
+          } catch (error) {
+            console.warn('Persistence error:', error);
+          }
+        }).catch(console.warn);
+      }
     }
-  }
-  
-  return result;
+    
+    return result;
+  };
 };
 
-// Load persisted cache
+// Optimized cache loader with error handling
 const loadPersistedCache = () => {
   try {
     const cached = localStorage.getItem('stoicplay_video_cache');
-    if (cached) {
-      const { feeds, channelDetails, timestamp } = JSON.parse(cached);
-      const now = Date.now();
-      const maxAge = 60 * 60 * 1000; // 1 hour
-      
-      // Only use cache if it's less than 1 hour old
-      if ((now - timestamp) < maxAge) {
-        return {
-          feeds: feeds || {},
-          channelDetails: channelDetails || {},
-          loading: {},
-          error: {},
-          newVideoCount: {}
-        };
-      }
+    if (!cached) return undefined;
+    
+    const { feeds, channelDetails, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+    const maxAge = 60 * 60 * 1000; // 1 hour
+    
+    // Validate cache age
+    if (!timestamp || (now - timestamp) > maxAge) {
+      localStorage.removeItem('stoicplay_video_cache');
+      return undefined;
     }
+    
+    return {
+      feeds: feeds || {},
+      channelDetails: channelDetails || {},
+      loading: {},
+      error: {},
+      newVideoCount: {},
+      searchResults: {},
+      searchLoading: {}
+    };
   } catch (error) {
-    console.warn('Failed to load persisted cache:', error);
+    console.warn('Failed to load persisted cache, clearing:', error);
+    localStorage.removeItem('stoicplay_video_cache');
+    return undefined;
   }
-  
-  return undefined;
 };
 
+// Performance-optimized store configuration
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -77,15 +142,61 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these action types for serializable check
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-        // Ignore these paths in the state
-        ignoredPaths: ['videoCache.loading', 'videoCache.error']
+        // Optimize serializable check for better performance
+        ignoredActions: [
+          'persist/PERSIST',
+          'persist/REHYDRATE',
+          'videoCache/fetchFeedVideos/fulfilled',
+          'videoCache/fetchFeedVideos/pending',
+          'videoCache/checkForNewVideos/fulfilled'
+        ],
+        ignoredPaths: ['videoCache.loading', 'videoCache.error'],
+        // Reduce check frequency for performance
+        warnAfter: 128,
+      },
+      immutableCheck: {
+        // Reduce immutable check overhead
+        warnAfter: 128,
+        ignoredPaths: ['videoCache.feeds', 'videoCache.channelDetails']
+      },
+      // Enable thunk for better async handling
+      thunk: {
+        extraArgument: {
+          // Add any extra arguments for thunks if needed
+        }
       }
-    }).concat(persistVideoCacheMiddleware),
+    }).concat(createAsyncPersistenceMiddleware()),
+  
+  // Enable Redux DevTools only in development
+  devTools: process.env.NODE_ENV === 'development',
+  
+  // Enhance store with performance optimizations
+  enhancers: (getDefaultEnhancers) => {
+    return getDefaultEnhancers({
+      // Optimize for production
+      autoBatch: true,
+    });
+  }
 });
 
-// Clean up old cache on app start
-store.dispatch({ type: 'videoCache/cleanup' });
+// Clean up old cache on app start (non-blocking)
+setTimeout(() => {
+  store.dispatch({ type: 'videoCache/cleanup' });
+}, 1000);
+
+// Performance monitoring in development
+if (process.env.NODE_ENV === 'development') {
+  let lastStateChange = Date.now();
+  store.subscribe(() => {
+    const now = Date.now();
+    const timeSinceLastChange = now - lastStateChange;
+    
+    if (timeSinceLastChange > 100) {
+      console.warn('Slow state update detected:', timeSinceLastChange, 'ms');
+    }
+    
+    lastStateChange = now;
+  });
+}
 
 export default store;

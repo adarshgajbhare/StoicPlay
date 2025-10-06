@@ -79,7 +79,9 @@ export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFi
       });
     }
 
-    setFeeds([...feeds, newFeed]);
+    // Fix: Ensure feeds is always treated as an array
+    const currentFeeds = Array.isArray(feeds) ? feeds : [];
+    setFeeds([...currentFeeds, newFeed]);
   } catch (error) {
     console.error("Error adding feed:", error);
     throw error;

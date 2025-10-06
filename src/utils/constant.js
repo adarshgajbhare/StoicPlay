@@ -505,4 +505,4 @@ export const handleShareMultipleFeeds = async (user, feedNames, allFeeds, setToa
   }
 };
 
-export const APP_NAME = "StoicPlay";
+export const APP_NAME = "ZenFeeds";

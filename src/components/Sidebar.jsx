@@ -103,7 +103,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       path: "/feeds",
       icon: <IconStack2 size={20} strokeWidth={1.5} />,
       isLink: true,
-    
     },
     {
       name: "Playlists",
@@ -126,7 +125,6 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     {
       name: "Import Feed",
       onClick: onImportClick,
-      
       icon: <IconDownload size={20} strokeWidth={1.5} />,
       isLink: false,
     },
@@ -148,110 +146,167 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
   return (
     <>
+      {/* Mobile Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] md:hidden" 
-             onClick={handleBackdropClick} />
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 md:hidden animate-fade-in" 
+          onClick={handleBackdropClick} 
+        />
       )}
 
-      <aside className={`fixed md:sticky left-0 top-0 z-[999] flex   h-screen flex-col bg-[#121212] transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-16" : "md:w-72 w-full"
-      } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
-        <div className="flex items-center justify-between p-4">
+      {/* Sidebar */}
+      <aside className={`
+        fixed md:sticky left-0 top-0 z-50 flex h-screen flex-col
+        liquid-glass-strong border-r border-glass-border
+        transition-all duration-slow ease-liquid
+        ${isCollapsed ? "w-16" : "md:w-72 w-full"}
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+      `}>
+        
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-glass-border/50">
           {!isCollapsed && (
-            <span className="text-xl font-bold text-lime-500">{APP_NAME}</span>
+            <div className="group cursor-pointer">
+              <span className="text-xl font-bold text-neon-blue">
+                {APP_NAME}
+              </span>
+              <div className="h-0.5 w-0 bg-neon-blue rounded-full transition-all duration-medium group-hover:w-full"></div>
+            </div>
           )}
+          
           <button
-            onClick={isCollapsed ? toggleCollapse : onClose} title="open"
-            className={`rounded-full p-2 hover:bg-zinc-800 ${isCollapsed ? "mx-auto" : "md:hidden"}`} 
+            onClick={isCollapsed ? toggleCollapse : onClose} 
+            title="Toggle sidebar"
+            className={`
+              ios-button p-2 transition-all duration-fast
+              ${isCollapsed ? "mx-auto" : "md:hidden"}
+              hover:bg-glass-white-soft hover:scale-105
+            `}
           >
             {isCollapsed ? (
-              <IconLayoutSidebar  className="h-5 w-5 text-zinc-400" />
+              <IconLayoutSidebar className="h-5 w-5 text-liquid-primary" />
             ) : (
-              <IconX className="h-5 w-5 text-zinc-400" />
+              <IconX className="h-5 w-5 text-liquid-secondary" />
             )}
           </button>
+          
           {!isCollapsed && (
-            <button title="close"
+            <button 
+              title="Collapse sidebar"
               onClick={toggleCollapse}
-              className="hidden md:block rounded-full p-2 hover:bg-zinc-800"
+              className="hidden md:block ios-button p-2 hover:bg-glass-white-soft hover:scale-105"
             >
-              <IconChevronLeft className="h-5 w-5 text-zinc-400" />
+              <IconChevronLeft className="h-5 w-5 text-liquid-secondary" />
             </button>
           )}
         </div>
-        <nav className="flex-1 space-y-1 p-2">
-  {navItems.map((item) => {
-    const isActive = location.pathname === item.path;
-    return (
-      <Link
-        key={item.name}
-        to={item.path}
-        onClick={() => {
-          if (item.isLink) navigate(item.path);
-          if (onClose) onClose(); // Close the sidebar
-          if (item.onClick) item.onClick();
-        }}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-          isActive
-            ? "bg-zinc-800 text-white"
-            : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-        } ${item.destructive ? "text-red-400 hover:text-red-400" : ""}`}
-        title={item.name}
-      >
-        <span className="flex-shrink-0">{item.icon}</span>
-        {!isCollapsed && <span>{item.name}</span>}
-      </Link>
-    );
-  })}
-</nav>
+        
+        {/* Navigation */}
+        <nav className="flex-1 space-y-2 p-3 overflow-y-auto">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                onClick={() => {
+                  if (item.isLink) navigate(item.path);
+                  if (onClose) onClose();
+                  if (item.onClick) item.onClick();
+                }}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-ios transition-all duration-fast
+                  ${
+                    isActive
+                      ? "liquid-glass-blue text-liquid-primary shadow-neon-blue animate-liquid-glow"
+                      : "text-liquid-secondary hover:liquid-glass hover:text-liquid-primary hover:scale-[1.02]"
+                  }
+                  ${item.destructive ? "hover:text-neon-red" : ""}
+                `}
+                title={item.name}
+              >
+                <span className="flex-shrink-0 transition-transform duration-fast group-hover:scale-110">
+                  {item.icon}
+                </span>
+                {!isCollapsed && (
+                  <span className="font-medium">
+                    {item.name}
+                  </span>
+                )}
+                {isActive && !isCollapsed && (
+                  <div className="ml-auto w-1.5 h-1.5 bg-neon-blue rounded-full animate-liquid-pulse"></div>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
 
-
-        <div className="mt-auto border-t border-zinc-800 p-4">
+        {/* User Section */}
+        <div className="mt-auto border-t border-glass-border/50 p-4">
           <div className="flex items-center gap-3">
-            <img
-              src={photoError ? "/default-profile.jpeg" : user?.photoURL}
-              alt="Profile"
-              className="h-8 w-8 rounded-full"
-              onError={() => setPhotoError(true)}
-            />
+            <div className="relative group">
+              <img
+                src={photoError ? "/default-profile.jpeg" : user?.photoURL}
+                alt="Profile"
+                className="h-8 w-8 rounded-full border border-glass-border transition-all duration-fast group-hover:border-neon-blue group-hover:scale-110"
+                onError={() => setPhotoError(true)}
+              />
+              <div className="absolute inset-0 rounded-full bg-neon-blue/20 opacity-0 group-hover:opacity-100 transition-opacity duration-fast"></div>
+            </div>
+            
             {!isCollapsed && (
               <div className="flex flex-1 items-center justify-between">
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-liquid-primary truncate">
                   {user?.displayName?.split(" ")[0] || "User"}
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="rounded-full p-1.5 hover:bg-zinc-800"
+                  title="Logout"
+                  className="ios-button p-1.5 hover:bg-glass-white-soft hover:scale-105"
                 >
-                  <IconLogout title="logout" className="h-5 w-5 text-zinc-400" />
+                  <IconLogout className="h-4 w-4 text-liquid-secondary" />
                 </button>
               </div>
             )}
           </div>
+          
           {!isCollapsed && (
-            <div className="mt-4 flex justify-between">
-              <a href="https://github.com/adarshgajbhare" target="_blank" className="text-xs text-zinc-400 hover:text-white">ABOUT US</a>
-              <a href="https://adarshh.vercel.app/" target="_blank"  className="text-xs text-zinc-400 hover:text-white">CONTACT US</a>
+            <div className="mt-4 flex justify-between text-xs">
+              <a 
+                href="https://github.com/adarshgajbhare" 
+                target="_blank" 
+                className="text-liquid-tertiary hover:text-neon-blue transition-colors duration-fast"
+              >
+                ABOUT US
+              </a>
+              <a 
+                href="https://adarshh.vercel.app/" 
+                target="_blank"  
+                className="text-liquid-tertiary hover:text-neon-blue transition-colors duration-fast"
+              >
+                CONTACT US
+              </a>
             </div>
           )}
         </div>
       </aside>
 
+      {/* Logout Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999]">
-          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold text-white mb-4">Confirm Logout</h2>
-            <p className="text-zinc-400 mb-4">Are you sure you want to log out?</p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-50 animate-fade-in">
+          <div className="liquid-glass-strong p-6 rounded-ios-lg max-w-md w-full mx-4 border border-glass-border animate-scale-in">
+            <h2 className="text-xl font-semibold text-liquid-primary mb-4">Confirm Logout</h2>
+            <p className="text-liquid-secondary mb-6">Are you sure you want to log out?</p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                className="ios-button px-4 py-2 text-liquid-secondary hover:text-liquid-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmLogout}
-                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                className="liquid-glass-interactive px-4 py-2 border border-neon-red/30 text-neon-red hover:bg-neon-red/10"
               >
                 Logout
               </button>
@@ -260,33 +315,39 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
         </div>
       )}
 
+      {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999] ">
-          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-50 animate-fade-in">
+          <div className="liquid-glass-strong p-6 rounded-ios-lg max-w-md w-full mx-4 border border-neon-red/30 animate-scale-in">
             <div className="flex items-center gap-3 mb-4">
-              <IconAlertTriangle className="h-5 w-5 text-red-500" />
-              <h2 className="text-xl font-semibold text-white">Delete Account</h2>
+              <div className="p-2 rounded-ios bg-neon-red/20">
+                <IconAlertTriangle className="h-5 w-5 text-neon-red" />
+              </div>
+              <h2 className="text-xl font-semibold text-liquid-primary">Delete Account</h2>
             </div>
-            <p className="text-zinc-400 mb-4">
+            
+            <p className="text-liquid-secondary mb-4">
               Are you absolutely sure you want to delete your account? This action cannot be undone.
             </p>
-            <ul className="list-disc list-inside text-zinc-400 mb-4 space-y-1">
+            
+            <ul className="list-disc list-inside text-liquid-tertiary mb-6 space-y-1">
               <li>All your saved feeds</li>
               <li>Your playlists</li>
               <li>Your watch history</li>
               <li>Your liked videos</li>
               <li>All personalized settings</li>
             </ul>
+            
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                className="ios-button px-4 py-2 text-liquid-secondary hover:text-liquid-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteAccount}
-                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                className="liquid-glass-interactive px-4 py-2 border border-neon-red/50 text-neon-red hover:bg-neon-red/20"
               >
                 Delete Account
               </button>

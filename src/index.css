@@ -30,26 +30,21 @@ html {
   text-size-adjust: none;
 }
 
-/* iOS 26 Liquid Glass Base Styling */
+/* Professional Dark Theme Base Styling */
 body {
   margin-block-end: 0;
   container-type: inline-size;
   min-height: 100svh;
   
-  /* Liquid Glass Background */
-  background: linear-gradient(135deg, 
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #f5576c 75%,
-    #4facfe 100%);
-  background-size: 400% 400%;
-  animation: liquid-gradient 15s ease infinite;
+  /* Professional dark background */
+  background: #0a0a0a;
+  color: rgba(255, 255, 255, 0.95);
   
-  /* Additional texture overlay */
+  /* Subtle texture overlay */
   position: relative;
 }
 
+/* Professional dark theme background overlay */
 body::before {
   content: '';
   position: fixed;
@@ -58,23 +53,11 @@ body::before {
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%);
+    radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.015) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(100, 116, 139, 0.01) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(16, 185, 129, 0.01) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
-}
-
-@keyframes liquid-gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 h1,
@@ -103,7 +86,7 @@ label {
 .popover {
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .popover::-webkit-scrollbar {
@@ -111,18 +94,18 @@ label {
 }
 
 .popover::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
 
 .popover::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .popover::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 ul[role="list"],
@@ -147,48 +130,49 @@ h6 {
   text-wrap: balance;
   font-weight: 600;
   letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 p,
 li,
 figcaption {
   max-width: 70ch;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-/* Enhanced Font System */
+/* Professional Font System */
 :root {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 
                Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
   font-weight: 400;
   line-height: 1.6;
 }
 
 @supports (font-variation-settings: normal) {
   :root { 
-    font-family: 'SF Pro Display Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
-/* Enhanced Animations */
-@keyframes wiggle {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-1deg); }
-  75% { transform: rotate(1deg); }
-  100% { transform: rotate(0deg); }
+/* Professional Animations */
+@keyframes subtle-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-0.5deg); }
+  75% { transform: rotate(0.5deg); }
 }
 
-@keyframes float {
+@keyframes gentle-float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-4px); }
 }
 
-@keyframes pulse-glow {
+@keyframes professional-pulse {
   0%, 100% { 
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); 
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.1); 
   }
   50% { 
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); 
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); 
   }
 }
 
@@ -224,58 +208,60 @@ figcaption {
 }
 
 .animate-wiggle {
-  animation: wiggle 0.3s ease-in-out infinite;
+  animation: subtle-wiggle 0.3s ease-in-out infinite;
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: gentle-float 4s ease-in-out infinite;
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: professional-pulse 3s ease-in-out infinite;
 }
 
 .animate-slide-in-bottom {
-  animation: slide-in-bottom 0.5s ease-out;
+  animation: slide-in-bottom 0.4s ease-out;
 }
 
 .animate-slide-in-right {
-  animation: slide-in-right 0.5s ease-out;
+  animation: slide-in-right 0.4s ease-out;
 }
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
 
-/* Custom Utility Classes for Liquid Glass */
+/* Professional backdrop blur utility */
 .backdrop-blur-glass {
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
 }
 
-/* Selection styling */
+/* Professional selection styling */
 ::selection {
-  background: rgba(0, 212, 255, 0.3);
-  color: white;
+  background: rgba(14, 165, 233, 0.2);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
-  body {
-    background-size: 200% 200%;
+  body::before {
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.01) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(100, 116, 139, 0.005) 0%, transparent 50%);
   }
   
   .liquid-interactive:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
   }
-  
-  /* Reduce motion for mobile performance */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+}
+
+/* Tablet optimizations */
+@media (max-width: 1024px) and (min-width: 769px) {
+  body::before {
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.01) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(100, 116, 139, 0.008) 0%, transparent 50%);
   }
 }
 
@@ -284,12 +270,27 @@ figcaption {
   .glass,
   .glass-soft,
   .glass-strong {
-    border: 2px solid currentColor;
+    border: 2px solid rgba(255, 255, 255, 0.4);
     background: rgba(0, 0, 0, 0.8);
   }
   
   .glass-text {
-    color: white;
+    color: rgba(255, 255, 255, 1);
     text-shadow: none;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-float,
+  .animate-wiggle,
+  .animate-pulse-glow {
+    animation: none;
   }
 }

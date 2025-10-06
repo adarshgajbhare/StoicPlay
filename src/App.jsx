@@ -10,6 +10,9 @@ import { Layout } from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import FeedPage from "./pages/FeedPage";
+// Add optimized components
+import FeedPageOptimized from "./pages/FeedPageOptimized";
+import HomePageOptimized from "./pages/HomePageOptimized";
 import PlaylistPage from "./pages/PlaylistPage";
 import LearnMorePage from "./pages/LearnMorePage";
 import ShareRedirect from "./components/ShareRedirect";
@@ -17,6 +20,9 @@ import PlaylistDetailPage from "./components/PlaylistDetailPage";
 import LikedVideosPage from "./pages/LikedVideosPage";
 import WatchLaterPage from "./pages/WatchLaterPage";
 import ImportFeedModal from "./components/ImportFeedModal";
+
+// Feature flag for safe deployment
+const USE_OPTIMIZED_COMPONENTS = true;
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -46,6 +52,10 @@ function App() {
     );
   };
 
+  // Component selection with fallback
+  const HomeComponent = USE_OPTIMIZED_COMPONENTS ? HomePageOptimized : HomePage;
+  const FeedComponent = USE_OPTIMIZED_COMPONENTS ? FeedPageOptimized : FeedPage;
+
   return (
     <AuthProvider>
       <Router>
@@ -61,7 +71,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout onImportClick={() => setShowImportModal(true)}>
-                  <HomePage />
+                  <HomeComponent />
                 </Layout>
                </PrivateRoute>
             }
@@ -71,7 +81,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout onImportClick={() => setShowImportModal(true)}>
-                  <FeedPage />
+                  <FeedComponent />
                 </Layout>
               </PrivateRoute>
             }

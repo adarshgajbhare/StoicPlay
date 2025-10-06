@@ -8,7 +8,7 @@ import {
 import {
   IconBookmark,
   IconThumbUp,
-  IconPlay,
+  IconPlayerPlay,
   IconClock,
   IconEye,
 } from "@tabler/icons-react";
@@ -346,7 +346,7 @@ function VideoCard({ video, channelDetails, onVideoRemoved }) {
                 isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
               }`}>
                 <div className="glass-elevated rounded-full p-4 neon-glow">
-                  <IconPlay className="w-8 h-8 text-glass fill-current" />
+                  <IconPlayerPlay className="w-8 h-8 text-glass fill-current" />
                 </div>
               </div>
               

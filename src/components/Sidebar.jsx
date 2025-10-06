@@ -103,32 +103,35 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       path: "/feeds",
       icon: <IconStack2 size={20} strokeWidth={1.5} />,
       isLink: true,
-    
+      gradient: "from-neon-blue to-neon-purple"
     },
     {
       name: "Playlists",
       path: "/playlists",
       icon: <IconPlaylist size={20} strokeWidth={1.5} />,
       isLink: true,
+      gradient: "from-neon-purple to-neon-pink"
     },
     {
       name: "Liked",
       path: "/liked",
       icon: <IconThumbUp size={20} strokeWidth={1.5} />,
       isLink: true,
+      gradient: "from-neon-pink to-neon-orange"
     },
     {
       name: "Watch Later",
       path: "/watch-later",
       icon: <IconDeviceTv size={20} strokeWidth={1.5} />,
       isLink: true,
+      gradient: "from-neon-green to-neon-blue"
     },
     {
       name: "Import Feed",
       onClick: onImportClick,
-      
       icon: <IconDownload size={20} strokeWidth={1.5} />,
       isLink: false,
+      gradient: "from-neon-orange to-neon-purple"
     },
     {
       name: "Delete Account",
@@ -136,6 +139,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       icon: <IconTrash size={20} strokeWidth={1.5} />,
       destructive: true,
       isLink: false,
+      gradient: "from-red-400 to-red-600"
     },
   ];
 
@@ -148,148 +152,259 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
 
   return (
     <>
+      {/* Mobile Overlay with Frosted Glass Effect */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] md:hidden" 
+        <div className="fixed inset-0 frosted-overlay z-[999] md:hidden animate-fade-in" 
              onClick={handleBackdropClick} />
       )}
 
-      <aside className={`fixed md:sticky left-0 top-0 z-[999] flex   h-screen flex-col bg-[#121212] transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-16" : "md:w-72 w-full"
-      } ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
-        <div className="flex items-center justify-between p-4">
+      {/* Main Sidebar with Liquid Glass Design */}
+      <aside className={`fixed md:sticky left-0 top-0 z-[1000] flex h-screen flex-col glass-sidebar transition-all duration-500 ease-liquid ${
+        isCollapsed ? "w-20" : "md:w-80 w-full"
+      } ${
+        isOpen ? "translate-x-0 animate-slide-in-right" : "-translate-x-full md:translate-x-0"
+      }`}>
+        
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-glass-white/5 via-transparent to-glass-white/10 animate-liquid-gradient" />
+        
+        {/* Header Section */}
+        <div className="relative flex items-center justify-between p-6 border-b border-glass-white/20">
           {!isCollapsed && (
-            <span className="text-xl font-bold text-lime-500">{APP_NAME}</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-neon-blue to-neon-purple p-0.5">
+                <div className="w-full h-full rounded-lg glass flex items-center justify-center">
+                  <span className="text-sm font-bold text-glass">S</span>
+                </div>
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent uppercase tracking-wider">
+                {APP_NAME}
+              </span>
+            </div>
           )}
-          <button
-            onClick={isCollapsed ? toggleCollapse : onClose} title="open"
-            className={`rounded-full p-2 hover:bg-zinc-800 ${isCollapsed ? "mx-auto" : "md:hidden"}`} 
-          >
-            {isCollapsed ? (
-              <IconLayoutSidebar  className="h-5 w-5 text-zinc-400" />
-            ) : (
-              <IconX className="h-5 w-5 text-zinc-400" />
-            )}
-          </button>
-          {!isCollapsed && (
-            <button title="close"
-              onClick={toggleCollapse}
-              className="hidden md:block rounded-full p-2 hover:bg-zinc-800"
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={isCollapsed ? toggleCollapse : onClose}
+              title={isCollapsed ? "Expand" : "Close"}
+              className={`glass-button p-3 rounded-xl neon-glow glass-focus ${
+                isCollapsed ? "mx-auto" : "md:hidden"
+              }`}
             >
-              <IconChevronLeft className="h-5 w-5 text-zinc-400" />
+              {isCollapsed ? (
+                <IconLayoutSidebar className="h-5 w-5 text-glass" />
+              ) : (
+                <IconX className="h-5 w-5 text-glass" />
+              )}
             </button>
-          )}
-        </div>
-        <nav className="flex-1 space-y-1 p-2">
-  {navItems.map((item) => {
-    const isActive = location.pathname === item.path;
-    return (
-      <Link
-        key={item.name}
-        to={item.path}
-        onClick={() => {
-          if (item.isLink) navigate(item.path);
-          if (onClose) onClose(); // Close the sidebar
-          if (item.onClick) item.onClick();
-        }}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-          isActive
-            ? "bg-zinc-800 text-white"
-            : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-        } ${item.destructive ? "text-red-400 hover:text-red-400" : ""}`}
-        title={item.name}
-      >
-        <span className="flex-shrink-0">{item.icon}</span>
-        {!isCollapsed && <span>{item.name}</span>}
-      </Link>
-    );
-  })}
-</nav>
-
-
-        <div className="mt-auto border-t border-zinc-800 p-4">
-          <div className="flex items-center gap-3">
-            <img
-              src={photoError ? "/default-profile.jpeg" : user?.photoURL}
-              alt="Profile"
-              className="h-8 w-8 rounded-full"
-              onError={() => setPhotoError(true)}
-            />
+            
             {!isCollapsed && (
-              <div className="flex flex-1 items-center justify-between">
-                <span className="text-sm font-medium text-white">
-                  {user?.displayName?.split(" ")[0] || "User"}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="rounded-full p-1.5 hover:bg-zinc-800"
+              <button
+                title="Collapse"
+                onClick={toggleCollapse}
+                className="hidden md:block glass-button p-3 rounded-xl glass-focus"
+              >
+                <IconChevronLeft className="h-5 w-5 text-glass" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation Section */}
+        <nav className="flex-1 p-4 space-y-2 relative overflow-y-auto">
+          {navItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                onClick={() => {
+                  if (item.isLink) navigate(item.path);
+                  if (onClose) onClose();
+                  if (item.onClick) item.onClick();
+                }}
+                className={`group relative flex items-center gap-4 rounded-glass px-4 py-4 transition-all duration-300 liquid-interactive ${
+                  isActive
+                    ? "glass-strong neon-glow text-glass"
+                    : "glass-soft hover:glass-strong text-glass/80 hover:text-glass"
+                } ${
+                  item.destructive ? "hover:border-red-400/50" : ""
+                }`}
+                title={item.name}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {/* Icon with Gradient Effect */}
+                <div className={`flex-shrink-0 p-2 rounded-lg bg-gradient-to-br ${item.gradient} bg-opacity-20`}>
+                  <div className="text-glass group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
+                  </div>
+                </div>
+                
+                {/* Navigation Text */}
+                {!isCollapsed && (
+                  <div className="flex-1">
+                    <span className="font-medium text-glass group-hover:text-white transition-colors duration-300">
+                      {item.name}
+                    </span>
+                    {isActive && (
+                      <div className="mt-1 h-0.5 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full animate-pulse-glow" />
+                    )}
+                  </div>
+                )}
+                
+                {/* Hover Effect */}
+                <div className="absolute inset-0 rounded-glass bg-gradient-to-r from-transparent via-glass-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* User Profile Section */}
+        <div className="relative mt-auto border-t border-glass-white/20 p-4">
+          <div className="glass-soft rounded-glass p-4">
+            <div className="flex items-center gap-4">
+              {/* Profile Picture with Glass Frame */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-neon-blue to-neon-purple">
+                  <img
+                    src={photoError ? "/default-profile.jpeg" : user?.photoURL}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                    onError={() => setPhotoError(true)}
+                  />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-br from-neon-green to-neon-blue rounded-full animate-pulse-glow" />
+              </div>
+              
+              {!isCollapsed && (
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-glass text-sm truncate">
+                        {user?.displayName?.split(" ")[0] || "User"}
+                      </p>
+                      <p className="text-glass/60 text-xs truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="glass-button p-2 rounded-lg neon-glow glass-focus"
+                      title="Logout"
+                    >
+                      <IconLogout className="h-4 w-4 text-glass" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {!isCollapsed && (
+              <div className="mt-4 flex justify-between text-xs">
+                <a 
+                  href="https://github.com/adarshgajbhare" 
+                  target="_blank"
+                  className="text-glass/60 hover:text-neon-blue transition-colors duration-300 font-medium"
                 >
-                  <IconLogout title="logout" className="h-5 w-5 text-zinc-400" />
-                </button>
+                  ABOUT US
+                </a>
+                <a 
+                  href="https://adarshh.vercel.app/" 
+                  target="_blank"
+                  className="text-glass/60 hover:text-neon-purple transition-colors duration-300 font-medium"
+                >
+                  CONTACT US
+                </a>
               </div>
             )}
           </div>
-          {!isCollapsed && (
-            <div className="mt-4 flex justify-between">
-              <a href="https://github.com/adarshgajbhare" target="_blank" className="text-xs text-zinc-400 hover:text-white">ABOUT US</a>
-              <a href="https://adarshh.vercel.app/" target="_blank"  className="text-xs text-zinc-400 hover:text-white">CONTACT US</a>
-            </div>
-          )}
         </div>
       </aside>
 
+      {/* Logout Modal with Glass Design */}
       {showLogoutModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999]">
-          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold text-white mb-4">Confirm Logout</h2>
-            <p className="text-zinc-400 mb-4">Are you sure you want to log out?</p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmLogout}
-                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
-              >
-                Logout
-              </button>
+        <div className="fixed inset-0 frosted-overlay flex items-center justify-center z-[1001] animate-fade-in">
+          <div className="glass-modal p-8 max-w-md w-full mx-4 animate-slide-in-bottom">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-neon-orange to-neon-pink p-0.5">
+                <div className="w-full h-full rounded-full glass flex items-center justify-center">
+                  <IconLogout className="h-8 w-8 text-glass" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-glass mb-4">Confirm Logout</h2>
+              <p className="text-glass/80 mb-8">Are you sure you want to log out?</p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 glass-button px-6 py-3 rounded-glass text-glass font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="flex-1 glass-button px-6 py-3 rounded-glass bg-gradient-to-r from-red-400/20 to-red-600/20 border-red-400/50 text-red-300 font-medium neon-glow"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* Delete Account Modal with Glass Design */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999] ">
-          <div className="bg-zinc-900 p-6 rounded-lg max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <IconAlertTriangle className="h-5 w-5 text-red-500" />
-              <h2 className="text-xl font-semibold text-white">Delete Account</h2>
-            </div>
-            <p className="text-zinc-400 mb-4">
-              Are you absolutely sure you want to delete your account? This action cannot be undone.
-            </p>
-            <ul className="list-disc list-inside text-zinc-400 mb-4 space-y-1">
-              <li>All your saved feeds</li>
-              <li>Your playlists</li>
-              <li>Your watch history</li>
-              <li>Your liked videos</li>
-              <li>All personalized settings</li>
-            </ul>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeleteAccount}
-                className="px-4 py-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
-              >
-                Delete Account
-              </button>
+        <div className="fixed inset-0 frosted-overlay flex items-center justify-center z-[1001] animate-fade-in">
+          <div className="glass-modal p-8 max-w-md w-full mx-4 animate-slide-in-bottom">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-400 to-red-600 p-0.5">
+                <div className="w-full h-full rounded-full glass flex items-center justify-center">
+                  <IconAlertTriangle className="h-8 w-8 text-red-400" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-glass mb-4">Delete Account</h2>
+              <p className="text-glass/80 mb-6">
+                Are you absolutely sure you want to delete your account? This action cannot be undone.
+              </p>
+              <div className="glass-soft rounded-glass p-4 mb-6 text-left">
+                <p className="text-sm text-glass/80 mb-3 font-medium">This will permanently delete:</p>
+                <ul className="text-sm text-glass/70 space-y-2">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    All your saved feeds
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    Your playlists
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    Your watch history
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    Your liked videos
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    All personalized settings
+                  </li>
+                </ul>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 glass-button px-6 py-3 rounded-glass text-glass font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteAccount}
+                  className="flex-1 glass-button px-6 py-3 rounded-glass bg-gradient-to-r from-red-400/20 to-red-600/20 border-red-400/50 text-red-300 font-medium neon-glow"
+                >
+                  Delete Account
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -297,4 +412,3 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     </>
   );
 }
-

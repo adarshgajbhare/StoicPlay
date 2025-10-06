@@ -2,14 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Variables for iOS 26 Liquid Glass Theme */
+:root {
+  /* Base Colors */
+  --liquid-black: #000000;
+  --liquid-dark: #0a0a0b;
+  --liquid-darker: #050506;
+  --liquid-surface: #1c1c1e;
+  --liquid-surface-light: #2c2c2e;
+  
+  /* Glass Variables */
+  --glass-bg: rgba(28, 28, 30, 0.68);
+  --glass-bg-strong: rgba(28, 28, 30, 0.85);
+  --glass-bg-subtle: rgba(28, 28, 30, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  --glass-border-subtle: rgba(255, 255, 255, 0.08);
+  
+  /* iOS 26 System Colors */
+  --ios-blue: #409CFF;
+  --ios-purple: #AF52DE;
+  --ios-pink: #FF375F;
+  --ios-green: #34C759;
+  --ios-orange: #FF9F0A;
+  --ios-red: #FF3B30;
+  --ios-yellow: #FFCC02;
+  --ios-teal: #64D2FF;
+  --ios-indigo: #5856D6;
+  
+  /* Text Colors */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --text-quaternary: rgba(255, 255, 255, 0.35);
+  --text-accent: var(--ios-blue);
+  
+  /* Shadow Variables */
+  --shadow-glass-subtle: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-glass-soft: 0 4px 16px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-glass-medium: 0 8px 32px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-glass-strong: 0 16px 64px rgba(0, 0, 0, 0.35), 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-neon-blue: 0 0 20px rgba(64, 156, 255, 0.25), 0 0 40px rgba(64, 156, 255, 0.15);
+  --shadow-neon-blue-strong: 0 0 30px rgba(64, 156, 255, 0.4), 0 0 60px rgba(64, 156, 255, 0.25);
+  
+  /* Border Radius */
+  --radius-ios: 12px;
+  --radius-ios-lg: 20px;
+  --radius-ios-xl: 28px;
+  
+  /* Transitions */
+  --transition-liquid: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset & Base Styles */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-textarea:not([rows]) {
-  min-height: 10em;
 }
 
 * {
@@ -17,110 +69,288 @@ textarea:not([rows]) {
   padding: 0;
   font: inherit;
   min-width: 0;
-  /* user-select: none; */
 }
 
 html {
-  -webkit-font-smoothing: antialiased; /* Smoother fonts for Webkit browsers */
-  -moz-osx-font-smoothing: grayscale; /* Better font rendering for macOS */
-  font-display: swap; /* Load text immediately with fallback fonts */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-display: swap;
   scroll-behavior: smooth;
   -moz-text-size-adjust: none;
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
+  /* Force dark mode */
+  color-scheme: dark;
+}
+
+body {
+  container-type: inline-size;
+  min-height: 100svh;
+  background: var(--liquid-black);
+  color: var(--text-primary);
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.6;
+  /* iOS 26 Liquid Glass base background */
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(64, 156, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(175, 82, 222, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 55, 95, 0.02) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 body,
-h1,
-h2,
-h3,
-h4,
-p,
-figure,
-blockquote,
-dl,
-dd {
+h1, h2, h3, h4, p,
+figure, blockquote,
+dl, dd {
   margin-block-end: 0;
 }
 
-h1,
-h2,
-h3,
-h4,
-button,
-input,
-label {
+h1, h2, h3, h4,
+button, input, label {
   line-height: 1.1;
 }
 
-
-/* Hide scrollbar but allow scrolling */
-.popover {
-  overflow: auto;
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+/* Typography Enhancements */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
-/* For Chrome, Edge, and Safari */
+p, li, figcaption {
+  max-width: 70ch;
+  color: var(--text-secondary);
+}
+
+/* Improved Focus States */
+*:focus-visible {
+  outline: 2px solid var(--ios-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection Styles */
+::selection {
+  background: rgba(64, 156, 255, 0.3);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(64, 156, 255, 0.3);
+  color: var(--text-primary);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--liquid-surface);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--glass-border-strong);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) var(--liquid-surface);
+}
+
+/* Enhanced Popover Styles */
+.popover {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-ios-lg);
+  box-shadow: var(--shadow-glass-strong);
+}
+
 .popover::-webkit-scrollbar {
   display: none;
-} 
+}
 
+/* List Styles */
 ul[role="list"],
 ol[role="list"] {
   list-style: none;
 }
 
-body {
-  container-type: inline-size; /* Use max-width for container */
-  min-height: 100svh; /* Full height */
-}
-
-img,
-picture,
-svg,
-video {
+/* Image & Media */
+img, picture, svg, video {
   display: block;
   max-width: 100%;
+  border-radius: var(--radius-ios);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  text-wrap: balance; /* Prevents text from overflowing */
+/* Form Elements */
+input, textarea, select {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-ios);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
-p,
-li,
-figcaption {
-  max-width: 70ch; /* Limit text width */
-   /* Better text wrapping */
+input:focus, textarea:focus, select:focus {
+  background: var(--glass-bg-strong);
+  border-color: var(--ios-blue);
+  box-shadow: 0 0 0 3px rgba(64, 156, 255, 0.15);
 }
 
-@font-face {
-  /* font-family: "Geist";
-  src: url("/geist-var-web.woff2") format("woff2"); */
-  /* font-display: swap; */
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
 }
 
-:root {
-  font-family: Inter, sans-serif;
-  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
-}
-@supports (font-variation-settings: normal) {
-  :root { font-family: InterVariable, sans-serif; }
+textarea:not([rows]) {
+  min-height: 10em;
+  resize: vertical;
 }
 
-@keyframes wiggle {
+/* Button Base Styles */
+button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  transition: all var(--transition-fast);
+}
+
+/* Utility Classes */
+.liquid-text-primary {
+  color: var(--text-primary);
+}
+
+.liquid-text-secondary {
+  color: var(--text-secondary);
+}
+
+.liquid-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.liquid-text-accent {
+  color: var(--text-accent);
+}
+
+.liquid-bg-surface {
+  background-color: var(--liquid-surface);
+}
+
+.liquid-bg-surface-light {
+  background-color: var(--liquid-surface-light);
+}
+
+/* Enhanced Loading States */
+@keyframes liquidPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes liquidSpin {
   0% { transform: rotate(0deg); }
-  25% { transform: rotate(-1deg); }
-  75% { transform: rotate(1deg); }
-  100% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.animate-wiggle {
-  animation: wiggle 0.3s ease-in-out infinite;
+.liquid-pulse {
+  animation: liquidPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.liquid-spin {
+  animation: liquidSpin 1s linear infinite;
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-border-strong: rgba(255, 255, 255, 0.35);
+    --text-secondary: rgba(255, 255, 255, 0.85);
+    --text-tertiary: rgba(255, 255, 255, 0.70);
+  }
+}
+
+/* Print Styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Font Loading Optimization */
+@font-face {
+  font-family: 'SF Pro Display';
+  font-display: swap;
+  font-weight: 400 700;
+}
+
+/* Root Font Configuration */
+:root {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-variation-settings: normal;
+}
+
+/* Legacy Webkit Smoothing */
+@supports (font-variation-settings: normal) {
+  :root { 
+    font-family: 'SF Pro Display Variable', -apple-system, BlinkMacSystemFont, system-ui, InterVariable, sans-serif; 
+  }
+}
+
+/* Animation Performance */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Glass morphism effects for better performance */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Custom properties for dynamic theming */
+[data-theme="liquid-glass"] {
+  --primary-glass: var(--glass-bg);
+  --primary-border: var(--glass-border);
+  --primary-shadow: var(--shadow-glass-soft);
+  --primary-text: var(--text-primary);
 }

@@ -27,6 +27,7 @@ function SearchPopover({
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
   const [activeTab, setActiveTab] = useState("channels");
+  const [addingChannels, setAddingChannels] = useState(new Set());
 
   const searchChannels = async (query) => {
     try {
@@ -38,44 +39,82 @@ function SearchPopover({
   };
 
   const addChannelToFeed = async (channelId, channelTitle) => {
-    if (!user) return;
+    if (!user || !channelId || addingChannels.has(channelId)) return;
 
     try {
+      // Add to processing set to prevent duplicate additions
+      setAddingChannels(prev => new Set(prev.add(channelId)));
       setIsLoading(true);
-      const channelDetail = await fetchChannelDetails(channelId);
+      
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
-      if (userDocSnap.exists()) {
-        const updatedFeeds = userDocSnap.data().feeds.map((feed) => {
-          if (feed.name === feedName) {
-            return {
-              ...feed,
-              channels: [...(feed.channels || []), { channelId, channelTitle }],
-            };
-          }
-          return feed;
-        });
-        await updateDoc(userDocRef, { feeds: updatedFeeds });
-      } else {
-        await setDoc(userDocRef, {
-          feeds: [{ name: feedName, channels: [{ channelId, channelTitle }] }],
-        });
+      if (!userDocSnap.exists()) {
+        console.error("User document does not exist");
+        return;
       }
 
+      const userData = userDocSnap.data();
+      const currentFeeds = userData.feeds || [];
+      const targetFeed = currentFeeds.find(feed => feed.name === feedName);
+      
+      if (!targetFeed) {
+        console.error(`Feed '${feedName}' not found`);
+        return;
+      }
+
+      // Check if channel is already in the feed
+      const existingChannel = targetFeed.channels?.find(ch => ch.channelId === channelId);
+      if (existingChannel) {
+        console.log(`Channel '${channelTitle}' is already in the feed`);
+        return;
+      }
+
+      // Fetch channel details first
+      const channelDetail = await fetchChannelDetails(channelId);
+      
+      // Update the feed with the new channel
+      const updatedFeeds = currentFeeds.map((feed) => {
+        if (feed.name === feedName) {
+          return {
+            ...feed,
+            channels: [...(feed.channels || []), { channelId, channelTitle }],
+          };
+        }
+        return feed;
+      });
+
+      // Save to Firebase
+      await updateDoc(userDocRef, { feeds: updatedFeeds });
+
+      // Update local state
       setFeedChannels((prev) => ({ ...prev, [channelId]: channelTitle }));
       setChannelDetails((prev) => ({ ...prev, [channelId]: channelDetail }));
       setSearchResults([]);
       setHasChannels(true);
       setVideos([]);
 
-      if (onChannelAdded) onChannelAdded();
-      await loadChannelDetails();
+      // Notify parent component and reload data
+      if (onChannelAdded) {
+        setTimeout(() => {
+          onChannelAdded();
+        }, 100);
+      }
+      
+      // Close the popover after successful addition
       onClose();
+      
     } catch (error) {
-      console.error("Error adding channel:", error);
+      console.error("Error adding channel to feed:", error);
+      // Show user-friendly error message here if needed
     } finally {
       setIsLoading(false);
+      // Remove from processing set
+      setAddingChannels(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(channelId);
+        return newSet;
+      });
     }
   };
 
@@ -143,13 +182,14 @@ function SearchPopover({
                     </div>
                   </div>
 
-                  <div className="overflow-y-auto  popover  max-h-[60vh] pr-2 -mr-2">
+                  <div className="overflow-y-auto popover max-h-[60vh] pr-2 -mr-2">
                     <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {searchResults.map((channel) => (
                         <ChannelCard
                           key={channel.id.channelId}
                           channel={channel}
                           onAddChannel={addChannelToFeed}
+                          isAdding={addingChannels.has(channel.id.channelId)}
                         />
                       ))}
                     </motion.div>

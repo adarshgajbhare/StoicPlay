@@ -31,19 +31,29 @@ export const handleFeedImage = async (file) => {
 
 export const loadHomeFeeds = async (user, setFeeds) => {
   if (user) {
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-    if (userDocSnap.exists()) {
-      setFeeds(userDocSnap.data().feeds || []);
-    } else {
-      console.log("No such document! Creating a new one...");
+      if (userDocSnap.exists()) {
+        const feeds = userDocSnap.data().feeds || [];
+        setFeeds(feeds);
+      } else {
+        console.log("No such document! Creating a new one...");
+        setFeeds([]);
+      }
+    } catch (error) {
+      console.error("Error loading feeds:", error);
       setFeeds([]);
     }
   }
 };
 
 export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFile) => {
+  if (!user || !feedName) {
+    throw new Error("User and feed name are required");
+  }
+
   try {
     let imageUrl = "/default-thumb.webp";
     
@@ -61,7 +71,7 @@ export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFi
     }
 
     const newFeed = { 
-      name: feedName, 
+      name: feedName.trim(), 
       image: imageUrl, 
       channels: [] 
     };
@@ -70,6 +80,18 @@ export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFi
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
+      const currentData = userDocSnap.data();
+      const existingFeeds = currentData.feeds || [];
+      
+      // Check for duplicate feed names
+      const duplicateFeed = existingFeeds.find(feed => 
+        feed.name.toLowerCase().trim() === feedName.toLowerCase().trim()
+      );
+      
+      if (duplicateFeed) {
+        throw new Error(`Feed with name "${feedName}" already exists`);
+      }
+
       await updateDoc(userDocRef, {
         feeds: arrayUnion(newFeed)
       });
@@ -79,9 +101,13 @@ export const handleAddHomeFeed = async (user, feeds, setFeeds, feedName, imageFi
       });
     }
 
-    // Fix: Ensure feeds is always treated as an array
-    const currentFeeds = Array.isArray(feeds) ? feeds : [];
-    setFeeds([...currentFeeds, newFeed]);
+    // Only call setFeeds if it's provided (for backwards compatibility)
+    if (typeof setFeeds === 'function') {
+      const currentFeeds = Array.isArray(feeds) ? feeds : [];
+      setFeeds([...currentFeeds, newFeed]);
+    }
+
+    return newFeed;
   } catch (error) {
     console.error("Error adding feed:", error);
     throw error;
@@ -108,7 +134,7 @@ export const handleUpdateHomeFeed = async (user, feeds, setFeeds, oldName, newNa
       feeds: arrayUnion(newFeed),
     });
 
-    setFeeds(updatedFeeds);
+    if (setFeeds) setFeeds(updatedFeeds);
   }
 };
 
@@ -122,38 +148,46 @@ export const loadFeedData = async (
   setHasChannels,
   setInitialLoad
 ) => {
-  if (user) {
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
+  if (!user || !feedName) {
+    resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
+    return;
+  }
 
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        const thisFeed = userData.feeds.find((feed) => feed.name === feedName);
+  try {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
 
-        if (thisFeed) {
-          setCurrentFeed(thisFeed);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      const feeds = userData.feeds || [];
+      const thisFeed = feeds.find((feed) => feed.name === feedName);
 
-          // Create a channels object in one go
-          const channels = thisFeed.channels.reduce((acc, channel) => {
-            acc[channel?.channelId] = channel?.channelTitle;
-            return acc;
-          }, {});
+      if (thisFeed) {
+        setCurrentFeed(thisFeed);
 
-          setFeedChannels(channels);
-          setHasChannels(thisFeed.channels.length > 0);
-        } else {
-          // If feed does not exist, reset states
-          resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
-        }
+        // Create a channels object in one go
+        const channels = (thisFeed.channels || []).reduce((acc, channel) => {
+          if (channel?.channelId && channel?.channelTitle) {
+            acc[channel.channelId] = channel.channelTitle;
+          }
+          return acc;
+        }, {});
+
+        setFeedChannels(channels);
+        setHasChannels(Object.keys(channels).length > 0);
+        setInitialLoad(false);
       } else {
-        console.log("No such document!");
+        // If feed does not exist, reset states
+        console.warn(`Feed '${feedName}' not found`);
         resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
       }
-    } catch (error) {
-      console.error("Error loading feed data:", error);
+    } else {
+      console.log("User document does not exist!");
       resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
     }
+  } catch (error) {
+    console.error("Error loading feed data:", error);
+    resetFeedStates(setFeedChannels, setHasChannels, setInitialLoad);
   }
 };
 

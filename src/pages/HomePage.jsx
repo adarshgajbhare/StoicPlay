@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../contexts/AuthContext";
+import { fetchFeeds, addFeed, deleteFeeds, shareFeeds } from "../store/feedsSlice";
 import AddFeedModal from "../components/AddFeedModal";
 import EditFeedModal from "../components/EditFeedModal";
 import ImportFeedModal from "../components/ImportFeedModal";
@@ -17,8 +19,6 @@ import {
   IconArrowBack,
 } from "@tabler/icons-react";
 import {
-  loadHomeFeeds,
-  handleAddHomeFeed,
   handleUpdateHomeFeed,
   handleDeleteFeed,
   handleShareMultipleFeeds,
@@ -28,10 +28,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function HomePage() {
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const { items: feeds, isLoading } = useSelector(state => state.feeds);
+  
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
-  const [feeds, setFeeds] = useState([]);
   const [editingFeed, setEditingFeed] = useState(null);
   const [isShareMode, setIsShareMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -42,14 +44,23 @@ function HomePage() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
-    loadHomeFeeds(user, setFeeds);
-  }, [user]);
+    if (user) {
+      dispatch(fetchFeeds(user));
+    }
+  }, [user, dispatch]);
 
-  const handleAddFeed = async (feedName, imageUrl) => {
-    await handleAddHomeFeed(user, feeds, setFeeds, feedName, imageUrl);
-    setToastMessage("New feed created successfully");
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  const handleAddFeed = async (feedName, imageFile) => {
+    try {
+      await dispatch(addFeed({ user, feedName, imageFile })).unwrap();
+      setToastMessage("New feed created successfully");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error("Error creating feed:", error);
+      setToastMessage("Error creating feed. Please try again.");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
   };
 
   const handleUpdateFeed = async (
@@ -61,7 +72,10 @@ function HomePage() {
     await handleUpdateHomeFeed(
       user,
       feeds,
-      setFeeds,
+      (updatedFeeds) => {
+        // Refresh feeds from server after update
+        dispatch(fetchFeeds(user));
+      },
       oldName,
       newName,
       newImageUrl,
@@ -134,7 +148,8 @@ function HomePage() {
   };
 
   const handleImportFeed = async (importedFeed) => {
-    setFeeds([...feeds, importedFeed]);
+    // Refresh feeds after import
+    dispatch(fetchFeeds(user));
     setToastMessage("Feed imported successfully");
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
@@ -143,33 +158,22 @@ function HomePage() {
   const confirmDelete = async () => {
     const feedsArray = Array.from(feedsToDelete);
     try {
-      await handleDeleteFeed(
-        user,
-        feedsArray,
-        () => {
-          setFeeds((currentFeeds) =>
-            currentFeeds.filter((feed) => !feedsToDelete.has(feed.name))
-          );
-          setToastMessage(
-            `Successfully deleted ${feedsArray.length} feed${
-              feedsArray.length > 1 ? "s" : ""
-            }`
-          );
-          setShowToast(true);
-        },
-        (error) => {
-          console.error("Error deleting feeds:", error);
-          setToastMessage("Error deleting feeds. Please try again.");
-          setShowToast(true);
-        }
+      await dispatch(deleteFeeds({ user, feedNames: feedsArray })).unwrap();
+      setToastMessage(
+        `Successfully deleted ${feedsArray.length} feed${
+          feedsArray.length > 1 ? "s" : ""
+        }`
       );
-
+      setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
       setFeedsToDelete(new Set());
       setIsDeleteMode(false);
       setShowDeleteConfirmation(false);
     } catch (error) {
-      console.error("Error in deletion process:", error);
+      console.error("Error deleting feeds:", error);
+      setToastMessage("Error deleting feeds. Please try again.");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 

@@ -98,17 +98,19 @@ function FeedPage() {
 
       for (const channelId in feedChannels) {
         try {
-          // Fetch only the latest video (maxResults = 1)
-          const result = await fetchChannelVideos(channelId, null, 1);
+          // Fetch latest videos (maxResults = 3 for better selection while keeping it efficient)
+          const result = await fetchChannelVideos(channelId, null, 3);
           if (result.videos && Array.isArray(result.videos)) {
-            result.videos.forEach((video) => {
-              video.channelDetails = channelDetailsMap[channelId];
-              allVideos.push(video);
-            });
+            // Take only the first/latest video from each channel for initial display
+            const latestVideo = result.videos[0];
+            if (latestVideo) {
+              latestVideo.channelDetails = channelDetailsMap[channelId];
+              allVideos.push(latestVideo);
+            }
             
             // Store pagination info for each channel
             pageTokens[channelId] = result.nextPageToken;
-            hasMoreData[channelId] = result.hasMore;
+            hasMoreData[channelId] = result.hasMore || result.videos.length > 1; // Has more if API says so OR if we got multiple videos
           }
         } catch (error) {
           console.error(
@@ -153,11 +155,11 @@ function FeedPage() {
         if (!channelsHasMore[channelId]) continue;
         
         try {
-          // Fetch next batch of videos for this channel (maxResults = 10 for load more)
+          // Fetch next batch of videos for this channel (maxResults = 15 for load more)
           const result = await fetchChannelVideos(
             channelId, 
             channelPageTokens[channelId], 
-            10
+            15
           );
           
           if (result.videos && Array.isArray(result.videos)) {
@@ -337,6 +339,15 @@ function FeedPage() {
         ) : isLoading ? (
           <div className="flex justify-center items-center h-20">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+          </div>
+        ) : filteredVideos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-40 text-white/60">
+            <p className="text-lg mb-2">No videos found</p>
+            <p className="text-sm text-center">
+              {selectedChannel 
+                ? `No videos available for ${feedChannels[selectedChannel]}` 
+                : "Try adding more channels or check back later"}
+            </p>
           </div>
         ) : (
           <>

@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import EmptyFeedCallToAction from "../components/EmptyFeedCallToAction";
 import SearchPopover from "../components/SearchPopover";
-import { IconChevronLeft, IconPlus, IconEdit, IconLoader } from "@tabler/icons-react";
+import { IconChevronLeft, IconPlus, IconEdit } from "@tabler/icons-react";
 import ChannelSidebar from "../components/ChannelSidebar";
 import {
   loadFeedData,
@@ -27,16 +27,18 @@ function FeedPage() {
   const [filteredVideos, setFilteredVideos] = useState([]);
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasChannels, setHasChannels] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [feedChannels, setFeedChannels] = useState({});
   const [channelDetails, setChannelDetails] = useState({});
-  const [channelPageTokens, setChannelPageTokens] = useState({}); // Track pagination tokens for each channel
-  const [channelsHasMore, setChannelsHasMore] = useState({}); // Track if each channel has more videos
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSearchPopoverOpen, setIsSearchPopoverOpen] = useState(false);
   const [currentFeed, setCurrentFeed] = useState(null);
+  const [currentDateRange, setCurrentDateRange] = useState({
+    start: new Date(new Date().setDate(new Date().getDate() - 15)),
+    end: new Date(),
+  });
+  const [hasMoreVideos, setHasMoreVideos] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(true);
 
@@ -86,42 +88,37 @@ function FeedPage() {
       }
     }
     setChannelDetails(details);
-    loadInitialFeedVideos(details);
+    loadFeedVideos(details);
   };
 
-  const loadInitialFeedVideos = async (channelDetailsMap) => {
+  const loadFeedVideos = async (channelDetailsMap, loadMore = false) => {
     setIsLoading(true);
     try {
-      let allVideos = [];
-      const pageTokens = {};
-      const hasMoreData = {};
+      let allVideos = loadMore ? [...videos] : [];
 
       for (const channelId in feedChannels) {
         try {
-          // Fetch latest videos (maxResults = 3 for better selection while keeping it efficient)
-          const result = await fetchChannelVideos(channelId, null, 3);
-          if (result.videos && Array.isArray(result.videos)) {
-            // Take only the first/latest video from each channel for initial display
-            const latestVideo = result.videos[0];
-            if (latestVideo) {
-              latestVideo.channelDetails = channelDetailsMap[channelId];
-              allVideos.push(latestVideo);
-            }
-            
-            // Store pagination info for each channel
-            pageTokens[channelId] = result.nextPageToken;
-            hasMoreData[channelId] = result.hasMore || result.videos.length > 1; // Has more if API says so OR if we got multiple videos
+          const channelVideos = await fetchChannelVideos(channelId);
+          if (Array.isArray(channelVideos)) {
+            channelVideos.forEach((video) => {
+              const publishedDate = new Date(video.snippet?.publishedAt);
+              if (
+                publishedDate >= currentDateRange.start &&
+                publishedDate <= currentDateRange.end
+              ) {
+                video.channelDetails = channelDetailsMap[channelId];
+                allVideos.push(video);
+              }
+            });
           }
         } catch (error) {
           console.error(
             `Error fetching videos for channel ${channelId}:`,
             error
           );
-          hasMoreData[channelId] = false;
         }
       }
 
-      // Sort videos by published date (newest first)
       allVideos.sort(
         (a, b) =>
           new Date(b.snippet?.publishedAt || 0) -
@@ -129,10 +126,9 @@ function FeedPage() {
       );
 
       setVideos(allVideos);
-      setChannelPageTokens(pageTokens);
-      setChannelsHasMore(hasMoreData);
+      setHasMoreVideos(allVideos.length > 0);
     } catch (error) {
-      console.error("Error loading initial feed videos:", error);
+      console.error("Error loading feed videos:", error);
       setVideos([]);
     } finally {
       setIsLoading(false);
@@ -140,81 +136,10 @@ function FeedPage() {
     }
   };
 
-  const loadMoreVideos = async () => {
-    if (isLoadingMore) return;
-    
-    setIsLoadingMore(true);
-    try {
-      let newVideos = [];
-      const updatedPageTokens = { ...channelPageTokens };
-      const updatedHasMore = { ...channelsHasMore };
-      let hasAnyNewVideo = false;
-
-      for (const channelId in feedChannels) {
-        // Skip channels that don't have more videos
-        if (!channelsHasMore[channelId]) continue;
-        
-        try {
-          // Fetch next batch of videos for this channel (maxResults = 15 for load more)
-          const result = await fetchChannelVideos(
-            channelId, 
-            channelPageTokens[channelId], 
-            15
-          );
-          
-          if (result.videos && Array.isArray(result.videos)) {
-            result.videos.forEach((video) => {
-              video.channelDetails = channelDetails[channelId];
-              newVideos.push(video);
-            });
-            
-            // Update pagination info
-            updatedPageTokens[channelId] = result.nextPageToken;
-            updatedHasMore[channelId] = result.hasMore;
-            
-            if (result.videos.length > 0) {
-              hasAnyNewVideo = true;
-            }
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching more videos for channel ${channelId}:`,
-            error
-          );
-          updatedHasMore[channelId] = false;
-        }
-      }
-
-      if (hasAnyNewVideo) {
-        // Combine with existing videos and sort
-        const combinedVideos = [...videos, ...newVideos];
-        combinedVideos.sort(
-          (a, b) =>
-            new Date(b.snippet?.publishedAt || 0) -
-            new Date(a.snippet?.publishedAt || 0)
-        );
-        
-        setVideos(combinedVideos);
-      }
-      
-      setChannelPageTokens(updatedPageTokens);
-      setChannelsHasMore(updatedHasMore);
-    } catch (error) {
-      console.error("Error loading more videos:", error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  };
-
-  // Check if any channel has more videos to load
-  const hasMoreVideosToLoad = Object.values(channelsHasMore).some(hasMore => hasMore);
-
   const handleChannelAdded = () => {
     setFeedChannels({});
     setChannelDetails({});
     setVideos([]);
-    setChannelPageTokens({});
-    setChannelsHasMore({});
     setIsLoading(true);
     setTimeout(() => {
       loadFeedData(
@@ -340,47 +265,16 @@ function FeedPage() {
           <div className="flex justify-center items-center h-20">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
           </div>
-        ) : filteredVideos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-40 text-white/60">
-            <p className="text-lg mb-2">No videos found</p>
-            <p className="text-sm text-center">
-              {selectedChannel 
-                ? `No videos available for ${feedChannels[selectedChannel]}` 
-                : "Try adding more channels or check back later"}
-            </p>
-          </div>
         ) : (
-          <>
-            <div className={`grid ${getGridColumns()} gap-6 md:p-4 p-0 transition-all duration-300`}>
-              {filteredVideos.map((video) => (
-                <VideoCard
-                  key={video.id?.videoId || video.id}
-                  video={video}
-                  channelDetails={video.channelDetails}
-                />
-              ))}
-            </div>
-            
-            {/* Load More Button */}
-            {hasMoreVideosToLoad && filteredVideos.length > 0 && (
-              <div className="flex justify-center mt-8 mb-4">
-                <button
-                  onClick={loadMoreVideos}
-                  disabled={isLoadingMore}
-                  className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoadingMore ? (
-                    <>
-                      <IconLoader className="animate-spin" size={20} />
-                      Loading...
-                    </>
-                  ) : (
-                    'Load More Videos'
-                  )}
-                </button>
-              </div>
-            )}
-          </>
+          <div className={`grid ${getGridColumns()} gap-6 md:p-4 p-0 transition-all duration-300`}>
+            {filteredVideos.map((video) => (
+              <VideoCard
+                key={video.id?.videoId || video.id}
+                video={video}
+                channelDetails={video.channelDetails}
+              />
+            ))}
+          </div>
         )}
 
         <ChannelSidebar

@@ -77,13 +77,9 @@ export const fetchChannelUploadsPlaylistId = async (channelId) => {
   }
 };
 
-// Updated function to support pagination and ensure we get at least one video
-export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null, maxResults = 5) => {
-  let apiUrl = `${config.youtube.baseUrl}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${config.youtube.apiKey}`;
-  
-  if (pageToken) {
-    apiUrl += `&pageToken=${pageToken}`;
-  }
+export const fetchVideosForChannel = async (uploadsPlaylistId) => {
+  const maxResults = 50;
+  const apiUrl = `${config.youtube.baseUrl}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${config.youtube.apiKey}`;
 
   try {
     const response = await fetch(apiUrl);
@@ -96,16 +92,6 @@ export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null,
       );
     }
     const data = await response.json();
-    
-    // If no items, return empty result
-    if (!data.items || data.items.length === 0) {
-      return {
-        videos: [],
-        nextPageToken: null,
-        hasMore: false
-      };
-    }
-    
     const videoIds = data.items
       .map((item) => item.snippet.resourceId.videoId)
       .join(',');
@@ -122,35 +108,21 @@ export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null,
     }
     const detailsData = await detailsResponse.json();
 
-    // First, try to find videos longer than 60 seconds
-    let filteredVideos = data.items.filter((item) => {
+    const fifteenDaysAgo = new Date();
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
+
+    return data.items.filter((item) => {
       const videoDetails = detailsData.items.find(
         (detail) => detail.id === item.snippet.resourceId.videoId
       );
       if (!videoDetails?.contentDetails) return false;
 
+      const publishedDate = new Date(item.snippet.publishedAt);
       const duration = videoDetails.contentDetails.duration;
       const durationInSeconds = parseDuration(duration);
 
-      return durationInSeconds >= 60;
+      return durationInSeconds >= 60 && publishedDate >= fifteenDaysAgo;
     });
-
-    // If no videos >= 60 seconds and this is the initial load (maxResults <= 5), include all videos
-    if (filteredVideos.length === 0 && maxResults <= 5) {
-      console.log('No videos >= 60 seconds found, including all videos for initial load');
-      filteredVideos = data.items.filter((item) => {
-        const videoDetails = detailsData.items.find(
-          (detail) => detail.id === item.snippet.resourceId.videoId
-        );
-        return !!videoDetails?.contentDetails;
-      });
-    }
-
-    return {
-      videos: filteredVideos,
-      nextPageToken: data.nextPageToken || null,
-      hasMore: !!data.nextPageToken
-    };
   } catch (error) {
     console.error('Error in fetchVideosForChannel:', error);
     throw error;
@@ -199,19 +171,14 @@ export const fetchChannelDetails = async (channelId) => {
   }
 };
 
-// Updated function to support pagination
-export const fetchChannelVideos = async (channelId, pageToken = null, maxResults = 5) => {
+export const fetchChannelVideos = async (channelId) => {
   try {
     const uploadsPlaylistId = await fetchChannelUploadsPlaylistId(channelId);
-    const result = await fetchVideosForChannel(uploadsPlaylistId, pageToken, maxResults);
-    return result;
+    const videos = await fetchVideosForChannel(uploadsPlaylistId);
+    return videos;
   } catch (error) {
     console.error('Error fetching videos for channel:', error);
-    return {
-      videos: [],
-      nextPageToken: null,
-      hasMore: false
-    };
+    return [];
   }
 };
 

@@ -77,8 +77,8 @@ export const fetchChannelUploadsPlaylistId = async (channelId) => {
   }
 };
 
-// Updated function to support pagination and fetch only the latest video initially
-export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null, maxResults = 1) => {
+// Updated function to support pagination and ensure we get at least one video
+export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null, maxResults = 5) => {
   let apiUrl = `${config.youtube.baseUrl}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${maxResults}&key=${config.youtube.apiKey}`;
   
   if (pageToken) {
@@ -122,7 +122,8 @@ export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null,
     }
     const detailsData = await detailsResponse.json();
 
-    const filteredVideos = data.items.filter((item) => {
+    // First, try to find videos longer than 60 seconds
+    let filteredVideos = data.items.filter((item) => {
       const videoDetails = detailsData.items.find(
         (detail) => detail.id === item.snippet.resourceId.videoId
       );
@@ -131,9 +132,19 @@ export const fetchVideosForChannel = async (uploadsPlaylistId, pageToken = null,
       const duration = videoDetails.contentDetails.duration;
       const durationInSeconds = parseDuration(duration);
 
-      // Only filter by duration (>=60 seconds), remove date filtering
       return durationInSeconds >= 60;
     });
+
+    // If no videos >= 60 seconds and this is the initial load (maxResults <= 5), include all videos
+    if (filteredVideos.length === 0 && maxResults <= 5) {
+      console.log('No videos >= 60 seconds found, including all videos for initial load');
+      filteredVideos = data.items.filter((item) => {
+        const videoDetails = detailsData.items.find(
+          (detail) => detail.id === item.snippet.resourceId.videoId
+        );
+        return !!videoDetails?.contentDetails;
+      });
+    }
 
     return {
       videos: filteredVideos,
@@ -189,7 +200,7 @@ export const fetchChannelDetails = async (channelId) => {
 };
 
 // Updated function to support pagination
-export const fetchChannelVideos = async (channelId, pageToken = null, maxResults = 1) => {
+export const fetchChannelVideos = async (channelId, pageToken = null, maxResults = 5) => {
   try {
     const uploadsPlaylistId = await fetchChannelUploadsPlaylistId(channelId);
     const result = await fetchVideosForChannel(uploadsPlaylistId, pageToken, maxResults);

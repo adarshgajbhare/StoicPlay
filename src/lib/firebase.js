@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // Import Firestore
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,11 +11,27 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: "G-L1KH2X9MPC"
-
 };
+
 const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
-export const provider = new GoogleAuthProvider();
-export const db = getFirestore(app); // Initialize Firestore
 
+// Enhanced Google provider with YouTube scope
+export const provider = new GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/youtube.readonly');
+provider.setCustomParameters({
+  'access_type': 'offline',
+  'prompt': 'consent'
+});
+
+export const db = getFirestore(app);
+
+// YouTube OAuth provider for existing users
+export const youtubeProvider = new GoogleAuthProvider();
+youtubeProvider.addScope('https://www.googleapis.com/auth/youtube.readonly');
+youtubeProvider.setCustomParameters({
+  'access_type': 'offline',
+  'prompt': 'consent',
+  'include_granted_scopes': 'true'
+});

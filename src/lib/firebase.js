@@ -17,21 +17,15 @@ const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 
-// Enhanced Google provider with YouTube scope
+// Default Google provider (existing login)
 export const provider = new GoogleAuthProvider();
-provider.addScope('https://www.googleapis.com/auth/youtube.readonly');
-provider.setCustomParameters({
-  'access_type': 'offline',
-  'prompt': 'consent'
-});
 
-export const db = getFirestore(app);
-
-// YouTube OAuth provider for existing users
+// YouTube provider with additional scope for subscriptions
 export const youtubeProvider = new GoogleAuthProvider();
 youtubeProvider.addScope('https://www.googleapis.com/auth/youtube.readonly');
 youtubeProvider.setCustomParameters({
-  'access_type': 'offline',
   'prompt': 'consent',
-  'include_granted_scopes': 'true'
+  'access_type': 'offline'
 });
+
+export const db = getFirestore(app);

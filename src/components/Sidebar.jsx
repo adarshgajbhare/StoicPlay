@@ -12,6 +12,7 @@ import {
   IconLayoutSidebar,
   IconAlertTriangle,
   IconChevronLeft,
+  IconBrandYoutube,
 } from "@tabler/icons-react";
 import {
   signOut,
@@ -70,7 +71,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
         await reauthenticateWithPopup(user, provider);
         const batch = writeBatch(db);
         
-        const collections = ["feeds", "playlists", "liked", "watchLater"];
+        const collections = ["feeds", "playlists", "liked", "watchLater", "userSubscriptions", "userTokens"];
         for (const collectionName of collections) {
           const q = query(
             collection(db, collectionName),
@@ -103,7 +104,12 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
       path: "/feeds",
       icon: <IconStack2 size={20} strokeWidth={1.5} />,
       isLink: true,
-    
+    },
+    {
+      name: "Subscriptions",
+      path: "/subscriptions",
+      icon: <IconBrandYoutube size={20} strokeWidth={1.5} />,
+      isLink: true,
     },
     {
       name: "Playlists",
@@ -185,7 +191,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
     return (
       <Link
         key={item.name}
-        to={item.path}
+        to={item.path || '#'}
         onClick={() => {
           if (item.isLink) navigate(item.path);
           if (onClose) onClose(); // Close the sidebar
@@ -275,6 +281,7 @@ export function Sidebar({ onImportClick, isOpen, onClose }) {
               <li>Your playlists</li>
               <li>Your watch history</li>
               <li>Your liked videos</li>
+              <li>Your YouTube subscriptions data</li>
               <li>All personalized settings</li>
             </ul>
             <div className="flex justify-end gap-3">

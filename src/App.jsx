@@ -13,6 +13,7 @@ import FeedPage from "./pages/FeedPage";
 // Add optimized components
 import FeedPageOptimized from "./pages/FeedPageOptimized";
 import HomePageOptimized from "./pages/HomePageOptimized";
+import SubscriptionsPage from "./pages/SubscriptionsPage";
 import PlaylistPage from "./pages/PlaylistPage";
 import LearnMorePage from "./pages/LearnMorePage";
 import ShareRedirect from "./components/ShareRedirect";
@@ -82,6 +83,16 @@ function App() {
               <PrivateRoute>
                 <Layout onImportClick={() => setShowImportModal(true)}>
                   <FeedComponent />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/subscriptions"
+            element={
+              <PrivateRoute>
+                <Layout onImportClick={() => setShowImportModal(true)}>
+                  <SubscriptionsPage />
                 </Layout>
               </PrivateRoute>
             }

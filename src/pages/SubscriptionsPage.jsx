@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import youtubeSubscriptionsService from '../services/youtubeSubscriptionsService';
+import simpleYouTubeService from '../services/simpleYoutubeService';
 import { 
   IconRefresh, 
   IconPlayerPlay, 
@@ -8,7 +8,11 @@ import {
   IconAlertCircle,
   IconBrandYoutube,
   IconArrowLeft,
-  IconExternalLink
+  IconExternalLink,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+  IconX
 } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 
@@ -17,11 +21,14 @@ function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasYouTubeAccess, setHasYouTubeAccess] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [channelVideos, setChannelVideos] = useState([]);
   const [loadingVideos, setLoadingVideos] = useState(false);
   const [error, setError] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -34,22 +41,8 @@ function SubscriptionsPage() {
       setLoading(true);
       setError(null);
       
-      // Check if user has YouTube access
-      const hasAccess = await youtubeSubscriptionsService.hasYouTubeAccess(user.uid);
-      setHasYouTubeAccess(hasAccess);
-      
-      if (hasAccess) {
-        const subs = await youtubeSubscriptionsService.getUserSubscriptions(user.uid);
-        if (subs) {
-          setSubscriptions(subs);
-        }
-      } else {
-        // Try to get cached subscriptions
-        const cached = await youtubeSubscriptionsService.getCachedSubscriptions(user.uid);
-        if (cached) {
-          setSubscriptions(cached.subscriptions);
-        }
-      }
+      const subs = await simpleYouTubeService.getUserSubscriptions(user.uid);
+      setSubscriptions(subs || []);
     } catch (error) {
       console.error('Error loading subscriptions:', error);
       setError(error.message);
@@ -59,34 +52,47 @@ function SubscriptionsPage() {
     }
   };
 
-  const requestYouTubeAccess = async () => {
+  const searchChannels = async () => {
+    if (!searchQuery.trim()) return;
+    
     try {
-      setLoading(true);
-      await youtubeSubscriptionsService.requestYouTubeAccess();
-      setHasYouTubeAccess(true);
-      toast.success('YouTube access granted!');
-      await loadSubscriptions();
+      setSearching(true);
+      const results = await simpleYouTubeService.searchChannels(searchQuery.trim());
+      setSearchResults(results);
     } catch (error) {
-      console.error('Error requesting YouTube access:', error);
-      toast.error('Failed to connect to YouTube. Please try again.');
+      console.error('Error searching channels:', error);
+      toast.error('Failed to search channels');
     } finally {
-      setLoading(false);
+      setSearching(false);
     }
   };
 
-  const refreshSubscriptions = async () => {
+  const addSubscription = async (channel) => {
     try {
-      setRefreshing(true);
-      const subs = await youtubeSubscriptionsService.getUserSubscriptions(user.uid, true);
-      if (subs) {
-        setSubscriptions(subs);
-        toast.success('Subscriptions refreshed!');
-      }
+      await simpleYouTubeService.addSubscription(user.uid, channel);
+      toast.success(`Subscribed to ${channel.title}!`);
+      await loadSubscriptions();
+      setShowAddModal(false);
+      setSearchQuery('');
+      setSearchResults([]);
     } catch (error) {
-      console.error('Error refreshing subscriptions:', error);
-      toast.error('Failed to refresh subscriptions');
-    } finally {
-      setRefreshing(false);
+      console.error('Error adding subscription:', error);
+      if (error.message.includes('Already subscribed')) {
+        toast.warn('You are already subscribed to this channel');
+      } else {
+        toast.error('Failed to add subscription');
+      }
+    }
+  };
+
+  const removeSubscription = async (channelId, channelTitle) => {
+    try {
+      await simpleYouTubeService.removeSubscription(user.uid, channelId);
+      toast.success(`Unsubscribed from ${channelTitle}`);
+      await loadSubscriptions();
+    } catch (error) {
+      console.error('Error removing subscription:', error);
+      toast.error('Failed to remove subscription');
     }
   };
 
@@ -95,16 +101,7 @@ function SubscriptionsPage() {
       setLoadingVideos(true);
       setSelectedChannel(channel);
       
-      const accessToken = await youtubeSubscriptionsService.getUserAccessToken(user.uid);
-      if (!accessToken) {
-        toast.error('Please reconnect to YouTube to view channel videos');
-        return;
-      }
-      
-      const videos = await youtubeSubscriptionsService.fetchChannelVideos(
-        channel.channelId, 
-        accessToken
-      );
+      const videos = await simpleYouTubeService.getChannelVideos(channel.channelId);
       setChannelVideos(videos);
     } catch (error) {
       console.error('Error loading channel videos:', error);
@@ -138,38 +135,6 @@ function SubscriptionsPage() {
     );
   }
 
-  // YouTube Access Required Screen
-  if (!hasYouTubeAccess && subscriptions.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#101010] flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          <IconBrandYoutube className="w-16 h-16 text-red-500 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Connect Your YouTube Account
-          </h2>
-          <p className="text-gray-400 mb-8">
-            To view your YouTube subscriptions, we need permission to access your YouTube account data.
-          </p>
-          <button
-            onClick={requestYouTubeAccess}
-            disabled={loading}
-            className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <IconLoader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <IconBrandYoutube className="w-5 h-5" />
-            )}
-            Connect YouTube Account
-          </button>
-          <p className="text-xs text-gray-500 mt-4">
-            We only request read-only access to your subscriptions
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   // Channel Videos View
   if (selectedChannel) {
     return (
@@ -197,6 +162,13 @@ function SubscriptionsPage() {
                 View on YouTube <IconExternalLink className="w-4 h-4" />
               </button>
             </div>
+            <button
+              onClick={() => removeSubscription(selectedChannel.channelId, selectedChannel.title)}
+              className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
+              <IconTrash className="w-4 h-4" />
+              Unsubscribe
+            </button>
           </div>
 
           {/* Videos Grid */}
@@ -258,25 +230,21 @@ function SubscriptionsPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            {hasYouTubeAccess && (
-              <button
-                onClick={refreshSubscriptions}
-                disabled={refreshing}
-                className="bg-gray-800 hover:bg-gray-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2"
-              >
-                <IconRefresh className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-            )}
-            {!hasYouTubeAccess && (
-              <button
-                onClick={requestYouTubeAccess}
-                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2"
-              >
-                <IconBrandYoutube className="w-4 h-4" />
-                Connect YouTube
-              </button>
-            )}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-lime-600 hover:bg-lime-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
+              <IconPlus className="w-4 h-4" />
+              Add Channel
+            </button>
+            <button
+              onClick={loadSubscriptions}
+              disabled={refreshing}
+              className="bg-gray-800 hover:bg-gray-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
+              <IconRefresh className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
           </div>
         </div>
 
@@ -296,10 +264,9 @@ function SubscriptionsPage() {
             {subscriptions.map((channel) => (
               <div
                 key={channel.id}
-                className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors cursor-pointer"
-                onClick={() => loadChannelVideos(channel)}
+                className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors cursor-pointer group"
               >
-                <div className="relative group">
+                <div className="relative" onClick={() => loadChannelVideos(channel)}>
                   <img
                     src={channel.thumbnail}
                     alt={channel.title}
@@ -310,9 +277,28 @@ function SubscriptionsPage() {
                   </div>
                 </div>
                 <div className="p-3">
-                  <h3 className="font-medium text-white text-sm line-clamp-2">
+                  <h3 className="font-medium text-white text-sm line-clamp-2 mb-2">
                     {channel.title}
                   </h3>
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={() => openChannelInYouTube(channel.channelId)}
+                      className="text-gray-400 hover:text-white text-xs flex items-center gap-1"
+                    >
+                      <IconExternalLink className="w-3 h-3" />
+                      YouTube
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSubscription(channel.id, channel.title);
+                      }}
+                      className="text-red-400 hover:text-red-300 p-1 rounded"
+                      title="Unsubscribe"
+                    >
+                      <IconTrash className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -321,25 +307,105 @@ function SubscriptionsPage() {
           !loading && (
             <div className="text-center py-12">
               <IconBrandYoutube className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-white mb-2">No Subscriptions Found</h3>
+              <h3 className="text-xl font-medium text-white mb-2">No Subscriptions Yet</h3>
               <p className="text-gray-400 mb-4">
-                {hasYouTubeAccess 
-                  ? "You don't seem to have any YouTube subscriptions." 
-                  : "Connect your YouTube account to view your subscriptions."
-                }
+                Start building your subscription list by adding your favorite channels.
               </p>
-              {!hasYouTubeAccess && (
-                <button
-                  onClick={requestYouTubeAccess}
-                  className="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
-                >
-                  Connect YouTube Account
-                </button>
-              )}
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-lime-600 hover:bg-lime-700 text-white py-2 px-6 rounded-lg font-medium transition-colors"
+              >
+                Add Your First Channel
+              </button>
             </div>
           )
         )}
       </div>
+
+      {/* Add Channel Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
+          <div className="bg-gray-900 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+              <h2 className="text-xl font-bold text-white">Add Channel</h2>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <IconX className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            
+            <div className="p-4">
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Search for channels..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && searchChannels()}
+                  className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-500"
+                />
+                <button
+                  onClick={searchChannels}
+                  disabled={searching || !searchQuery.trim()}
+                  className="bg-lime-600 hover:bg-lime-700 disabled:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  {searching ? (
+                    <IconLoader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <IconSearch className="w-4 h-4" />
+                  )}
+                  Search
+                </button>
+              </div>
+              
+              <div className="max-h-96 overflow-y-auto">
+                {searchResults.length > 0 ? (
+                  <div className="space-y-2">
+                    {searchResults.map((channel) => (
+                      <div key={channel.id} className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
+                        <img
+                          src={channel.thumbnail}
+                          alt={channel.title}
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-medium text-white">{channel.title}</h3>
+                          <p className="text-gray-400 text-sm line-clamp-2">{channel.description}</p>
+                        </div>
+                        <button
+                          onClick={() => addSubscription(channel)}
+                          className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm transition-colors"
+                        >
+                          Subscribe
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  searchQuery && !searching && (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">No channels found. Try a different search term.</p>
+                    </div>
+                  )
+                )}
+                
+                {!searchQuery && (
+                  <div className="text-center py-8">
+                    <IconSearch className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400">Search for channels to add to your subscriptions.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

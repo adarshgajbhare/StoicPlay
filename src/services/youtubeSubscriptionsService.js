@@ -29,9 +29,10 @@ class YouTubeSubscriptionsService {
       // Store the access token in Firestore for the user
       await this.storeUserTokens(user.uid, {
         accessToken: credential.oauthAccessToken,
-        refreshToken: credential.oauthRefreshToken,
-        expiresAt: Date.now() + (credential.oauthExpiresIn * 1000),
-        scope: credential.oauthIdToken ? 'youtube' : 'basic'
+        refreshToken: credential.oauthRefreshToken || null, // Handle undefined
+        expiresAt: Date.now() + ((credential.oauthExpiresIn || 3600) * 1000),
+        scope: 'youtube',
+        grantedAt: new Date().toISOString()
       });
 
       return credential.oauthAccessToken;
@@ -47,8 +48,18 @@ class YouTubeSubscriptionsService {
   async storeUserTokens(userId, tokenData) {
     try {
       const userTokenRef = doc(db, 'userTokens', userId);
+      
+      // Clean the token data to avoid undefined values
+      const cleanTokenData = {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken || null,
+        expiresAt: tokenData.expiresAt,
+        scope: tokenData.scope,
+        grantedAt: tokenData.grantedAt || new Date().toISOString()
+      };
+      
       await setDoc(userTokenRef, {
-        youtube: tokenData,
+        youtube: cleanTokenData,
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (error) {
@@ -69,10 +80,11 @@ class YouTubeSubscriptionsService {
         return null;
       }
 
-      const tokenData = tokenDoc.data().youtube;
+      const data = tokenDoc.data();
+      const tokenData = data?.youtube;
       
-      // Check if token is expired
-      if (tokenData && tokenData.expiresAt > Date.now()) {
+      // Check if token exists and is not expired
+      if (tokenData && tokenData.accessToken && tokenData.expiresAt > Date.now()) {
         return tokenData.accessToken;
       }
 
@@ -147,7 +159,8 @@ class YouTubeSubscriptionsService {
       await setDoc(userSubsRef, {
         subscriptions,
         lastUpdated: new Date().toISOString(),
-        totalCount: subscriptions.length
+        totalCount: subscriptions.length,
+        userId // Add userId for security rules
       });
     } catch (error) {
       console.error('Error caching subscriptions to Firestore:', error);
